@@ -11,372 +11,351 @@
     <!-- Chart.js CDN -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- Google Fonts Inter -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Inter', sans-serif; }
-        .tab-btn { transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); }
-        .tab-btn.active {
-            background-color: #0f172a;
+        body { font-family: 'Inter', sans-serif; background-color: #f0f2f5; }
+        .sidebar-item { transition: all 0.2s ease; }
+        .sidebar-item.active {
+            background-color: #1890ff;
             color: #ffffff;
-            box-shadow: 0 10px 15px -3px rgba(15, 23, 42, 0.2);
+            font-weight: 600;
         }
-        .card-hover { transition: transform 0.2s ease, box-shadow 0.2s ease; }
-        .card-hover:hover { transform: translateY(-2px); box-shadow: 0 12px 24px -10px rgba(0,0,0,0.08); }
         /* Custom Scrollbars */
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: #f1f5f9; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar { width: 5px; height: 5px; }
+        ::-webkit-scrollbar-track { background: #f0f2f5; }
+        ::-webkit-scrollbar-thumb { background: #ccc; border-radius: 4px; }
     </style>
 </head>
-<body class="bg-slate-100 text-slate-800 antialiased min-h-screen p-4 sm:p-6 lg:p-8">
+<body class="antialiased text-slate-700 min-h-screen flex">
 
-    <div class="max-w-[1600px] mx-auto space-y-6">
-
-        <!-- HEADER PRINCIPAL EJECUTIVO -->
-        <header class="bg-gradient-to-r from-slate-900 via-slate-800 to-indigo-950 text-white p-6 sm:p-8 rounded-3xl shadow-2xl flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 border border-slate-700/50">
-            <div class="flex items-center space-x-5">
-                <div class="p-3.5 bg-indigo-600/30 border border-indigo-400/30 rounded-2xl backdrop-blur-sm">
-                    <i data-lucide="building" class="w-8 h-8 text-indigo-400"></i>
-                </div>
-                <div>
-                    <div class="flex items-center space-x-3">
-                        <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">Control Presupuestal</h1>
-                        <span class="bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 text-[10px] uppercase font-bold px-2.5 py-0.5 rounded-full tracking-wider">Módulo Dirección</span>
-                    </div>
-                    <p class="text-xs sm:text-sm text-slate-300 font-medium mt-1">Consolidado Corporativo, Gestión de Egresos y Análisis Financiero</p>
-                </div>
+    <!-- 1. SIDEBAR NAVEGACIÓN LATERAL (ESTILO DASHBOARD MODERN) -->
+    <aside class="w-64 bg-[#001529] text-slate-300 flex flex-col shrink-0 min-h-screen shadow-xl z-20">
+        <!-- Logo Header -->
+        <div class="p-5 flex items-center space-x-3 border-b border-slate-800">
+            <div class="p-2 bg-blue-600 rounded-lg text-white">
+                <i data-lucide="pie-chart" class="w-6 h-6"></i>
             </div>
+            <div>
+                <h1 class="text-white font-bold text-base tracking-wide leading-tight">CorpBudget</h1>
+                <span class="text-[11px] text-slate-400 font-medium">Control Presupuestal</span>
+            </div>
+        </div>
 
-            <!-- SELECTOR DE EMPRESA -->
-            <div class="flex items-center space-x-3 bg-slate-900/90 p-2.5 rounded-2xl border border-slate-700/80 w-full lg:w-auto shadow-inner">
-                <span class="text-xs text-slate-400 font-semibold flex items-center space-x-2 pl-2">
-                    <i data-lucide="globe" class="w-4 h-4 text-indigo-400"></i>
-                    <span>Entidad:</span>
-                </span>
-                <select id="empresaSelect" onchange="cambiarEmpresa()" class="bg-slate-800 text-white text-xs sm:text-sm rounded-xl px-4 py-2 font-bold focus:outline-none focus:ring-2 focus:ring-indigo-500 border border-slate-600 cursor-pointer w-full lg:w-auto">
+        <!-- Menú de Opciones -->
+        <nav class="flex-1 px-3 py-4 space-y-1 text-xs">
+            <button onclick="cambiarPestana(1)" id="tab1" class="sidebar-item active w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800/60">
+                <i data-lucide="receipt" class="w-4 h-4"></i>
+                <span class="text-xs">Captura & Bitácora</span>
+            </button>
+            <button onclick="cambiarPestana(2)" id="tab2" class="sidebar-item w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800/60">
+                <i data-lucide="book-open" class="w-4 h-4"></i>
+                <span class="text-xs">Catálogo & Presupuestos</span>
+            </button>
+            <button onclick="cambiarPestana(3)" id="tab3" class="sidebar-item w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800/60">
+                <i data-lucide="layers" class="w-4 h-4"></i>
+                <span class="text-xs">Comparativo Consolidado</span>
+            </button>
+            <button onclick="cambiarPestana(4)" id="tab4" class="sidebar-item w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800/60">
+                <i data-lucide="line-chart" class="w-4 h-4"></i>
+                <span class="text-xs">Tablero de Dirección</span>
+            </button>
+        </nav>
+
+        <!-- Footer Sidebar -->
+        <div class="p-4 border-t border-slate-800 text-[11px] text-slate-500 text-center">
+            Módulo Dirección &copy; 2026
+        </div>
+    </aside>
+
+    <!-- CONTAINER PRINCIPAL -->
+    <div class="flex-1 flex flex-col min-w-0 h-screen overflow-y-auto">
+
+        <!-- 2. BARRA SUPERIOR (TOPBAR) -->
+        <header class="bg-white border-b border-slate-200 px-8 py-3.5 flex justify-between items-center sticky top-0 z-10">
+            <div class="flex items-center space-x-4">
+                <i data-lucide="menu" class="w-5 h-5 text-slate-400 cursor-pointer"></i>
+                <span class="text-xs font-semibold text-slate-400">Entidad Seleccionada:</span>
+                <select id="empresaSelect" onchange="cambiarEmpresa()" class="bg-slate-50 border border-slate-300 text-slate-800 text-xs rounded-lg px-3 py-1.5 font-bold focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer">
                     <option value="Carrduci">Carrduci S.A. de C.V.</option>
                     <option value="CarrduciMetal">Carrduci Metal</option>
                 </select>
             </div>
+
+            <div class="flex items-center space-x-5 text-slate-500">
+                <button onclick="exportarCSV()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs px-4 py-2 rounded-lg font-semibold flex items-center space-x-2 shadow-sm transition">
+                    <i data-lucide="download" class="w-3.5 h-3.5"></i>
+                    <span>Exportar CSV</span>
+                </button>
+                <div class="h-4 w-px bg-slate-200"></div>
+                <div class="flex items-center space-x-2 cursor-pointer">
+                    <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 font-bold flex items-center justify-center text-xs border border-blue-200">
+                        DIR
+                    </div>
+                    <span class="text-xs font-medium text-slate-700">Dirección General</span>
+                </div>
+            </div>
         </header>
 
-        <!-- NAVEGACIÓN TABS Y EXPORTAR -->
-        <nav class="bg-white p-2 rounded-2xl shadow-sm border border-slate-200/80 flex flex-col lg:flex-row justify-between items-center gap-3">
-            <div class="flex flex-wrap gap-2 text-xs sm:text-sm font-bold w-full lg:w-auto">
-                <button onclick="cambiarPestana(1)" id="tab1" class="tab-btn active px-5 py-3 rounded-xl flex items-center space-x-2">
-                    <i data-lucide="receipt" class="w-4 h-4"></i>
-                    <span>1. Captura & Bitácora</span>
-                </button>
-                <button onclick="cambiarPestana(2)" id="tab2" class="tab-btn text-slate-600 hover:bg-slate-100 px-5 py-3 rounded-xl flex items-center space-x-2">
-                    <i data-lucide="book-open" class="w-4 h-4"></i>
-                    <span>2. Catálogo & Presupuestos</span>
-                </button>
-                <button onclick="cambiarPestana(3)" id="tab3" class="tab-btn text-slate-600 hover:bg-slate-100 px-5 py-3 rounded-xl flex items-center space-x-2">
-                    <i data-lucide="layers" class="w-4 h-4"></i>
-                    <span>3. Comparativo Consolidado</span>
-                </button>
-                <button onclick="cambiarPestana(4)" id="tab4" class="tab-btn text-slate-600 hover:bg-slate-100 px-5 py-3 rounded-xl flex items-center space-x-2">
-                    <i data-lucide="line-chart" class="w-4 h-4"></i>
-                    <span>4. Tablero de Dirección</span>
-                </button>
-            </div>
-            <button onclick="exportarCSV()" class="w-full lg:w-auto bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm px-6 py-3 rounded-xl font-bold flex items-center justify-center space-x-2 shadow-md shadow-emerald-600/20 transition">
-                <i data-lucide="download" class="w-4 h-4"></i>
-                <span>Exportar Reporte CSV</span>
-            </button>
-        </nav>
+        <!-- 3. ÁREA DE CONTENIDO -->
+        <main class="p-8 space-y-6 flex-1">
 
-        <!-- KPIS GLOBALES PRINCIPALES -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200/80 card-hover flex justify-between items-center">
-                <div>
-                    <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Ingreso Global Aprobado</span>
-                    <div class="text-2xl font-extrabold text-slate-900 mt-1 font-mono" id="ingresoGlobal">$0.00</div>
+            <!-- KPIS SUPERIORES (ESTILO TARGETAS MINIMALISTAS) -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                <div class="bg-white p-5 rounded-xl border border-slate-200/80 shadow-sm relative">
+                    <span class="text-xs font-medium text-slate-400">Ingreso Global Aprobado</span>
+                    <div class="text-2xl font-bold text-slate-800 mt-2 font-mono" id="ingresoGlobal">$0.00</div>
+                    <i data-lucide="info" class="w-4 h-4 text-slate-300 absolute top-5 right-5"></i>
                 </div>
-                <div class="p-3 bg-indigo-50 rounded-xl text-indigo-600">
-                    <i data-lucide="wallet" class="w-6 h-6"></i>
+                <div class="bg-white p-5 rounded-xl border border-slate-200/80 shadow-sm relative">
+                    <span class="text-xs font-medium text-slate-400">Presupuesto Asignado</span>
+                    <div class="text-2xl font-bold text-blue-600 mt-2 font-mono" id="totalPresupuestado">$0.00</div>
+                    <i data-lucide="info" class="w-4 h-4 text-slate-300 absolute top-5 right-5"></i>
                 </div>
-            </div>
-            <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200/80 card-hover flex justify-between items-center">
-                <div>
-                    <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Presupuesto Asignado</span>
-                    <div class="text-2xl font-extrabold text-indigo-600 mt-1 font-mono" id="totalPresupuestado">$0.00</div>
+                <div class="bg-white p-5 rounded-xl border border-slate-200/80 shadow-sm relative">
+                    <span class="text-xs font-medium text-slate-400">Total Ejercido</span>
+                    <div class="text-2xl font-bold text-amber-500 mt-2 font-mono" id="totalEjercido">$0.00</div>
+                    <i data-lucide="info" class="w-4 h-4 text-slate-300 absolute top-5 right-5"></i>
                 </div>
-                <div class="p-3 bg-blue-50 rounded-xl text-blue-600">
-                    <i data-lucide="target" class="w-6 h-6"></i>
+                <div class="bg-white p-5 rounded-xl border border-slate-200/80 shadow-sm relative">
+                    <span class="text-xs font-medium text-slate-400">Disponible Remanente</span>
+                    <div class="text-2xl font-bold text-emerald-600 mt-2 font-mono" id="disponibleRemanente">$0.00</div>
+                    <i data-lucide="info" class="w-4 h-4 text-slate-300 absolute top-5 right-5"></i>
                 </div>
-            </div>
-            <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200/80 card-hover flex justify-between items-center">
-                <div>
-                    <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Total Ejercido</span>
-                    <div class="text-2xl font-extrabold text-amber-600 mt-1 font-mono" id="totalEjercido">$0.00</div>
-                </div>
-                <div class="p-3 bg-amber-50 rounded-xl text-amber-600">
-                    <i data-lucide="trending-down" class="w-6 h-6"></i>
-                </div>
-            </div>
-            <div class="bg-emerald-50/80 p-5 rounded-2xl shadow-sm border border-emerald-200/80 card-hover flex justify-between items-center">
-                <div>
-                    <span class="text-[11px] font-bold uppercase tracking-wider text-emerald-700">Disponible Remanente</span>
-                    <div class="text-2xl font-extrabold text-emerald-600 mt-1 font-mono" id="disponibleRemanente">$0.00</div>
-                </div>
-                <div class="p-3 bg-emerald-100/80 rounded-xl text-emerald-700">
-                    <i data-lucide="check-circle-2" class="w-6 h-6"></i>
-                </div>
-            </div>
-        </div>
-
-        <!-- SECCIONES DE CONTENIDO -->
-
-        <!-- PESTAÑA 1: CAPTURA Y PRESUPUESTO AMPLIO -->
-        <div id="pestana1" class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-            <!-- Formulario lateral -->
-            <div class="lg:col-span-4 bg-white p-6 rounded-2xl shadow-sm border border-slate-200/80 h-fit">
-                <div class="flex items-center space-x-2 pb-4 mb-4 border-b border-slate-100">
-                    <i data-lucide="plus-circle" class="w-5 h-5 text-emerald-600"></i>
-                    <h3 class="text-xs font-extrabold text-slate-800 uppercase tracking-wider" id="formTitulo">Registrar Nuevo Gasto</h3>
-                </div>
-                
-                <form onsubmit="registrarGasto(event)" class="space-y-4 text-xs">
-                    <div>
-                        <label class="block font-semibold text-slate-600 mb-1.5">Fecha de Transacción</label>
-                        <input type="date" id="inputFecha" required class="w-full border border-slate-300 rounded-xl p-3 bg-slate-50/50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-slate-900 transition font-medium text-slate-700">
-                    </div>
-                    <div>
-                        <label class="block font-semibold text-slate-600 mb-1.5">Código / Partida Asignada</label>
-                        <select id="selectPartida" required class="w-full border border-slate-300 rounded-xl p-3 bg-slate-50/50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-slate-900 transition font-medium text-slate-700">
-                            <option value="">Seleccionar partida...</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block font-semibold text-slate-600 mb-1.5">Concepto / Descripción del Pago</label>
-                        <input type="text" id="inputConcepto" required placeholder="Ej. Factura de mantenimiento equipos" class="w-full border border-slate-300 rounded-xl p-3 bg-slate-50/50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-slate-900 transition font-medium text-slate-700">
-                    </div>
-                    <div>
-                        <label class="block font-semibold text-slate-600 mb-1.5">Monto Importe ($ MXN)</label>
-                        <input type="number" step="0.01" id="inputMonto" required placeholder="0.00" class="w-full border border-slate-300 rounded-xl p-3 bg-slate-50/50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-slate-900 transition font-semibold text-slate-800 text-sm">
-                    </div>
-                    <div>
-                        <label class="block font-semibold text-slate-600 mb-1.5">Comprobante (Opcional)</label>
-                        <input type="file" class="w-full border border-slate-300 rounded-xl p-2 bg-slate-50/50 text-slate-500 text-xs">
-                    </div>
-                    <button type="submit" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-3.5 rounded-xl text-xs shadow-lg transition">
-                        Aceptar y Registrar Gasto
-                    </button>
-                </form>
             </div>
 
-            <!-- Tablas Principales de Presentación -->
-            <div class="lg:col-span-8 space-y-6">
-                <!-- PRESUPUESTO AMPLIO PRESENTACIÓN -->
-                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200/80">
-                    <div class="flex justify-between items-center mb-5 pb-3 border-b border-slate-100">
+            <!-- PESTAÑA 1: CAPTURA Y BITÁCORA -->
+            <div id="pestana1" class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- Formulario Sidebar -->
+                <div class="lg:col-span-4 bg-white p-6 rounded-xl border border-slate-200/80 shadow-sm h-fit">
+                    <div class="flex items-center space-x-2 pb-3 mb-4 border-b border-slate-100">
+                        <i data-lucide="plus-circle" class="w-4 h-4 text-blue-600"></i>
+                        <h3 class="text-xs font-bold text-slate-700 uppercase" id="formTitulo">Registrar Nuevo Gasto</h3>
+                    </div>
+                    <form onsubmit="registrarGasto(event)" class="space-y-4 text-xs">
                         <div>
-                            <h3 class="text-sm font-extrabold text-slate-900 uppercase tracking-wider" id="presupuestoTitulo">Estado del Presupuesto Individual</h3>
-                            <p class="text-xs text-slate-400 mt-0.5">Vista ampliada para exposición directiva</p>
+                            <label class="block font-medium text-slate-500 mb-1">Fecha de Transacción</label>
+                            <input type="date" id="inputFecha" required class="w-full border border-slate-200 rounded-lg p-2.5 bg-slate-50 focus:bg-white focus:outline-none focus:ring-1 focus:ring-blue-500 text-slate-700">
                         </div>
-                        <span class="bg-slate-100 text-slate-700 font-mono font-bold text-xs px-3 py-1 rounded-full border border-slate-200">
-                            Vista Directiva
-                        </span>
-                    </div>
-                    
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left border-collapse">
-                            <thead>
-                                <tr class="border-b-2 border-slate-200 text-slate-500 font-bold uppercase text-[11px] tracking-wider">
-                                    <th class="py-3 px-3">Código</th>
-                                    <th class="py-3 px-3">Rubro / Partida</th>
-                                    <th class="py-3 px-3 text-right">Presupuestado</th>
-                                    <th class="py-3 px-3 text-right">Gasto Real</th>
-                                    <th class="py-3 px-3 text-right">Disponible</th>
-                                    <th class="py-3 px-4 text-center w-36">% Avance</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tablaPresupuesto" class="divide-y divide-slate-100 text-xs font-medium"></tbody>
-                        </table>
-                    </div>
+                        <div>
+                            <label class="block font-medium text-slate-500 mb-1">Código / Partida Asignada</label>
+                            <select id="selectPartida" required class="w-full border border-slate-200 rounded-lg p-2.5 bg-slate-50 focus:bg-white focus:outline-none focus:ring-1 focus:ring-blue-500 text-slate-700">
+                                <option value="">Seleccionar partida...</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block font-medium text-slate-500 mb-1">Concepto / Descripción del Pago</label>
+                            <input type="text" id="inputConcepto" required placeholder="Ej. Factura de mantenimiento" class="w-full border border-slate-200 rounded-lg p-2.5 bg-slate-50 focus:bg-white focus:outline-none focus:ring-1 focus:ring-blue-500 text-slate-700">
+                        </div>
+                        <div>
+                            <label class="block font-medium text-slate-500 mb-1">Monto Importe ($ MXN)</label>
+                            <input type="number" step="0.01" id="inputMonto" required placeholder="0.00" class="w-full border border-slate-200 rounded-lg p-2.5 bg-slate-50 focus:bg-white focus:outline-none focus:ring-1 focus:ring-blue-500 text-slate-800 font-semibold">
+                        </div>
+                        <div>
+                            <label class="block font-medium text-slate-500 mb-1">Comprobante (Opcional)</label>
+                            <input type="file" class="w-full border border-slate-200 rounded-lg p-2 bg-slate-50 text-slate-500 text-xs">
+                        </div>
+                        <button type="submit" class="w-full bg-[#001529] hover:bg-slate-800 text-white font-semibold py-3 rounded-lg text-xs transition shadow-sm">
+                            Aceptar y Registrar Gasto
+                        </button>
+                    </form>
                 </div>
 
-                <!-- BITÁCORA DE GASTOS -->
-                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200/80">
-                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4 pb-3 border-b border-slate-100">
-                        <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Bitácora General de Operaciones</h3>
-                        <div class="flex items-center space-x-2 text-xs w-full sm:w-auto">
-                            <select id="filtroCodigo" onchange="renderizarTablas()" class="border border-slate-300 rounded-xl px-3 py-1.5 bg-slate-50 font-medium text-slate-700 focus:outline-none">
-                                <option value="">-- Todas las Partidas --</option>
-                            </select>
-                            <button onclick="limpiarGastos()" class="text-red-600 hover:text-red-700 font-bold text-xs px-2 py-1">Vaciar Registros</button>
+                <!-- Tablas Principales -->
+                <div class="lg:col-span-8 space-y-6">
+                    <!-- PRESUPUESTO INDIVIDUAL -->
+                    <div class="bg-white p-6 rounded-xl border border-slate-200/80 shadow-sm">
+                        <div class="flex justify-between items-center mb-4 pb-3 border-b border-slate-100">
+                            <div>
+                                <h3 class="text-xs font-bold text-slate-700 uppercase" id="presupuestoTitulo">Estado del Presupuesto Individual</h3>
+                                <p class="text-[11px] text-slate-400">Vista ampliada para exposición directiva</p>
+                            </div>
+                            <span class="bg-slate-100 text-slate-600 font-mono font-bold text-[11px] px-2.5 py-1 rounded">
+                                Vista Directiva
+                            </span>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr class="border-b border-slate-200 text-slate-400 font-semibold text-[11px] uppercase">
+                                        <th class="py-3 px-3">Código</th>
+                                        <th class="py-3 px-3">Rubro / Partida</th>
+                                        <th class="py-3 px-3 text-right">Presupuestado</th>
+                                        <th class="py-3 px-3 text-right">Gasto Real</th>
+                                        <th class="py-3 px-3 text-right">Disponible</th>
+                                        <th class="py-3 px-4 text-center w-36">% Avance</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tablaPresupuesto" class="divide-y divide-slate-100 text-xs"></tbody>
+                            </table>
                         </div>
                     </div>
+
+                    <!-- BITÁCORA DE GASTOS -->
+                    <div class="bg-white p-6 rounded-xl border border-slate-200/80 shadow-sm">
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4 pb-3 border-b border-slate-100">
+                            <h3 class="text-xs font-bold text-slate-700 uppercase">Bitácora General de Operaciones</h3>
+                            <div class="flex items-center space-x-2 text-xs w-full sm:w-auto">
+                                <select id="filtroCodigo" onchange="renderizarTablas()" class="border border-slate-200 rounded-lg px-2.5 py-1 bg-slate-50 text-slate-700 focus:outline-none">
+                                    <option value="">-- Todas las Partidas --</option>
+                                </select>
+                                <button onclick="limpiarGastos()" class="text-red-500 hover:text-red-700 font-semibold text-xs px-2 py-1">Vaciar Registros</button>
+                            </div>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs">
+                                <thead>
+                                    <tr class="border-b border-slate-200 text-slate-400 font-semibold uppercase text-[10px]">
+                                        <th class="py-2.5 px-2">Fecha</th>
+                                        <th class="py-2.5 px-2">Código</th>
+                                        <th class="py-2.5 px-2">Concepto</th>
+                                        <th class="py-2.5 px-2 text-right">Monto Importe</th>
+                                        <th class="py-2.5 px-2 text-center">Acción</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tablaBitacora" class="divide-y divide-slate-100 text-slate-700"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PESTAÑA 2: CATÁLOGO Y CONFIGURACIÓN -->
+            <div id="pestana2" class="grid grid-cols-1 lg:grid-cols-3 gap-6 hidden">
+                <div class="bg-white p-6 rounded-xl border border-slate-200/80 shadow-sm h-fit">
+                    <h3 class="text-xs font-bold text-slate-700 uppercase mb-4 pb-3 border-b border-slate-100">Alta de Partida Contable</h3>
+                    <form onsubmit="agregarPartida(event)" class="space-y-4 text-xs">
+                        <div>
+                            <label class="block font-medium text-slate-500 mb-1">Código Contable</label>
+                            <input type="text" id="nuevoCodigo" required placeholder="Ej. 605-01" class="w-full border border-slate-200 rounded-lg p-2.5 bg-slate-50">
+                        </div>
+                        <div>
+                            <label class="block font-medium text-slate-500 mb-1">Descripción del Rubro</label>
+                            <input type="text" id="nuevaDescripcion" required placeholder="Ej. Gastos de Representación" class="w-full border border-slate-200 rounded-lg p-2.5 bg-slate-50">
+                        </div>
+                        <div>
+                            <label class="block font-medium text-slate-500 mb-1">Presupuesto Asignado ($)</label>
+                            <input type="number" step="0.01" id="nuevoMonto" required placeholder="0.00" class="w-full border border-slate-200 rounded-lg p-2.5 bg-slate-50">
+                        </div>
+                        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg text-xs transition shadow-sm">
+                            Guardar en Catálogo
+                        </button>
+                    </form>
+                </div>
+
+                <div class="lg:col-span-2 bg-white p-6 rounded-xl border border-slate-200/80 shadow-sm">
+                    <h3 class="text-xs font-bold text-slate-700 uppercase mb-4 pb-3 border-b border-slate-100">Catálogo de Partidas Asignadas</h3>
                     <div class="overflow-x-auto">
                         <table class="w-full text-left text-xs">
                             <thead>
-                                <tr class="border-b border-slate-200 text-slate-400 font-bold uppercase text-[10px]">
-                                    <th class="py-2.5 px-2">Fecha</th>
+                                <tr class="border-b border-slate-200 text-slate-400 font-semibold uppercase text-[10px]">
                                     <th class="py-2.5 px-2">Código</th>
-                                    <th class="py-2.5 px-2">Concepto</th>
-                                    <th class="py-2.5 px-2 text-right">Monto Importe</th>
-                                    <th class="py-2.5 px-2 text-center">Acción</th>
+                                    <th class="py-2.5 px-2">Descripción</th>
+                                    <th class="py-2.5 px-2 text-right">Presupuesto Asignado</th>
+                                    <th class="py-2.5 px-2 text-center">Acciones</th>
                                 </tr>
                             </thead>
-                            <tbody id="tablaBitacora" class="divide-y divide-slate-100 text-slate-700 font-medium"></tbody>
+                            <tbody id="tablaCatalogo" class="divide-y divide-slate-100 text-slate-700"></tbody>
                         </table>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- PESTAÑA 2: CATÁLOGO Y CONFIGURACIÓN -->
-        <div id="pestana2" class="grid grid-cols-1 lg:grid-cols-3 gap-6 hidden">
-            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200/80 h-fit">
-                <h3 class="text-xs font-bold text-slate-800 uppercase tracking-wider mb-4 pb-3 border-b border-slate-100">Alta de Partida Contable</h3>
-                <form onsubmit="agregarPartida(event)" class="space-y-4 text-xs">
+            <!-- PESTAÑA 3: COMPARATIVO CONSOLIDADO -->
+            <div id="pestana3" class="bg-white p-6 rounded-xl border border-slate-200/80 shadow-sm hidden">
+                <div class="mb-4 pb-3 border-b border-slate-100 flex justify-between items-center">
                     <div>
-                        <label class="block font-semibold text-slate-600 mb-1.5">Código Contable</label>
-                        <input type="text" id="nuevoCodigo" required placeholder="Ej. 605-01" class="w-full border border-slate-300 rounded-xl p-3 bg-slate-50/50">
+                        <h3 class="text-xs font-bold text-slate-700 uppercase">Consolidado Multiempresa</h3>
+                        <p class="text-[11px] text-slate-400">Comparativa Global: Carrduci S.A. vs Carrduci Metal</p>
                     </div>
-                    <div>
-                        <label class="block font-semibold text-slate-600 mb-1.5">Descripción del Rubro</label>
-                        <input type="text" id="nuevaDescripcion" required placeholder="Ej. Gastos de Representación" class="w-full border border-slate-300 rounded-xl p-3 bg-slate-50/50">
-                    </div>
-                    <div>
-                        <label class="block font-semibold text-slate-600 mb-1.5">Presupuesto Asignado ($)</label>
-                        <input type="number" step="0.01" id="nuevoMonto" required placeholder="0.00" class="w-full border border-slate-300 rounded-xl p-3 bg-slate-50/50">
-                    </div>
-                    <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3.5 rounded-xl text-xs transition shadow-md shadow-indigo-600/20">
-                        Guardar en Catálogo
-                    </button>
-                </form>
-            </div>
-
-            <div class="lg:col-span-2 bg-white p-6 rounded-2xl shadow-sm border border-slate-200/80">
-                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">Catálogo de Partidas Asignadas</h3>
+                    <span class="bg-blue-50 text-blue-600 text-[11px] font-semibold px-2.5 py-1 rounded border border-blue-100">Visión Corporativa</span>
+                </div>
                 <div class="overflow-x-auto">
                     <table class="w-full text-left text-xs">
                         <thead>
-                            <tr class="border-b border-slate-200 text-slate-400 font-bold uppercase text-[10px]">
-                                <th class="py-2.5 px-2">Código</th>
-                                <th class="py-2.5 px-2">Descripción</th>
-                                <th class="py-2.5 px-2 text-right">Presupuesto Asignado</th>
-                                <th class="py-2.5 px-2 text-center">Acciones</th>
+                            <tr class="bg-slate-100 text-slate-600 uppercase text-[10px] font-bold">
+                                <th class="py-3 px-4 rounded-l">Código</th>
+                                <th class="py-3 px-4">Concepto Rubro</th>
+                                <th class="py-3 px-4 text-right">Presupuesto Total</th>
+                                <th class="py-3 px-4 text-right">Gasto Carrduci</th>
+                                <th class="py-3 px-4 text-right">Gasto Carrduci Metal</th>
+                                <th class="py-3 px-4 text-right">Gasto Acumulado</th>
+                                <th class="py-3 px-4 text-right rounded-r">Disponible Global</th>
                             </tr>
                         </thead>
-                        <tbody id="tablaCatalogo" class="divide-y divide-slate-100 text-slate-700 font-medium"></tbody>
+                        <tbody id="tablaConsolidado" class="divide-y divide-slate-100 text-slate-700"></tbody>
                     </table>
                 </div>
             </div>
-        </div>
 
-        <!-- PESTAÑA 3: COMPARATIVO CONSOLIDADO -->
-        <div id="pestana3" class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200/80 hidden">
-            <div class="mb-4 pb-3 border-b border-slate-100 flex justify-between items-center">
-                <div>
-                    <h3 class="text-sm font-extrabold text-slate-900 uppercase tracking-wider">Consolidado Multiempresa</h3>
-                    <p class="text-xs text-slate-400">Comparativa Global: Carrduci S.A. vs Carrduci Metal</p>
-                </div>
-                <span class="bg-indigo-50 text-indigo-700 text-xs font-bold px-3 py-1 rounded-full border border-indigo-100">Visión Corporativa</span>
-            </div>
-            <div class="overflow-x-auto">
-                <table class="w-full text-left text-xs">
-                    <thead>
-                        <tr class="bg-slate-900 text-white uppercase text-[10px] tracking-wider">
-                            <th class="py-3.5 px-4 rounded-l-xl">Código</th>
-                            <th class="py-3.5 px-4">Concepto Rubro</th>
-                            <th class="py-3.5 px-4 text-right">Presupuesto Total</th>
-                            <th class="py-3.5 px-4 text-right">Gasto Carrduci</th>
-                            <th class="py-3.5 px-4 text-right">Gasto Carrduci Metal</th>
-                            <th class="py-3.5 px-4 text-right">Gasto Acumulado</th>
-                            <th class="py-3.5 px-4 text-right rounded-r-xl">Disponible Global</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tablaConsolidado" class="divide-y divide-slate-100 text-slate-700 font-medium"></tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- PESTAÑA 4: TABLERO DE DIRECCIÓN EJECUTIVO -->
-        <div id="pestana4" class="space-y-6 hidden">
-            
-            <!-- PANEL DE FILTRO MULTI-CÓDIGO Y KPIS DE DIRECCIÓN -->
-            <div class="bg-slate-900 text-white p-6 rounded-2xl shadow-xl border border-slate-800 space-y-6">
-                <div class="flex flex-col lg:flex-row justify-between lg:items-center gap-4 pb-4 border-b border-slate-800">
-                    <div>
-                        <h3 class="text-base font-extrabold text-white flex items-center space-x-2">
-                            <i data-lucide="sliders" class="w-5 h-5 text-indigo-400"></i>
-                            <span>Filtro de Análisis Directivo</span>
-                        </h3>
-                        <p class="text-xs text-slate-400 mt-0.5">Selecciona uno o múltiples códigos para filtrar los gráficos y métricas</p>
+            <!-- PESTAÑA 4: TABLERO DE DIRECCIÓN -->
+            <div id="pestana4" class="space-y-6 hidden">
+                
+                <!-- FILTRO Y SELECCIÓN DE CÓDIGOS -->
+                <div class="bg-white p-6 rounded-xl border border-slate-200/80 shadow-sm space-y-4">
+                    <div class="flex flex-col lg:flex-row justify-between lg:items-center gap-3 pb-3 border-b border-slate-100">
+                        <div>
+                            <h3 class="text-xs font-bold text-slate-700 uppercase flex items-center space-x-2">
+                                <i data-lucide="sliders" class="w-4 h-4 text-blue-600"></i>
+                                <span>Filtro de Análisis Directivo</span>
+                            </h3>
+                            <p class="text-[11px] text-slate-400 mt-0.5">Selecciona uno o múltiples códigos para filtrar gráficos y métricas</p>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <button onclick="seleccionarTodosCodigos(true)" class="text-[11px] bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold px-3 py-1 rounded transition border border-slate-200">Seleccionar Todos</button>
+                            <button onclick="seleccionarTodosCodigos(false)" class="text-[11px] bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold px-3 py-1 rounded transition border border-slate-200">Desmarcar Todos</button>
+                        </div>
                     </div>
-                    
-                    <div class="flex items-center space-x-2">
-                        <button onclick="seleccionarTodosCodigos(true)" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold px-3 py-1.5 rounded-lg transition border border-slate-700">Seleccionar Todos</button>
-                        <button onclick="seleccionarTodosCodigos(false)" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold px-3 py-1.5 rounded-lg transition border border-slate-700">Desmarcar Todos</button>
+                    <div id="contenedorFiltroCodigos" class="flex flex-wrap gap-2 text-xs"></div>
+                </div>
+
+                <!-- KPIS ESPECÍFICOS DE TABLERO -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                    <div class="bg-white p-5 rounded-xl border border-slate-200/80 shadow-sm">
+                        <span class="text-xs font-medium text-slate-400">Ejecución del Presupuesto</span>
+                        <div class="text-2xl font-bold text-slate-800 mt-1 font-mono" id="kpiPorcentajeAvance">0%</div>
+                        <div class="w-full bg-slate-100 h-2 rounded-full mt-3 overflow-hidden">
+                            <div id="kpiBarraPorcentaje" class="bg-blue-600 h-full rounded-full" style="width: 0%"></div>
+                        </div>
                     </div>
-                </div>
-
-                <!-- Lista Checkboxes de Códigos -->
-                <div id="contenedorFiltroCodigos" class="flex flex-wrap gap-2 text-xs">
-                    <!-- Se genera dinámicamente -->
-                </div>
-            </div>
-
-            <!-- KPIS ADICIONALES PARA EXPOSICIÓN -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200/80 card-hover">
-                    <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Ejecución del Presupuesto</span>
-                    <div class="text-2xl font-extrabold text-slate-900 mt-1 font-mono" id="kpiPorcentajeAvance">0%</div>
-                    <div class="w-full bg-slate-100 h-2 rounded-full mt-3 overflow-hidden">
-                        <div id="kpiBarraPorcentaje" class="bg-indigo-600 h-full rounded-full" style="width: 0%"></div>
+                    <div class="bg-white p-5 rounded-xl border border-slate-200/80 shadow-sm">
+                        <span class="text-xs font-medium text-slate-400">Gasto Promedio por Partida</span>
+                        <div class="text-2xl font-bold text-slate-800 mt-1 font-mono" id="kpiPromedioGasto">$0.00</div>
+                        <span class="text-[10px] text-slate-400 mt-2 block">Promedio de partidas seleccionadas</span>
+                    </div>
+                    <div class="bg-white p-5 rounded-xl border border-slate-200/80 shadow-sm">
+                        <span class="text-xs font-medium text-slate-400">Partida Mayor Impacto</span>
+                        <div class="text-base font-bold text-slate-800 mt-1 truncate" id="kpiPartidaMayor">N/A</div>
+                        <span class="text-[10px] text-amber-500 font-semibold mt-1 block" id="kpiPartidaMayorMonto">$0.00</span>
+                    </div>
+                    <div class="bg-white p-5 rounded-xl border border-slate-200/80 shadow-sm">
+                        <span class="text-xs font-medium text-slate-400">Transacciones Filtradas</span>
+                        <div class="text-2xl font-bold text-slate-800 mt-1 font-mono" id="kpiNumTransacciones">0</div>
+                        <span class="text-[10px] text-slate-400 mt-2 block">Operaciones en la selección</span>
                     </div>
                 </div>
 
-                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200/80 card-hover">
-                    <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Gasto Promedio por Partida</span>
-                    <div class="text-2xl font-extrabold text-slate-900 mt-1 font-mono" id="kpiPromedioGasto">$0.00</div>
-                    <span class="text-[10px] text-slate-400 mt-2 block">Promedio filtrado</span>
-                </div>
-
-                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200/80 card-hover">
-                    <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Partida Mayor Impacto</span>
-                    <div class="text-lg font-bold text-slate-900 mt-1 truncate" id="kpiPartidaMayor">N/A</div>
-                    <span class="text-[10px] text-amber-600 font-semibold mt-1 block" id="kpiPartidaMayorMonto">$0.00</span>
-                </div>
-
-                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200/80 card-hover">
-                    <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Transacciones Filtradas</span>
-                    <div class="text-2xl font-extrabold text-slate-900 mt-1 font-mono" id="kpiNumTransacciones">0</div>
-                    <span class="text-[10px] text-slate-400 mt-2 block">Operaciones registradas</span>
-                </div>
-            </div>
-
-            <!-- GRÁFICAS DEL TABLERO -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200/80">
-                    <h3 class="text-sm font-bold text-slate-800 mb-4 flex items-center justify-between">
-                        <span>Presupuesto vs Gasto por Partida</span>
-                        <span class="text-xs font-normal text-slate-400">(Códigos Seleccionados)</span>
-                    </h3>
-                    <div class="h-80">
-                        <canvas id="chartBarras"></canvas>
+                <!-- GRÁFICAS -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="bg-white p-6 rounded-xl border border-slate-200/80 shadow-sm">
+                        <h3 class="text-xs font-bold text-slate-700 uppercase mb-4">Presupuesto vs Gasto Real</h3>
+                        <div class="h-80">
+                            <canvas id="chartBarras"></canvas>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-slate-200/80 shadow-sm">
+                        <h3 class="text-xs font-bold text-slate-700 uppercase mb-4">Distribución de Egresos</h3>
+                        <div class="h-80 flex justify-center">
+                            <canvas id="chartDona"></canvas>
+                        </div>
                     </div>
                 </div>
 
-                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200/80">
-                    <h3 class="text-sm font-bold text-slate-800 mb-4 flex items-center justify-between">
-                        <span>Distribución de Egresos</span>
-                        <span class="text-xs font-normal text-slate-400">(Partidas Filtradas)</span>
-                    </h3>
-                    <div class="h-80 flex justify-center">
-                        <canvas id="chartDona"></canvas>
-                    </div>
-                </div>
             </div>
 
-        </div>
-
+        </main>
     </div>
 
-    <!-- JAVASCRIPT DINÁMICO MULTI-PESTAÑA -->
+    <!-- JAVASCRIPT LÓGICO INTRACTO -->
     <script>
         lucide.createIcons();
 
@@ -526,7 +505,6 @@
             const tBit = document.getElementById('tablaBitacora');
             const filtro = document.getElementById('filtroCodigo').value;
 
-            // PRESUPUESTO AMPLIO DE PRESENTACIÓN
             tPres.innerHTML = '';
             baseDatos[empresaActual].partidas.forEach(p => {
                 const g = baseDatos[empresaActual].gastos.filter(x => x.codigo === p.codigo).reduce((a,b)=>a+b.monto,0);
@@ -539,23 +517,22 @@
 
                 tPres.innerHTML += `
                 <tr class="hover:bg-slate-50 transition border-b border-slate-100">
-                    <td class="py-4 px-3 font-extrabold text-slate-900 font-mono">${p.codigo}</td>
-                    <td class="py-4 px-3 text-slate-700 font-semibold">${p.descripcion}</td>
-                    <td class="py-4 px-3 text-right font-bold text-slate-800 font-mono">$${p.monto.toLocaleString('en-US',{minimumFractionDigits:2})}</td>
-                    <td class="py-4 px-3 text-right font-bold text-amber-600 font-mono">$${g.toLocaleString('en-US',{minimumFractionDigits:2})}</td>
-                    <td class="py-4 px-3 text-right font-extrabold font-mono ${r<0?'text-red-600':'text-emerald-600'}">$${r.toLocaleString('en-US',{minimumFractionDigits:2})}</td>
-                    <td class="py-4 px-4 text-center">
+                    <td class="py-3.5 px-3 font-bold text-slate-800 font-mono">${p.codigo}</td>
+                    <td class="py-3.5 px-3 text-slate-600 font-medium">${p.descripcion}</td>
+                    <td class="py-3.5 px-3 text-right font-semibold text-slate-700 font-mono">$${p.monto.toLocaleString('en-US',{minimumFractionDigits:2})}</td>
+                    <td class="py-3.5 px-3 text-right font-semibold text-amber-600 font-mono">$${g.toLocaleString('en-US',{minimumFractionDigits:2})}</td>
+                    <td class="py-3.5 px-3 text-right font-bold font-mono ${r<0?'text-red-500':'text-emerald-600'}">$${r.toLocaleString('en-US',{minimumFractionDigits:2})}</td>
+                    <td class="py-3.5 px-4 text-center">
                         <div class="flex items-center space-x-2">
-                            <div class="w-full bg-slate-100 rounded-full h-2.5 overflow-hidden">
-                                <div class="${colorBarra} h-2.5 rounded-full" style="width: ${porcentaje}%"></div>
+                            <div class="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
+                                <div class="${colorBarra} h-2 rounded-full" style="width: ${porcentaje}%"></div>
                             </div>
-                            <span class="text-[11px] font-bold text-slate-600 w-8">${porcentaje}%</span>
+                            <span class="text-[11px] font-bold text-slate-500 w-8">${porcentaje}%</span>
                         </div>
                     </td>
                 </tr>`;
             });
 
-            // BITÁCORA DE GASTOS
             tBit.innerHTML = '';
             let lista = baseDatos[empresaActual].gastos;
             if(filtro) lista = lista.filter(x => x.codigo === filtro);
@@ -565,12 +542,12 @@
             } else {
                 lista.forEach(g => {
                     tBit.innerHTML += `
-                    <tr class="hover:bg-slate-50/80 transition">
-                        <td class="py-3 px-2 font-mono text-slate-500">${g.fecha}</td>
-                        <td class="px-2 font-extrabold text-slate-900 font-mono">${g.codigo}</td>
-                        <td class="px-2">${g.concepto}</td>
-                        <td class="px-2 text-right font-bold text-amber-600 font-mono">$${g.monto.toLocaleString('en-US',{minimumFractionDigits:2})}</td>
-                        <td class="px-2 text-center"><button onclick="borrarGasto(${g.id})" class="text-slate-400 hover:text-red-600 font-bold px-2 py-1 transition">✕</button></td>
+                    <tr class="hover:bg-slate-50 transition">
+                        <td class="py-2.5 px-2 font-mono text-slate-500">${g.fecha}</td>
+                        <td class="px-2 font-bold text-slate-800 font-mono">${g.codigo}</td>
+                        <td class="px-2 text-slate-600">${g.concepto}</td>
+                        <td class="px-2 text-right font-semibold text-amber-600 font-mono">$${g.monto.toLocaleString('en-US',{minimumFractionDigits:2})}</td>
+                        <td class="px-2 text-center"><button onclick="borrarGasto(${g.id})" class="text-slate-400 hover:text-red-500 font-bold px-2 py-1 transition">✕</button></td>
                     </tr>`;
                 });
             }
@@ -582,10 +559,10 @@
             baseDatos[empresaActual].partidas.forEach(p => {
                 tCat.innerHTML += `
                 <tr class="hover:bg-slate-50 transition">
-                    <td class="py-3 px-2 font-bold text-slate-900 font-mono">${p.codigo}</td>
-                    <td class="px-2">${p.descripcion}</td>
-                    <td class="px-2 text-right font-bold text-slate-800 font-mono">$${p.monto.toLocaleString('en-US',{minimumFractionDigits:2})}</td>
-                    <td class="px-2 text-center"><button onclick="borrarPartida('${p.codigo}')" class="bg-red-50 text-red-600 hover:bg-red-100 font-bold px-3 py-1 rounded-lg text-xs transition">Eliminar</button></td>
+                    <td class="py-3 px-2 font-bold text-slate-800 font-mono">${p.codigo}</td>
+                    <td class="px-2 text-slate-600">${p.descripcion}</td>
+                    <td class="px-2 text-right font-semibold text-slate-700 font-mono">$${p.monto.toLocaleString('en-US',{minimumFractionDigits:2})}</td>
+                    <td class="px-2 text-center"><button onclick="borrarPartida('${p.codigo}')" class="text-red-500 hover:bg-red-50 font-semibold px-2.5 py-1 rounded text-xs transition">Eliminar</button></td>
                 </tr>`;
             });
         }
@@ -616,18 +593,16 @@
 
                 tCon.innerHTML += `
                 <tr class="hover:bg-slate-50 transition">
-                    <td class="py-3.5 px-4 font-bold text-slate-900 font-mono">${m.cod}</td>
-                    <td class="py-3.5 px-4">${m.desc}</td>
-                    <td class="py-3.5 px-4 text-right font-semibold font-mono">$${presTot.toLocaleString('en-US',{minimumFractionDigits:2})}</td>
+                    <td class="py-3.5 px-4 font-bold text-slate-800 font-mono">${m.cod}</td>
+                    <td class="py-3.5 px-4 text-slate-600">${m.desc}</td>
+                    <td class="py-3.5 px-4 text-right font-semibold font-mono text-slate-700">$${presTot.toLocaleString('en-US',{minimumFractionDigits:2})}</td>
                     <td class="py-3.5 px-4 text-right text-amber-600 font-mono">$${gasto1.toLocaleString('en-US',{minimumFractionDigits:2})}</td>
                     <td class="py-3.5 px-4 text-right text-amber-600 font-mono">$${gasto2.toLocaleString('en-US',{minimumFractionDigits:2})}</td>
-                    <td class="py-3.5 px-4 text-right font-bold text-slate-900 font-mono">$${totalGasto.toLocaleString('en-US',{minimumFractionDigits:2})}</td>
-                    <td class="py-3.5 px-4 text-right font-extrabold text-emerald-600 font-mono">$${rest.toLocaleString('en-US',{minimumFractionDigits:2})}</td>
+                    <td class="py-3.5 px-4 text-right font-bold text-slate-800 font-mono">$${totalGasto.toLocaleString('en-US',{minimumFractionDigits:2})}</td>
+                    <td class="py-3.5 px-4 text-right font-bold text-emerald-600 font-mono">$${rest.toLocaleString('en-US',{minimumFractionDigits:2})}</td>
                 </tr>`;
             });
         }
-
-        /* --- FUNCIONALIDADES DEL TABLERO DE DIRECCIÓN --- */
 
         function renderizarTableroDireccion() {
             renderizarFiltroCodigos();
@@ -641,10 +616,10 @@
             baseDatos[empresaActual].partidas.forEach(p => {
                 const checked = codigosSeleccionadosTablero.includes(p.codigo) ? 'checked' : '';
                 container.innerHTML += `
-                <label class="inline-flex items-center space-x-2 bg-slate-800 hover:bg-slate-700/80 px-3 py-2 rounded-xl border border-slate-700 cursor-pointer transition select-none">
-                    <input type="checkbox" value="${p.codigo}" ${checked} onchange="toggleCodigoFiltro('${p.codigo}')" class="rounded border-slate-600 text-indigo-600 focus:ring-indigo-500 w-4 h-4">
-                    <span class="font-bold font-mono text-indigo-300">${p.codigo}</span>
-                    <span class="text-slate-300 text-[11px] truncate max-w-[120px]">${p.descripcion}</span>
+                <label class="inline-flex items-center space-x-2 bg-slate-50 hover:bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-200 cursor-pointer transition select-none">
+                    <input type="checkbox" value="${p.codigo}" ${checked} onchange="toggleCodigoFiltro('${p.codigo}')" class="rounded border-slate-300 text-blue-600 focus:ring-blue-500 w-3.5 h-3.5">
+                    <span class="font-bold font-mono text-blue-600 text-xs">${p.codigo}</span>
+                    <span class="text-slate-600 text-[11px] truncate max-w-[120px]">${p.descripcion}</span>
                 </label>`;
             });
         }
@@ -669,10 +644,8 @@
         }
 
         function actualizarGraficosYKPIS() {
-            // Filtrar partidas
             const partidasFiltradas = baseDatos[empresaActual].partidas.filter(p => codigosSeleccionadosTablero.includes(p.codigo));
             
-            // Datos
             const labels = partidasFiltradas.map(p => p.codigo);
             const dataPres = partidasFiltradas.map(p => p.monto);
             const dataGasto = partidasFiltradas.map(p => {
@@ -681,13 +654,11 @@
                     .reduce((a,b) => a + b.monto, 0);
             });
 
-            // KPIs Calculados
             const totalPres = dataPres.reduce((a,b)=>a+b,0);
             const totalGast = dataGasto.reduce((a,b)=>a+b,0);
             const pctAvance = totalPres > 0 ? Math.round((totalGast / totalPres) * 100) : 0;
             const promGasto = partidasFiltradas.length > 0 ? totalGast / partidasFiltradas.length : 0;
 
-            // Encontrar partida con mayor gasto
             let mayorGasto = 0;
             let partidaMayor = 'N/A';
             partidasFiltradas.forEach((p, idx) => {
@@ -697,10 +668,8 @@
                 }
             });
 
-            // Conteo transacciones
             const numTrans = baseDatos[empresaActual].gastos.filter(g => codigosSeleccionadosTablero.includes(g.codigo)).length;
 
-            // Renderizar KPIs
             document.getElementById('kpiPorcentajeAvance').innerText = `${pctAvance}%`;
             document.getElementById('kpiBarraPorcentaje').style.width = `${Math.min(pctAvance, 100)}%`;
             document.getElementById('kpiPromedioGasto').innerText = `$${promGasto.toLocaleString('en-US',{minimumFractionDigits:2})}`;
@@ -708,7 +677,6 @@
             document.getElementById('kpiPartidaMayorMonto').innerText = `$${mayorGasto.toLocaleString('en-US',{minimumFractionDigits:2})}`;
             document.getElementById('kpiNumTransacciones').innerText = numTrans;
 
-            // Render Gráficos
             if(chartBarrasInst) chartBarrasInst.destroy();
             if(chartDonaInst) chartDonaInst.destroy();
 
@@ -718,8 +686,8 @@
                 data: {
                     labels: labels,
                     datasets: [
-                        { label: 'Presupuesto', data: dataPres, backgroundColor: '#0f172a', borderRadius: 8 },
-                        { label: 'Gasto Real', data: dataGasto, backgroundColor: '#f59e0b', borderRadius: 8 }
+                        { label: 'Presupuesto', data: dataPres, backgroundColor: '#1890ff', borderRadius: 4 },
+                        { label: 'Gasto Real', data: dataGasto, backgroundColor: '#faad14', borderRadius: 4 }
                     ]
                 },
                 options: { responsive: true, maintainAspectRatio: false }
@@ -732,7 +700,7 @@
                     labels: labels.length > 0 ? labels : ['Sin selección'],
                     datasets: [{
                         data: dataGasto.length > 0 && totalGast > 0 ? dataGasto : [1],
-                        backgroundColor: ['#4f46e5', '#f59e0b', '#10b981', '#ef4444', '#8b5cf6', '#06b6d4']
+                        backgroundColor: ['#1890ff', '#faad14', '#52c41a', '#ff4d4f', '#722ed1', '#13c2c2']
                     }]
                 },
                 options: { responsive: true, maintainAspectRatio: false }
@@ -765,7 +733,7 @@
             const blob = new Blob([csv], { type: 'text/csv' });
             const a = document.createElement('a');
             a.href = URL.createObjectURL(blob);
-            a.download = 'Reporte_Presupuestal_Ejecutivo.csv';
+            a.download = 'Reporte_Presupuestal.csv';
             a.click();
         }
     </script>
