@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema Corporativo de Control Presupuestal Mensual</title>
+    <title>Sistema Corporativo de Control Presupuestal</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Lucide Icons -->
@@ -20,6 +20,7 @@
             color: #ffffff;
             font-weight: 600;
         }
+        /* Custom Scrollbars */
         ::-webkit-scrollbar { width: 5px; height: 5px; }
         ::-webkit-scrollbar-track { background: #f0f2f5; }
         ::-webkit-scrollbar-thumb { background: #ccc; border-radius: 4px; }
@@ -27,37 +28,40 @@
 </head>
 <body class="antialiased text-slate-700 min-h-screen flex">
 
-    <!-- 1. SIDEBAR NAVEGACIÓN LATERAL -->
+    <!-- 1. SIDEBAR NAVEGACIÓN LATERAL (ESTILO DASHBOARD MODERN) -->
     <aside class="w-64 bg-[#001529] text-slate-300 flex flex-col shrink-0 min-h-screen shadow-xl z-20">
+        <!-- Logo Header -->
         <div class="p-5 flex items-center space-x-3 border-b border-slate-800">
             <div class="p-2 bg-blue-600 rounded-lg text-white">
                 <i data-lucide="pie-chart" class="w-6 h-6"></i>
             </div>
             <div>
                 <h1 class="text-white font-bold text-base tracking-wide leading-tight">CorpBudget</h1>
-                <span class="text-[11px] text-slate-400 font-medium">Control Mensual</span>
+                <span class="text-[11px] text-slate-400 font-medium">Control Presupuestal</span>
             </div>
         </div>
 
+        <!-- Menú de Opciones -->
         <nav class="flex-1 px-3 py-4 space-y-1 text-xs">
             <button onclick="cambiarPestana(1)" id="tab1" class="sidebar-item active w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800/60">
                 <i data-lucide="receipt" class="w-4 h-4"></i>
-                <span>Captura & Bitácora</span>
+                <span class="text-xs">Captura & Bitácora</span>
             </button>
             <button onclick="cambiarPestana(2)" id="tab2" class="sidebar-item w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800/60">
                 <i data-lucide="book-open" class="w-4 h-4"></i>
-                <span>Catálogo & Subcuentas</span>
+                <span class="text-xs">Catálogo & Presupuestos</span>
             </button>
             <button onclick="cambiarPestana(3)" id="tab3" class="sidebar-item w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800/60">
                 <i data-lucide="layers" class="w-4 h-4"></i>
-                <span>Comparativo Consolidado</span>
+                <span class="text-xs">Comparativo Consolidado</span>
             </button>
             <button onclick="cambiarPestana(4)" id="tab4" class="sidebar-item w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800/60">
                 <i data-lucide="line-chart" class="w-4 h-4"></i>
-                <span>Tablero de Dirección</span>
+                <span class="text-xs">Tablero de Dirección</span>
             </button>
         </nav>
 
+        <!-- Footer Sidebar -->
         <div class="p-4 border-t border-slate-800 text-[11px] text-slate-500 text-center">
             Módulo Dirección &copy; 2026
         </div>
@@ -66,44 +70,15 @@
     <!-- CONTAINER PRINCIPAL -->
     <div class="flex-1 flex flex-col min-w-0 h-screen overflow-y-auto">
 
-        <!-- 2. BARRA SUPERIOR -->
-        <header class="bg-white border-b border-slate-200 px-8 py-3.5 flex flex-wrap justify-between items-center gap-4 sticky top-0 z-10">
+        <!-- 2. BARRA SUPERIOR (TOPBAR) -->
+        <header class="bg-white border-b border-slate-200 px-8 py-3.5 flex justify-between items-center sticky top-0 z-10">
             <div class="flex items-center space-x-4">
                 <i data-lucide="menu" class="w-5 h-5 text-slate-400 cursor-pointer"></i>
-                
-                <!-- Selector de Empresa -->
-                <div class="flex items-center space-x-2">
-                    <span class="text-xs font-semibold text-slate-400">Entidad:</span>
-                    <select id="empresaSelect" onchange="cambiarEmpresa()" class="bg-slate-50 border border-slate-300 text-slate-800 text-xs rounded-lg px-3 py-1.5 font-bold focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer">
-                        <option value="Carrduci">Carrduci S.A. de C.V.</option>
-                        <option value="CarrduciMetal">Carrduci Metal</option>
-                    </select>
-                </div>
-
-                <!-- SELECTOR DE MES Y AÑO -->
-                <div class="flex items-center space-x-2 bg-blue-50 border border-blue-200 px-3 py-1.5 rounded-lg">
-                    <i data-lucide="calendar" class="w-4 h-4 text-blue-600"></i>
-                    <span class="text-xs font-bold text-blue-900">Período:</span>
-                    <select id="selectMes" onchange="cambiarPeriodo()" class="bg-white border border-blue-300 text-blue-900 text-xs font-bold rounded px-2 py-0.5 focus:outline-none focus:ring-1 focus:ring-blue-500 cursor-pointer">
-                        <option value="01">Enero</option>
-                        <option value="02">Febrero</option>
-                        <option value="03">Marzo</option>
-                        <option value="04">Abril</option>
-                        <option value="05">Mayo</option>
-                        <option value="06">Junio</option>
-                        <option value="07" selected>Julio</option>
-                        <option value="08">Agosto</option>
-                        <option value="09">Septiembre</option>
-                        <option value="10">Octubre</option>
-                        <option value="11">Noviembre</option>
-                        <option value="12">Diciembre</option>
-                    </select>
-                    <select id="selectAnio" onchange="cambiarPeriodo()" class="bg-white border border-blue-300 text-blue-900 text-xs font-bold rounded px-2 py-0.5 focus:outline-none focus:ring-1 focus:ring-blue-500 cursor-pointer">
-                        <option value="2025">2025</option>
-                        <option value="2026" selected>2026</option>
-                        <option value="2027">2027</option>
-                    </select>
-                </div>
+                <span class="text-xs font-semibold text-slate-400">Entidad Seleccionada:</span>
+                <select id="empresaSelect" onchange="cambiarEmpresa()" class="bg-slate-50 border border-slate-300 text-slate-800 text-xs rounded-lg px-3 py-1.5 font-bold focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer">
+                    <option value="Carrduci">Carrduci S.A. de C.V.</option>
+                    <option value="CarrduciMetal">Carrduci Metal</option>
+                </select>
             </div>
 
             <div class="flex items-center space-x-5 text-slate-500">
@@ -113,7 +88,9 @@
                 </button>
                 <div class="h-4 w-px bg-slate-200"></div>
                 <div class="flex items-center space-x-2 cursor-pointer">
-                    <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 font-bold flex items-center justify-center text-xs border border-blue-200">DIR</div>
+                    <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 font-bold flex items-center justify-center text-xs border border-blue-200">
+                        DIR
+                    </div>
                     <span class="text-xs font-medium text-slate-700">Dirección General</span>
                 </div>
             </div>
@@ -122,74 +99,62 @@
         <!-- 3. ÁREA DE CONTENIDO -->
         <main class="p-8 space-y-6 flex-1">
 
-            <!-- KPIS SUPERIORES -->
+            <!-- KPIS SUPERIORES (ESTILO TARGETAS MINIMALISTAS) -->
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
                 <div class="bg-white p-5 rounded-xl border border-slate-200/80 shadow-sm relative">
                     <span class="text-xs font-medium text-slate-400">Ingreso Global Aprobado</span>
                     <div class="text-2xl font-bold text-slate-800 mt-2 font-mono" id="ingresoGlobal">$0.00</div>
+                    <i data-lucide="info" class="w-4 h-4 text-slate-300 absolute top-5 right-5"></i>
                 </div>
                 <div class="bg-white p-5 rounded-xl border border-slate-200/80 shadow-sm relative">
-                    <span class="text-xs font-medium text-slate-400">Presupuesto del Mes</span>
+                    <span class="text-xs font-medium text-slate-400">Presupuesto Asignado</span>
                     <div class="text-2xl font-bold text-blue-600 mt-2 font-mono" id="totalPresupuestado">$0.00</div>
+                    <i data-lucide="info" class="w-4 h-4 text-slate-300 absolute top-5 right-5"></i>
                 </div>
                 <div class="bg-white p-5 rounded-xl border border-slate-200/80 shadow-sm relative">
-                    <span class="text-xs font-medium text-slate-400">Gasto Ejercido en Mes</span>
+                    <span class="text-xs font-medium text-slate-400">Total Ejercido</span>
                     <div class="text-2xl font-bold text-amber-500 mt-2 font-mono" id="totalEjercido">$0.00</div>
+                    <i data-lucide="info" class="w-4 h-4 text-slate-300 absolute top-5 right-5"></i>
                 </div>
                 <div class="bg-white p-5 rounded-xl border border-slate-200/80 shadow-sm relative">
                     <span class="text-xs font-medium text-slate-400">Disponible Remanente</span>
                     <div class="text-2xl font-bold text-emerald-600 mt-2 font-mono" id="disponibleRemanente">$0.00</div>
+                    <i data-lucide="info" class="w-4 h-4 text-slate-300 absolute top-5 right-5"></i>
                 </div>
             </div>
 
             <!-- PESTAÑA 1: CAPTURA Y BITÁCORA -->
             <div id="pestana1" class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                <!-- Formulario -->
+                <!-- Formulario Sidebar -->
                 <div class="lg:col-span-4 bg-white p-6 rounded-xl border border-slate-200/80 shadow-sm h-fit">
                     <div class="flex items-center space-x-2 pb-3 mb-4 border-b border-slate-100">
                         <i data-lucide="plus-circle" class="w-4 h-4 text-blue-600"></i>
                         <h3 class="text-xs font-bold text-slate-700 uppercase" id="formTitulo">Registrar Nuevo Gasto</h3>
                     </div>
-                    <form onsubmit="registrarGasto(event)" class="space-y-3.5 text-xs">
+                    <form onsubmit="registrarGasto(event)" class="space-y-4 text-xs">
                         <div>
-                            <label class="block font-medium text-slate-500 mb-1">Fecha Exacta del Gasto</label>
-                            <input type="date" id="inputFecha" required class="w-full border border-slate-200 rounded-lg p-2 bg-slate-50 focus:bg-white focus:outline-none focus:ring-1 focus:ring-blue-500 text-slate-700 font-semibold">
+                            <label class="block font-medium text-slate-500 mb-1">Fecha de Transacción</label>
+                            <input type="date" id="inputFecha" required class="w-full border border-slate-200 rounded-lg p-2.5 bg-slate-50 focus:bg-white focus:outline-none focus:ring-1 focus:ring-blue-500 text-slate-700">
                         </div>
                         <div>
-                            <label class="block font-medium text-slate-500 mb-1">Subcuenta / Código Contable</label>
-                            <select id="selectSubcuenta" required class="w-full border border-slate-200 rounded-lg p-2 bg-slate-50 focus:bg-white focus:outline-none focus:ring-1 focus:ring-blue-500 text-slate-700">
-                                <option value="">Seleccionar subcuenta...</option>
+                            <label class="block font-medium text-slate-500 mb-1">Código / Partida Asignada</label>
+                            <select id="selectPartida" required class="w-full border border-slate-200 rounded-lg p-2.5 bg-slate-50 focus:bg-white focus:outline-none focus:ring-1 focus:ring-blue-500 text-slate-700">
+                                <option value="">Seleccionar partida...</option>
                             </select>
-                        </div>
-                        <div class="grid grid-cols-2 gap-2">
-                            <div>
-                                <label class="block font-medium text-slate-500 mb-1">Clasificación</label>
-                                <select id="selectClasificacion" required class="w-full border border-slate-200 rounded-lg p-2 bg-slate-50 focus:bg-white focus:outline-none focus:ring-1 focus:ring-blue-500 text-slate-700">
-                                    <option value="Gasto Fijo">Gasto Fijo</option>
-                                    <option value="Gasto Variable">Gasto Variable</option>
-                                    <option value="Operativo">Operativo</option>
-                                    <option value="Extraordinario">Extraordinario</option>
-                                    <option value="Impuestos">Impuestos</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block font-medium text-slate-500 mb-1">Forma de Pago</label>
-                                <select id="selectFormaPago" required class="w-full border border-slate-200 rounded-lg p-2 bg-slate-50 focus:bg-white focus:outline-none focus:ring-1 focus:ring-blue-500 text-slate-700 font-semibold">
-                                    <option value="Transfer">Transfer</option>
-                                    <option value="Cheque">Cheque</option>
-                                    <option value="Reembolso">Reembolso</option>
-                                </select>
-                            </div>
                         </div>
                         <div>
                             <label class="block font-medium text-slate-500 mb-1">Concepto / Descripción del Pago</label>
-                            <input type="text" id="inputConcepto" required placeholder="Ej. Pago de Factura de Mantenimiento" class="w-full border border-slate-200 rounded-lg p-2 bg-slate-50 focus:bg-white focus:outline-none focus:ring-1 focus:ring-blue-500 text-slate-700">
+                            <input type="text" id="inputConcepto" required placeholder="Ej. Factura de mantenimiento" class="w-full border border-slate-200 rounded-lg p-2.5 bg-slate-50 focus:bg-white focus:outline-none focus:ring-1 focus:ring-blue-500 text-slate-700">
                         </div>
                         <div>
                             <label class="block font-medium text-slate-500 mb-1">Monto Importe ($ MXN)</label>
-                            <input type="number" step="0.01" id="inputMonto" required placeholder="0.00" class="w-full border border-slate-200 rounded-lg p-2 bg-slate-50 focus:bg-white focus:outline-none focus:ring-1 focus:ring-blue-500 text-slate-800 font-semibold">
+                            <input type="number" step="0.01" id="inputMonto" required placeholder="0.00" class="w-full border border-slate-200 rounded-lg p-2.5 bg-slate-50 focus:bg-white focus:outline-none focus:ring-1 focus:ring-blue-500 text-slate-800 font-semibold">
                         </div>
-                        <button type="submit" class="w-full bg-[#001529] hover:bg-slate-800 text-white font-semibold py-2.5 rounded-lg text-xs transition shadow-sm mt-2">
+                        <div>
+                            <label class="block font-medium text-slate-500 mb-1">Comprobante (Opcional)</label>
+                            <input type="file" class="w-full border border-slate-200 rounded-lg p-2 bg-slate-50 text-slate-500 text-xs">
+                        </div>
+                        <button type="submit" class="w-full bg-[#001529] hover:bg-slate-800 text-white font-semibold py-3 rounded-lg text-xs transition shadow-sm">
                             Aceptar y Registrar Gasto
                         </button>
                     </form>
@@ -197,27 +162,27 @@
 
                 <!-- Tablas Principales -->
                 <div class="lg:col-span-8 space-y-6">
-                    <!-- Presupuesto por Código Acumulado -->
+                    <!-- PRESUPUESTO INDIVIDUAL -->
                     <div class="bg-white p-6 rounded-xl border border-slate-200/80 shadow-sm">
                         <div class="flex justify-between items-center mb-4 pb-3 border-b border-slate-100">
                             <div>
-                                <h3 class="text-xs font-bold text-slate-700 uppercase" id="presupuestoTitulo">Presupuesto Consolidado por Código Contable</h3>
-                                <p class="text-[11px] text-slate-400">Suma automática de las subcuentas asignadas al mes</p>
+                                <h3 class="text-xs font-bold text-slate-700 uppercase" id="presupuestoTitulo">Estado del Presupuesto Individual</h3>
+                                <p class="text-[11px] text-slate-400">Vista ampliada para exposición directiva</p>
                             </div>
-                            <span class="bg-blue-50 text-blue-700 font-mono font-bold text-[11px] px-2.5 py-1 rounded border border-blue-100" id="badgeMesActual">
-                                Período 2026-07
+                            <span class="bg-slate-100 text-slate-600 font-mono font-bold text-[11px] px-2.5 py-1 rounded">
+                                Vista Directiva
                             </span>
                         </div>
                         <div class="overflow-x-auto">
                             <table class="w-full text-left border-collapse">
                                 <thead>
                                     <tr class="border-b border-slate-200 text-slate-400 font-semibold text-[11px] uppercase">
-                                        <th class="py-3 px-3">Código Padre</th>
+                                        <th class="py-3 px-3">Código</th>
                                         <th class="py-3 px-3">Rubro / Partida</th>
-                                        <th class="py-3 px-3 text-right">Presupuestado Sumado</th>
-                                        <th class="py-3 px-3 text-right">Gasto Real Sumado</th>
+                                        <th class="py-3 px-3 text-right">Presupuestado</th>
+                                        <th class="py-3 px-3 text-right">Gasto Real</th>
                                         <th class="py-3 px-3 text-right">Disponible</th>
-                                        <th class="py-3 px-4 text-center w-32">% Avance</th>
+                                        <th class="py-3 px-4 text-center w-36">% Avance</th>
                                     </tr>
                                 </thead>
                                 <tbody id="tablaPresupuesto" class="divide-y divide-slate-100 text-xs"></tbody>
@@ -225,30 +190,25 @@
                         </div>
                     </div>
 
-                    <!-- Bitácora de Gastos con Buscador -->
+                    <!-- BITÁCORA DE GASTOS -->
                     <div class="bg-white p-6 rounded-xl border border-slate-200/80 shadow-sm">
-                        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 mb-4 pb-3 border-b border-slate-100">
-                            <h3 class="text-xs font-bold text-slate-700 uppercase">Bitácora de Gastos</h3>
-                            
-                            <!-- Buscador e Insumos de Filtro -->
-                            <div class="flex flex-wrap items-center gap-2 text-xs w-full md:w-auto">
-                                <div class="relative flex-1 md:w-56">
-                                    <input type="text" id="inputBuscador" onkeyup="renderizarTablas()" placeholder="🔍 Buscar palabra, número, concepto..." class="w-full pl-8 pr-3 py-1 border border-slate-200 rounded-lg bg-slate-50 text-slate-700 focus:outline-none focus:ring-1 focus:ring-blue-500 text-xs">
-                                </div>
-                                <input type="date" id="filtroFechaDia" onchange="renderizarTablas()" class="border border-slate-200 rounded-lg px-2 py-1 bg-slate-50 text-slate-700 focus:outline-none" title="Filtrar por día exacto">
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4 pb-3 border-b border-slate-100">
+                            <h3 class="text-xs font-bold text-slate-700 uppercase">Bitácora General de Operaciones</h3>
+                            <div class="flex items-center space-x-2 text-xs w-full sm:w-auto">
+                                <select id="filtroCodigo" onchange="renderizarTablas()" class="border border-slate-200 rounded-lg px-2.5 py-1 bg-slate-50 text-slate-700 focus:outline-none">
+                                    <option value="">-- Todas las Partidas --</option>
+                                </select>
+                                <button onclick="limpiarGastos()" class="text-red-500 hover:text-red-700 font-semibold text-xs px-2 py-1">Vaciar Registros</button>
                             </div>
                         </div>
-
                         <div class="overflow-x-auto">
                             <table class="w-full text-left text-xs">
                                 <thead>
                                     <tr class="border-b border-slate-200 text-slate-400 font-semibold uppercase text-[10px]">
                                         <th class="py-2.5 px-2">Fecha</th>
-                                        <th class="py-2.5 px-2">Subcuenta</th>
+                                        <th class="py-2.5 px-2">Código</th>
                                         <th class="py-2.5 px-2">Concepto</th>
-                                        <th class="py-2.5 px-2">Clasificación</th>
-                                        <th class="py-2.5 px-2">Pago</th>
-                                        <th class="py-2.5 px-2 text-right">Monto</th>
+                                        <th class="py-2.5 px-2 text-right">Monto Importe</th>
                                         <th class="py-2.5 px-2 text-center">Acción</th>
                                     </tr>
                                 </thead>
@@ -259,73 +219,38 @@
                 </div>
             </div>
 
-            <!-- PESTAÑA 2: CATÁLOGO Y SUBCUENTAS -->
+            <!-- PESTAÑA 2: CATÁLOGO Y CONFIGURACIÓN -->
             <div id="pestana2" class="grid grid-cols-1 lg:grid-cols-3 gap-6 hidden">
-                <div class="bg-white p-6 rounded-xl border border-slate-200/80 shadow-sm h-fit space-y-5">
-                    
-                    <!-- Formulario Alta Código Principal -->
-                    <div>
-                        <h3 class="text-xs font-bold text-slate-700 uppercase mb-3 pb-2 border-b border-slate-100">1. Alta de Código Principal</h3>
-                        <form onsubmit="agregarCodigoPrincipal(event)" class="space-y-3 text-xs">
-                            <div>
-                                <label class="block font-medium text-slate-500 mb-1">Código Contable Padre</label>
-                                <input type="text" id="nuevoCodigoPadre" required placeholder="Ej. 601-00" class="w-full border border-slate-200 rounded-lg p-2 bg-slate-50">
-                            </div>
-                            <div>
-                                <label class="block font-medium text-slate-500 mb-1">Descripción del Rubro</label>
-                                <input type="text" id="nuevaDescripcionPadre" required placeholder="Ej. Gastos Operativos" class="w-full border border-slate-200 rounded-lg p-2 bg-slate-50">
-                            </div>
-                            <button type="submit" class="w-full bg-slate-700 hover:bg-slate-800 text-white font-semibold py-2 rounded-lg text-xs transition">
-                                Guardar Código Principal
-                            </button>
-                        </form>
-                    </div>
-
-                    <!-- Formulario Alta Subcuenta -->
-                    <div class="pt-3 border-t border-slate-200">
-                        <h3 class="text-xs font-bold text-blue-600 uppercase mb-3 pb-2 border-b border-slate-100">2. Alta de Subcuenta con Monto</h3>
-                        <form onsubmit="agregarSubcuenta(event)" class="space-y-3 text-xs">
-                            <div>
-                                <label class="block font-medium text-slate-500 mb-1">Código Padre Periferico</label>
-                                <select id="selectCodigoPadreForm" required class="w-full border border-slate-200 rounded-lg p-2 bg-slate-50">
-                                    <option value="">Seleccionar Código Padre...</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block font-medium text-slate-500 mb-1">Código Subcuenta</label>
-                                <input type="text" id="nuevoCodigoSub" required placeholder="Ej. 601-00-01" class="w-full border border-slate-200 rounded-lg p-2 bg-slate-50">
-                            </div>
-                            <div>
-                                <label class="block font-medium text-slate-500 mb-1">Descripción Subcuenta</label>
-                                <input type="text" id="nuevaDescripcionSub" required placeholder="Ej. Servicio Energía Electrica CFE" class="w-full border border-slate-200 rounded-lg p-2 bg-slate-50">
-                            </div>
-                            <div>
-                                <label class="block font-medium text-slate-500 mb-1">Presupuesto Asignado Mes Activo ($)</label>
-                                <input type="number" step="0.01" id="nuevoMontoSub" required placeholder="0.00" class="w-full border border-slate-200 rounded-lg p-2 bg-slate-50">
-                            </div>
-                            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 rounded-lg text-xs transition shadow-sm">
-                                Guardar Subcuenta
-                            </button>
-                        </form>
-                    </div>
-
+                <div class="bg-white p-6 rounded-xl border border-slate-200/80 shadow-sm h-fit">
+                    <h3 class="text-xs font-bold text-slate-700 uppercase mb-4 pb-3 border-b border-slate-100">Alta de Partida Contable</h3>
+                    <form onsubmit="agregarPartida(event)" class="space-y-4 text-xs">
+                        <div>
+                            <label class="block font-medium text-slate-500 mb-1">Código Contable</label>
+                            <input type="text" id="nuevoCodigo" required placeholder="Ej. 605-01" class="w-full border border-slate-200 rounded-lg p-2.5 bg-slate-50">
+                        </div>
+                        <div>
+                            <label class="block font-medium text-slate-500 mb-1">Descripción del Rubro</label>
+                            <input type="text" id="nuevaDescripcion" required placeholder="Ej. Gastos de Representación" class="w-full border border-slate-200 rounded-lg p-2.5 bg-slate-50">
+                        </div>
+                        <div>
+                            <label class="block font-medium text-slate-500 mb-1">Presupuesto Asignado ($)</label>
+                            <input type="number" step="0.01" id="nuevoMonto" required placeholder="0.00" class="w-full border border-slate-200 rounded-lg p-2.5 bg-slate-50">
+                        </div>
+                        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg text-xs transition shadow-sm">
+                            Guardar en Catálogo
+                        </button>
+                    </form>
                 </div>
 
                 <div class="lg:col-span-2 bg-white p-6 rounded-xl border border-slate-200/80 shadow-sm">
-                    <div class="flex justify-between items-center mb-4 pb-3 border-b border-slate-100">
-                        <div>
-                            <h3 class="text-xs font-bold text-slate-700 uppercase">Catálogo de Subcuentas y Asignaciones</h3>
-                            <p class="text-[11px] text-slate-400">Edita los montos de cada subcuenta para el mes activo</p>
-                        </div>
-                    </div>
+                    <h3 class="text-xs font-bold text-slate-700 uppercase mb-4 pb-3 border-b border-slate-100">Catálogo de Partidas Asignadas</h3>
                     <div class="overflow-x-auto">
                         <table class="w-full text-left text-xs">
                             <thead>
                                 <tr class="border-b border-slate-200 text-slate-400 font-semibold uppercase text-[10px]">
-                                    <th class="py-2.5 px-2">Subcuenta</th>
-                                    <th class="py-2.5 px-2">Código Padre</th>
+                                    <th class="py-2.5 px-2">Código</th>
                                     <th class="py-2.5 px-2">Descripción</th>
-                                    <th class="py-2.5 px-2 text-right">Presupuesto Mes ($)</th>
+                                    <th class="py-2.5 px-2 text-right">Presupuesto Asignado</th>
                                     <th class="py-2.5 px-2 text-center">Acciones</th>
                                 </tr>
                             </thead>
@@ -340,7 +265,7 @@
                 <div class="mb-4 pb-3 border-b border-slate-100 flex justify-between items-center">
                     <div>
                         <h3 class="text-xs font-bold text-slate-700 uppercase">Consolidado Multiempresa</h3>
-                        <p class="text-[11px] text-slate-400">Comparativa Global del Mes por Código Padre: Carrduci S.A. vs Carrduci Metal</p>
+                        <p class="text-[11px] text-slate-400">Comparativa Global: Carrduci S.A. vs Carrduci Metal</p>
                     </div>
                     <span class="bg-blue-50 text-blue-600 text-[11px] font-semibold px-2.5 py-1 rounded border border-blue-100">Visión Corporativa</span>
                 </div>
@@ -348,12 +273,12 @@
                     <table class="w-full text-left text-xs">
                         <thead>
                             <tr class="bg-slate-100 text-slate-600 uppercase text-[10px] font-bold">
-                                <th class="py-3 px-4 rounded-l">Código Padre</th>
+                                <th class="py-3 px-4 rounded-l">Código</th>
                                 <th class="py-3 px-4">Concepto Rubro</th>
-                                <th class="py-3 px-4 text-right">Presupuesto Mes Total</th>
+                                <th class="py-3 px-4 text-right">Presupuesto Total</th>
                                 <th class="py-3 px-4 text-right">Gasto Carrduci</th>
                                 <th class="py-3 px-4 text-right">Gasto Carrduci Metal</th>
-                                <th class="py-3 px-4 text-right">Gasto Acumulado Mes</th>
+                                <th class="py-3 px-4 text-right">Gasto Acumulado</th>
                                 <th class="py-3 px-4 text-right rounded-r">Disponible Global</th>
                             </tr>
                         </thead>
@@ -364,14 +289,16 @@
 
             <!-- PESTAÑA 4: TABLERO DE DIRECCIÓN -->
             <div id="pestana4" class="space-y-6 hidden">
+                
+                <!-- FILTRO Y SELECCIÓN DE CÓDIGOS -->
                 <div class="bg-white p-6 rounded-xl border border-slate-200/80 shadow-sm space-y-4">
                     <div class="flex flex-col lg:flex-row justify-between lg:items-center gap-3 pb-3 border-b border-slate-100">
                         <div>
                             <h3 class="text-xs font-bold text-slate-700 uppercase flex items-center space-x-2">
                                 <i data-lucide="sliders" class="w-4 h-4 text-blue-600"></i>
-                                <span>Filtro Directivo</span>
+                                <span>Filtro de Análisis Directivo</span>
                             </h3>
-                            <p class="text-[11px] text-slate-400 mt-0.5">Filtra códigos para el análisis del mes activo</p>
+                            <p class="text-[11px] text-slate-400 mt-0.5">Selecciona uno o múltiples códigos para filtrar gráficos y métricas</p>
                         </div>
                         <div class="flex items-center space-x-2">
                             <button onclick="seleccionarTodosCodigos(true)" class="text-[11px] bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold px-3 py-1 rounded transition border border-slate-200">Seleccionar Todos</button>
@@ -381,6 +308,7 @@
                     <div id="contenedorFiltroCodigos" class="flex flex-wrap gap-2 text-xs"></div>
                 </div>
 
+                <!-- KPIS ESPECÍFICOS DE TABLERO -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
                     <div class="bg-white p-5 rounded-xl border border-slate-200/80 shadow-sm">
                         <span class="text-xs font-medium text-slate-400">Ejecución del Presupuesto</span>
@@ -390,85 +318,69 @@
                         </div>
                     </div>
                     <div class="bg-white p-5 rounded-xl border border-slate-200/80 shadow-sm">
-                        <span class="text-xs font-medium text-slate-400">Gasto Promedio por Código</span>
+                        <span class="text-xs font-medium text-slate-400">Gasto Promedio por Partida</span>
                         <div class="text-2xl font-bold text-slate-800 mt-1 font-mono" id="kpiPromedioGasto">$0.00</div>
+                        <span class="text-[10px] text-slate-400 mt-2 block">Promedio de partidas seleccionadas</span>
                     </div>
                     <div class="bg-white p-5 rounded-xl border border-slate-200/80 shadow-sm">
-                        <span class="text-xs font-medium text-slate-400">Código Mayor Impacto</span>
+                        <span class="text-xs font-medium text-slate-400">Partida Mayor Impacto</span>
                         <div class="text-base font-bold text-slate-800 mt-1 truncate" id="kpiPartidaMayor">N/A</div>
                         <span class="text-[10px] text-amber-500 font-semibold mt-1 block" id="kpiPartidaMayorMonto">$0.00</span>
                     </div>
                     <div class="bg-white p-5 rounded-xl border border-slate-200/80 shadow-sm">
-                        <span class="text-xs font-medium text-slate-400">Transacciones del Mes</span>
+                        <span class="text-xs font-medium text-slate-400">Transacciones Filtradas</span>
                         <div class="text-2xl font-bold text-slate-800 mt-1 font-mono" id="kpiNumTransacciones">0</div>
+                        <span class="text-[10px] text-slate-400 mt-2 block">Operaciones en la selección</span>
                     </div>
                 </div>
 
+                <!-- GRÁFICAS -->
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     <div class="bg-white p-6 rounded-xl border border-slate-200/80 shadow-sm">
-                        <h3 class="text-xs font-bold text-slate-700 uppercase mb-4">Presupuesto vs Gasto Real (Mes)</h3>
+                        <h3 class="text-xs font-bold text-slate-700 uppercase mb-4">Presupuesto vs Gasto Real</h3>
                         <div class="h-80">
                             <canvas id="chartBarras"></canvas>
                         </div>
                     </div>
                     <div class="bg-white p-6 rounded-xl border border-slate-200/80 shadow-sm">
-                        <h3 class="text-xs font-bold text-slate-700 uppercase mb-4">Distribución por Forma de Pago</h3>
+                        <h3 class="text-xs font-bold text-slate-700 uppercase mb-4">Distribución de Egresos</h3>
                         <div class="h-80 flex justify-center">
                             <canvas id="chartDona"></canvas>
                         </div>
                     </div>
                 </div>
+
             </div>
 
         </main>
     </div>
 
-    <!-- JAVASCRIPT -->
+    <!-- JAVASCRIPT LÓGICO INTRACTO -->
     <script>
         lucide.createIcons();
 
         let baseDatos = {
             ingresoGlobal: 250000.00,
             Carrduci: {
-                codigosPadre: [
-                    { codigo: '601-00', descripcion: 'Servicios Públicos y Generales' },
-                    { codigo: '602-00', descripcion: 'Insumos de Oficina' },
-                    { codigo: '604-00', descripcion: 'Tecnología y Software' }
+                partidas: [
+                    { codigo: '601-03', descripcion: 'Servicios Públicos (Luz, Agua, Gas)', monto: 18000 },
+                    { codigo: '602-01', descripcion: 'Papelería, Oficina y Consumibles', monto: 4500 },
+                    { codigo: '604-01', descripcion: 'Licencias, Sistemas y Software', monto: 12500 },
+                    { codigo: '605-02', descripcion: 'Mantenimiento General e Instalaciones', monto: 15000 }
                 ],
-                subcuentas: [
-                    { codigoSub: '601-00-01', codigoPadre: '601-00', descripcion: 'Luz Electricidad (CFE)' },
-                    { codigoSub: '601-00-02', codigoPadre: '601-00', descripcion: 'Agua y Alcantarillado' },
-                    { codigoSub: '602-00-01', codigoPadre: '602-00', descripcion: 'Papelería y Toner' },
-                    { codigoSub: '604-00-01', codigoPadre: '604-00', descripcion: 'Licencias ERP' }
-                ],
-                presupuestosMensuales: {
-                    '2026-07': { '601-00-01': 15000, '601-00-02': 3000, '602-00-01': 4500, '604-00-01': 12500 }
-                },
-                gastos: [
-                    { id: 1, fecha: '2026-07-05', codigoSub: '601-00-01', concepto: 'Pago CFE Planta', clasificacion: 'Gasto Fijo', formaPago: 'Transfer', monto: 12500 },
-                    { id: 2, fecha: '2026-07-08', codigoSub: '602-00-01', concepto: 'Hojas y Insumos Impresora', clasificacion: 'Operativo', formaPago: 'Reembolso', monto: 1200 }
-                ]
+                gastos: []
             },
             CarrduciMetal: {
-                codigosPadre: [
-                    { codigo: '601-00', descripcion: 'Servicios Públicos e Industriales' },
-                    { codigo: '603-00', descripcion: 'Mantenimiento e Maquinaria' }
+                partidas: [
+                    { codigo: '601-03', descripcion: 'Servicios Públicos (Luz, Agua, Gas)', monto: 22000 },
+                    { codigo: '603-01', descripcion: 'Mantenimiento Maquinaria Pesada', monto: 28000 },
+                    { codigo: '605-02', descripcion: 'Mantenimiento General e Instalaciones', monto: 8000 }
                 ],
-                subcuentas: [
-                    { codigoSub: '601-00-01', codigoPadre: '601-00', descripcion: 'Electricidad Industrial CFE' },
-                    { codigoSub: '603-00-01', codigoPadre: '603-00', descripcion: 'Mantenimiento Torno CNC' }
-                ],
-                presupuestosMensuales: {
-                    '2026-07': { '601-00-01': 22000, '603-00-01': 28000 }
-                },
-                gastos: [
-                    { id: 3, fecha: '2026-07-10', codigoSub: '603-00-01', concepto: 'Refacción Servomotor CNC', clasificacion: 'Extraordinario', formaPago: 'Cheque', monto: 14500 }
-                ]
+                gastos: []
             }
         };
 
         let empresaActual = 'Carrduci';
-        let periodoActual = '2026-07';
         let pestanaActiva = 1;
         let codigosSeleccionadosTablero = [];
         let chartBarrasInst, chartDonaInst;
@@ -477,17 +389,8 @@
             document.getElementById('inputFecha').valueAsDate = new Date();
             inicializarCodigosTablero();
             actualizarSelects();
-            cambiarPeriodo();
-        };
-
-        function cambiarPeriodo() {
-            const mes = document.getElementById('selectMes').value;
-            const anio = document.getElementById('selectAnio').value;
-            periodoActual = `${anio}-${mes}`;
-            
-            document.getElementById('badgeMesActual').innerText = `Período ${periodoActual}`;
             renderizarTodo();
-        }
+        };
 
         function cambiarPestana(n) {
             pestanaActiva = n;
@@ -498,14 +401,16 @@
             document.getElementById(`pestana${n}`).classList.remove('hidden');
             document.getElementById(`tab${n}`).classList.add('active');
 
-            if(n === 4) renderizarTableroDireccion();
+            if(n === 4) {
+                renderizarTableroDireccion();
+            }
         }
 
         function cambiarEmpresa() {
             empresaActual = document.getElementById('empresaSelect').value;
             const nom = empresaActual === 'Carrduci' ? 'Carrduci S.A.' : 'Carrduci Metal';
             document.getElementById('formTitulo').innerText = `Registrar Gasto (${nom})`;
-            document.getElementById('presupuestoTitulo').innerText = `Presupuesto Consolidado (${nom})`;
+            document.getElementById('presupuestoTitulo').innerText = `Estado del Presupuesto Individual (${nom})`;
             
             inicializarCodigosTablero();
             actualizarSelects();
@@ -513,89 +418,47 @@
         }
 
         function inicializarCodigosTablero() {
-            codigosSeleccionadosTablero = baseDatos[empresaActual].codigosPadre.map(p => p.codigo);
+            codigosSeleccionadosTablero = baseDatos[empresaActual].partidas.map(p => p.codigo);
         }
 
         function actualizarSelects() {
-            const selectSubcuenta = document.getElementById('selectSubcuenta');
-            const selectCodigoPadreForm = document.getElementById('selectCodigoPadreForm');
+            const selectPartida = document.getElementById('selectPartida');
+            const filtroCodigo = document.getElementById('filtroCodigo');
+            selectPartida.innerHTML = '<option value="">Seleccionar partida...</option>';
+            filtroCodigo.innerHTML = '<option value="">-- Todas las Partidas --</option>';
 
-            selectSubcuenta.innerHTML = '<option value="">Seleccionar subcuenta...</option>';
-            selectCodigoPadreForm.innerHTML = '<option value="">Seleccionar Código Padre...</option>';
-
-            baseDatos[empresaActual].subcuentas.forEach(s => {
-                selectSubcuenta.innerHTML += `<option value="${s.codigoSub}">${s.codigoSub} - ${s.descripcion}</option>`;
+            baseDatos[empresaActual].partidas.forEach(p => {
+                selectPartida.innerHTML += `<option value="${p.codigo}">${p.codigo} - ${p.descripcion}</option>`;
+                filtroCodigo.innerHTML += `<option value="${p.codigo}">${p.codigo} - ${p.descripcion}</option>`;
             });
-
-            baseDatos[empresaActual].codigosPadre.forEach(p => {
-                selectCodigoPadreForm.innerHTML += `<option value="${p.codigo}">${p.codigo} - ${p.descripcion}</option>`;
-            });
-        }
-
-        function obtenerPresupuestoSubcuenta(emp, codigoSub, periodo) {
-            const pMes = baseDatos[emp].presupuestosMensuales[periodo];
-            return (pMes && pMes[codigoSub]) ? pMes[codigoSub] : 0;
         }
 
         function registrarGasto(e) {
             e.preventDefault();
             const fecha = document.getElementById('inputFecha').value;
-            const codigoSub = document.getElementById('selectSubcuenta').value;
-            const clasificacion = document.getElementById('selectClasificacion').value;
-            const formaPago = document.getElementById('selectFormaPago').value;
+            const codigo = document.getElementById('selectPartida').value;
             const concepto = document.getElementById('inputConcepto').value;
             const monto = parseFloat(document.getElementById('inputMonto').value);
 
-            baseDatos[empresaActual].gastos.push({ id: Date.now(), fecha, codigoSub, concepto, clasificacion, formaPago, monto });
+            baseDatos[empresaActual].gastos.push({ id: Date.now(), fecha, codigo, concepto, monto });
             document.getElementById('inputConcepto').value = '';
             document.getElementById('inputMonto').value = '';
             renderizarTodo();
         }
 
-        function agregarCodigoPrincipal(e) {
+        function agregarPartida(e) {
             e.preventDefault();
-            const codigo = document.getElementById('nuevoCodigoPadre').value;
-            const descripcion = document.getElementById('nuevaDescripcionPadre').value;
+            const codigo = document.getElementById('nuevoCodigo').value;
+            const descripcion = document.getElementById('nuevaDescripcion').value;
+            const monto = parseFloat(document.getElementById('nuevoMonto').value);
 
-            baseDatos[empresaActual].codigosPadre.push({ codigo, descripcion });
-            document.getElementById('nuevoCodigoPadre').value = '';
-            document.getElementById('nuevaDescripcionPadre').value = '';
+            baseDatos[empresaActual].partidas.push({ codigo, descripcion, monto });
+            document.getElementById('nuevoCodigo').value = '';
+            document.getElementById('nuevaDescripcion').value = '';
+            document.getElementById('nuevoMonto').value = '';
 
             inicializarCodigosTablero();
             actualizarSelects();
-            renderizarTodo();
-        }
-
-        function agregarSubcuenta(e) {
-            e.preventDefault();
-            const codigoPadre = document.getElementById('selectCodigoPadreForm').value;
-            const codigoSub = document.getElementById('nuevoCodigoSub').value;
-            const descripcion = document.getElementById('nuevaDescripcionSub').value;
-            const monto = parseFloat(document.getElementById('nuevoMontoSub').value);
-
-            baseDatos[empresaActual].subcuentas.push({ codigoSub, codigoPadre, descripcion });
-
-            if(!baseDatos[empresaActual].presupuestosMensuales[periodoActual]) {
-                baseDatos[empresaActual].presupuestosMensuales[periodoActual] = {};
-            }
-            baseDatos[empresaActual].presupuestosMensuales[periodoActual][codigoSub] = monto;
-
-            document.getElementById('nuevoCodigoSub').value = '';
-            document.getElementById('nuevaDescripcionSub').value = '';
-            document.getElementById('nuevoMontoSub').value = '';
-
-            actualizarSelects();
-            renderizarTodo();
-        }
-
-        function actualizarMontoSubcuentaDirecto(codigoSub, nuevoValor) {
-            const valorNumerico = parseFloat(nuevoValor);
-            if(isNaN(valorNumerico) || valorNumerico < 0) return;
-
-            if(!baseDatos[empresaActual].presupuestosMensuales[periodoActual]) {
-                baseDatos[empresaActual].presupuestosMensuales[periodoActual] = {};
-            }
-            baseDatos[empresaActual].presupuestosMensuales[periodoActual][codigoSub] = valorNumerico;
             renderizarTodo();
         }
 
@@ -604,9 +467,18 @@
             renderizarTodo();
         }
 
-        function borrarSubcuenta(codigoSub) {
-            baseDatos[empresaActual].subcuentas = baseDatos[empresaActual].subcuentas.filter(s => s.codigoSub !== codigoSub);
+        function borrarPartida(codigo) {
+            baseDatos[empresaActual].partidas = baseDatos[empresaActual].partidas.filter(p => p.codigo !== codigo);
+            inicializarCodigosTablero();
+            actualizarSelects();
             renderizarTodo();
+        }
+
+        function limpiarGastos() {
+            if(confirm("¿Confirmas limpiar todos los registros de gastos de esta entidad?")) {
+                baseDatos[empresaActual].gastos = [];
+                renderizarTodo();
+            }
         }
 
         function renderizarTodo() {
@@ -618,15 +490,8 @@
         }
 
         function renderizarMetricas() {
-            let presTotal = 0;
-            baseDatos[empresaActual].subcuentas.forEach(s => {
-                presTotal += obtenerPresupuestoSubcuenta(empresaActual, s.codigoSub, periodoActual);
-            });
-
-            const ejercidoTotal = baseDatos[empresaActual].gastos
-                .filter(g => g.fecha.startsWith(periodoActual))
-                .reduce((a,b) => a + b.monto, 0);
-
+            const presTotal = baseDatos[empresaActual].partidas.reduce((a,b)=>a+b.monto,0);
+            const ejercidoTotal = baseDatos[empresaActual].gastos.reduce((a,b)=>a+b.monto,0);
             const remanente = presTotal - ejercidoTotal;
 
             document.getElementById('ingresoGlobal').innerText = `$${baseDatos.ingresoGlobal.toLocaleString('en-US',{minimumFractionDigits:2})}`;
@@ -638,25 +503,13 @@
         function renderizarTablas() {
             const tPres = document.getElementById('tablaPresupuesto');
             const tBit = document.getElementById('tablaBitacora');
-            const textoBuscador = document.getElementById('inputBuscador').value.toLowerCase().trim();
-            const filtroFechaDia = document.getElementById('filtroFechaDia').value;
+            const filtro = document.getElementById('filtroCodigo').value;
 
-            // Renderizar presupuesto sumado por Código Padre
             tPres.innerHTML = '';
-            baseDatos[empresaActual].codigosPadre.forEach(p => {
-                const subcuentasRel = baseDatos[empresaActual].subcuentas.filter(s => s.codigoPadre === p.codigo);
-                const codigosSubRel = subcuentasRel.map(s => s.codigoSub);
-
-                // Sumar presupuestos de subcuentas del mes
-                const presSumado = subcuentasRel.reduce((acc, s) => acc + obtenerPresupuestoSubcuenta(empresaActual, s.codigoSub, periodoActual), 0);
-                
-                // Sumar gastos de subcuentas del mes
-                const gastoSumado = baseDatos[empresaActual].gastos
-                    .filter(x => codigosSubRel.includes(x.codigoSub) && x.fecha.startsWith(periodoActual))
-                    .reduce((acc, b) => acc + b.monto, 0);
-
-                const disponible = presSumado - gastoSumado;
-                const porcentaje = presSumado > 0 ? Math.min(Math.round((gastoSumado / presSumado) * 100), 100) : 0;
+            baseDatos[empresaActual].partidas.forEach(p => {
+                const g = baseDatos[empresaActual].gastos.filter(x => x.codigo === p.codigo).reduce((a,b)=>a+b.monto,0);
+                const r = p.monto - g;
+                const porcentaje = p.monto > 0 ? Math.min(Math.round((g / p.monto) * 100), 100) : 0;
                 
                 let colorBarra = 'bg-emerald-500';
                 if(porcentaje >= 80 && porcentaje < 100) colorBarra = 'bg-amber-500';
@@ -666,9 +519,9 @@
                 <tr class="hover:bg-slate-50 transition border-b border-slate-100">
                     <td class="py-3.5 px-3 font-bold text-slate-800 font-mono">${p.codigo}</td>
                     <td class="py-3.5 px-3 text-slate-600 font-medium">${p.descripcion}</td>
-                    <td class="py-3.5 px-3 text-right font-semibold text-slate-700 font-mono">$${presSumado.toLocaleString('en-US',{minimumFractionDigits:2})}</td>
-                    <td class="py-3.5 px-3 text-right font-semibold text-amber-600 font-mono">$${gastoSumado.toLocaleString('en-US',{minimumFractionDigits:2})}</td>
-                    <td class="py-3.5 px-3 text-right font-bold font-mono ${disponible<0?'text-red-500':'text-emerald-600'}">$${disponible.toLocaleString('en-US',{minimumFractionDigits:2})}</td>
+                    <td class="py-3.5 px-3 text-right font-semibold text-slate-700 font-mono">$${p.monto.toLocaleString('en-US',{minimumFractionDigits:2})}</td>
+                    <td class="py-3.5 px-3 text-right font-semibold text-amber-600 font-mono">$${g.toLocaleString('en-US',{minimumFractionDigits:2})}</td>
+                    <td class="py-3.5 px-3 text-right font-bold font-mono ${r<0?'text-red-500':'text-emerald-600'}">$${r.toLocaleString('en-US',{minimumFractionDigits:2})}</td>
                     <td class="py-3.5 px-4 text-center">
                         <div class="flex items-center space-x-2">
                             <div class="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
@@ -680,40 +533,19 @@
                 </tr>`;
             });
 
-            // Renderizar Bitácora con Buscador Universal
             tBit.innerHTML = '';
-            let lista = baseDatos[empresaActual].gastos.filter(g => g.fecha.startsWith(periodoActual));
-            
-            if(filtroFechaDia) lista = lista.filter(x => x.fecha === filtroFechaDia);
-
-            if(textoBuscador) {
-                lista = lista.filter(x => {
-                    const sub = baseDatos[empresaActual].subcuentas.find(s => s.codigoSub === x.codigoSub);
-                    const descSub = sub ? sub.descripcion.toLowerCase() : '';
-                    return x.codigoSub.toLowerCase().includes(textoBuscador) ||
-                           x.concepto.toLowerCase().includes(textoBuscador) ||
-                           x.clasificacion.toLowerCase().includes(textoBuscador) ||
-                           x.formaPago.toLowerCase().includes(textoBuscador) ||
-                           x.monto.toString().includes(textoBuscador) ||
-                           descSub.includes(textoBuscador);
-                });
-            }
+            let lista = baseDatos[empresaActual].gastos;
+            if(filtro) lista = lista.filter(x => x.codigo === filtro);
 
             if(lista.length === 0) {
-                tBit.innerHTML = `<tr><td colspan="7" class="py-6 text-center text-slate-400 italic">No hay registros que coincidan con la búsqueda o filtro</td></tr>`;
+                tBit.innerHTML = `<tr><td colspan="5" class="py-6 text-center text-slate-400 italic">No hay transacciones registradas</td></tr>`;
             } else {
                 lista.forEach(g => {
-                    let badgePago = 'bg-blue-50 text-blue-700 border-blue-200';
-                    if(g.formaPago === 'Cheque') badgePago = 'bg-purple-50 text-purple-700 border-purple-200';
-                    if(g.formaPago === 'Reembolso') badgePago = 'bg-amber-50 text-amber-700 border-amber-200';
-
                     tBit.innerHTML += `
                     <tr class="hover:bg-slate-50 transition">
-                        <td class="py-2.5 px-2 font-mono text-slate-500 font-semibold">${g.fecha}</td>
-                        <td class="px-2 font-bold text-slate-800 font-mono">${g.codigoSub}</td>
+                        <td class="py-2.5 px-2 font-mono text-slate-500">${g.fecha}</td>
+                        <td class="px-2 font-bold text-slate-800 font-mono">${g.codigo}</td>
                         <td class="px-2 text-slate-600">${g.concepto}</td>
-                        <td class="px-2 text-slate-500"><span class="bg-slate-100 text-slate-600 px-2 py-0.5 rounded text-[10px] font-semibold">${g.clasificacion}</span></td>
-                        <td class="px-2"><span class="${badgePago} border px-2 py-0.5 rounded text-[10px] font-bold">${g.formaPago}</span></td>
                         <td class="px-2 text-right font-semibold text-amber-600 font-mono">$${g.monto.toLocaleString('en-US',{minimumFractionDigits:2})}</td>
                         <td class="px-2 text-center"><button onclick="borrarGasto(${g.id})" class="text-slate-400 hover:text-red-500 font-bold px-2 py-1 transition">✕</button></td>
                     </tr>`;
@@ -724,26 +556,13 @@
         function renderizarCatalogo() {
             const tCat = document.getElementById('tablaCatalogo');
             tCat.innerHTML = '';
-            baseDatos[empresaActual].subcuentas.forEach(s => {
-                const montoMes = obtenerPresupuestoSubcuenta(empresaActual, s.codigoSub, periodoActual);
+            baseDatos[empresaActual].partidas.forEach(p => {
                 tCat.innerHTML += `
                 <tr class="hover:bg-slate-50 transition">
-                    <td class="py-3 px-2 font-bold text-slate-800 font-mono">${s.codigoSub}</td>
-                    <td class="px-2 font-mono text-slate-500">${s.codigoPadre}</td>
-                    <td class="px-2 text-slate-600">${s.descripcion}</td>
-                    <td class="px-2 text-right">
-                        <div class="inline-flex items-center space-x-1 border border-slate-200 rounded-lg bg-slate-50 hover:bg-white focus-within:bg-white focus-within:ring-1 focus-within:ring-blue-500 px-2 py-1 transition">
-                            <span class="text-slate-400 font-mono font-bold">$</span>
-                            <input type="number" 
-                                   step="0.01" 
-                                   value="${montoMes}" 
-                                   onchange="actualizarMontoSubcuentaDirecto('${s.codigoSub}', this.value)"
-                                   class="w-28 text-right font-bold text-slate-800 font-mono bg-transparent focus:outline-none">
-                        </div>
-                    </td>
-                    <td class="px-2 text-center">
-                        <button onclick="borrarSubcuenta('${s.codigoSub}')" class="text-red-500 hover:bg-red-50 font-semibold px-2 py-1 rounded text-xs transition">Eliminar</button>
-                    </td>
+                    <td class="py-3 px-2 font-bold text-slate-800 font-mono">${p.codigo}</td>
+                    <td class="px-2 text-slate-600">${p.descripcion}</td>
+                    <td class="px-2 text-right font-semibold text-slate-700 font-mono">$${p.monto.toLocaleString('en-US',{minimumFractionDigits:2})}</td>
+                    <td class="px-2 text-center"><button onclick="borrarPartida('${p.codigo}')" class="text-red-500 hover:bg-red-50 font-semibold px-2.5 py-1 rounded text-xs transition">Eliminar</button></td>
                 </tr>`;
             });
         }
@@ -754,26 +573,16 @@
             let mapa = {};
 
             ['Carrduci', 'CarrduciMetal'].forEach(emp => {
-                baseDatos[emp].codigosPadre.forEach(p => {
+                baseDatos[emp].partidas.forEach(p => {
                     if(!mapa[p.codigo]) mapa[p.codigo] = { cod: p.codigo, desc: p.descripcion, pC: 0, pM: 0 };
-                    
-                    const subs = baseDatos[emp].subcuentas.filter(s => s.codigoPadre === p.codigo);
-                    const presTotalEmp = subs.reduce((acc, s) => acc + obtenerPresupuestoSubcuenta(emp, s.codigoSub, periodoActual), 0);
-
-                    if(emp === 'Carrduci') mapa[p.codigo].pC = presTotalEmp;
-                    if(emp === 'CarrduciMetal') mapa[p.codigo].pM = presTotalEmp;
+                    if(emp === 'Carrduci') mapa[p.codigo].pC = p.monto;
+                    if(emp === 'CarrduciMetal') mapa[p.codigo].pM = p.monto;
                 });
             });
 
             let gC = {}, gM = {};
-            baseDatos.Carrduci.gastos.filter(g => g.fecha.startsWith(periodoActual)).forEach(g => {
-                const sub = baseDatos.Carrduci.subcuentas.find(s => s.codigoSub === g.codigoSub);
-                if(sub) gC[sub.codigoPadre] = (gC[sub.codigoPadre] || 0) + g.monto;
-            });
-            baseDatos.CarrduciMetal.gastos.filter(g => g.fecha.startsWith(periodoActual)).forEach(g => {
-                const sub = baseDatos.CarrduciMetal.subcuentas.find(s => s.codigoSub === g.codigoSub);
-                if(sub) gM[sub.codigoPadre] = (gM[sub.codigoPadre] || 0) + g.monto;
-            });
+            baseDatos.Carrduci.gastos.forEach(g => { gC[g.codigo] = (gC[g.codigo] || 0) + g.monto; });
+            baseDatos.CarrduciMetal.gastos.forEach(g => { gM[g.codigo] = (gM[g.codigo] || 0) + g.monto; });
 
             Object.values(mapa).forEach(m => {
                 const presTot = m.pC + m.pM;
@@ -804,7 +613,7 @@
             const container = document.getElementById('contenedorFiltroCodigos');
             container.innerHTML = '';
 
-            baseDatos[empresaActual].codigosPadre.forEach(p => {
+            baseDatos[empresaActual].partidas.forEach(p => {
                 const checked = codigosSeleccionadosTablero.includes(p.codigo) ? 'checked' : '';
                 container.innerHTML += `
                 <label class="inline-flex items-center space-x-2 bg-slate-50 hover:bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-200 cursor-pointer transition select-none">
@@ -826,7 +635,7 @@
 
         function seleccionarTodosCodigos(status) {
             if(status) {
-                codigosSeleccionadosTablero = baseDatos[empresaActual].codigosPadre.map(p => p.codigo);
+                codigosSeleccionadosTablero = baseDatos[empresaActual].partidas.map(p => p.codigo);
             } else {
                 codigosSeleccionadosTablero = [];
             }
@@ -835,41 +644,31 @@
         }
 
         function actualizarGraficosYKPIS() {
-            const codigosFiltrados = baseDatos[empresaActual].codigosPadre.filter(p => codigosSeleccionadosTablero.includes(p.codigo));
+            const partidasFiltradas = baseDatos[empresaActual].partidas.filter(p => codigosSeleccionadosTablero.includes(p.codigo));
             
-            const labels = codigosFiltrados.map(p => p.codigo);
-            
-            const dataPres = codigosFiltrados.map(p => {
-                const subs = baseDatos[empresaActual].subcuentas.filter(s => s.codigoPadre === p.codigo);
-                return subs.reduce((acc, s) => acc + obtenerPresupuestoSubcuenta(empresaActual, s.codigoSub, periodoActual), 0);
-            });
-
-            const dataGasto = codigosFiltrados.map(p => {
-                const subs = baseDatos[empresaActual].subcuentas.filter(s => s.codigoPadre === p.codigo);
-                const codsSub = subs.map(s => s.codigoSub);
+            const labels = partidasFiltradas.map(p => p.codigo);
+            const dataPres = partidasFiltradas.map(p => p.monto);
+            const dataGasto = partidasFiltradas.map(p => {
                 return baseDatos[empresaActual].gastos
-                    .filter(g => codsSub.includes(g.codigoSub) && g.fecha.startsWith(periodoActual))
+                    .filter(g => g.codigo === p.codigo)
                     .reduce((a,b) => a + b.monto, 0);
             });
 
             const totalPres = dataPres.reduce((a,b)=>a+b,0);
             const totalGast = dataGasto.reduce((a,b)=>a+b,0);
             const pctAvance = totalPres > 0 ? Math.round((totalGast / totalPres) * 100) : 0;
-            const promGasto = codigosFiltrados.length > 0 ? totalGast / codigosFiltrados.length : 0;
+            const promGasto = partidasFiltradas.length > 0 ? totalGast / partidasFiltradas.length : 0;
 
             let mayorGasto = 0;
             let partidaMayor = 'N/A';
-            codigosFiltrados.forEach((p, idx) => {
+            partidasFiltradas.forEach((p, idx) => {
                 if(dataGasto[idx] > mayorGasto) {
                     mayorGasto = dataGasto[idx];
                     partidaMayor = `${p.codigo} - ${p.descripcion}`;
                 }
             });
 
-            const numTrans = baseDatos[empresaActual].gastos.filter(g => {
-                const sub = baseDatos[empresaActual].subcuentas.find(s => s.codigoSub === g.codigoSub);
-                return sub && codigosSeleccionadosTablero.includes(sub.codigoPadre) && g.fecha.startsWith(periodoActual);
-            }).length;
+            const numTrans = baseDatos[empresaActual].gastos.filter(g => codigosSeleccionadosTablero.includes(g.codigo)).length;
 
             document.getElementById('kpiPorcentajeAvance').innerText = `${pctAvance}%`;
             document.getElementById('kpiBarraPorcentaje').style.width = `${Math.min(pctAvance, 100)}%`;
@@ -887,29 +686,21 @@
                 data: {
                     labels: labels,
                     datasets: [
-                        { label: 'Presupuesto Mes', data: dataPres, backgroundColor: '#1890ff', borderRadius: 4 },
-                        { label: 'Gasto Real Mes', data: dataGasto, backgroundColor: '#faad14', borderRadius: 4 }
+                        { label: 'Presupuesto', data: dataPres, backgroundColor: '#1890ff', borderRadius: 4 },
+                        { label: 'Gasto Real', data: dataGasto, backgroundColor: '#faad14', borderRadius: 4 }
                     ]
                 },
                 options: { responsive: true, maintainAspectRatio: false }
             });
 
-            // Distribución por Forma de Pago
-            const pagosMap = { Transfer: 0, Cheque: 0, Reembolso: 0 };
-            baseDatos[empresaActual].gastos
-                .filter(g => g.fecha.startsWith(periodoActual))
-                .forEach(g => {
-                    if(pagosMap[g.formaPago] !== undefined) pagosMap[g.formaPago] += g.monto;
-                });
-
             const ctx2 = document.getElementById('chartDona').getContext('2d');
             chartDonaInst = new Chart(ctx2, {
                 type: 'doughnut',
                 data: {
-                    labels: ['Transfer', 'Cheque', 'Reembolso'],
+                    labels: labels.length > 0 ? labels : ['Sin selección'],
                     datasets: [{
-                        data: [pagosMap.Transfer, pagosMap.Cheque, pagosMap.Reembolso],
-                        backgroundColor: ['#1890ff', '#722ed1', '#faad14']
+                        data: dataGasto.length > 0 && totalGast > 0 ? dataGasto : [1],
+                        backgroundColor: ['#1890ff', '#faad14', '#52c41a', '#ff4d4f', '#722ed1', '#13c2c2']
                     }]
                 },
                 options: { responsive: true, maintainAspectRatio: false }
@@ -917,43 +708,32 @@
         }
 
         function exportarCSV() {
-            let csv = "PERIODO,CODIGO PADRE,DESCRIPCION,PRESUPUESTO SUMADO,GASTO CARRDUCI,GASTO CARRDUCI METAL,GASTO TOTAL,DISPONIBLE\n";
+            let csv = "CODIGO,DESCRIPCION,PRESUPUESTO TOTAL,GASTO CARRDUCI,GASTO CARRDUCI METAL,GASTO TOTAL,DISPONIBLE\n";
             let mapa = {};
-
             ['Carrduci', 'CarrduciMetal'].forEach(emp => {
-                baseDatos[emp].codigosPadre.forEach(p => {
+                baseDatos[emp].partidas.forEach(p => {
                     if(!mapa[p.codigo]) mapa[p.codigo] = { cod: p.codigo, desc: p.descripcion, pC: 0, pM: 0 };
-                    
-                    const subs = baseDatos[emp].subcuentas.filter(s => s.codigoPadre === p.codigo);
-                    const presTotalEmp = subs.reduce((acc, s) => acc + obtenerPresupuestoSubcuenta(emp, s.codigoSub, periodoActual), 0);
-
-                    if(emp === 'Carrduci') mapa[p.codigo].pC = presTotalEmp;
-                    if(emp === 'CarrduciMetal') mapa[p.codigo].pM = presTotalEmp;
+                    if(emp === 'Carrduci') mapa[p.codigo].pC = p.monto;
+                    if(emp === 'CarrduciMetal') mapa[p.codigo].pM = p.monto;
                 });
             });
 
             let gC = {}, gM = {};
-            baseDatos.Carrduci.gastos.filter(g => g.fecha.startsWith(periodoActual)).forEach(g => {
-                const sub = baseDatos.Carrduci.subcuentas.find(s => s.codigoSub === g.codigoSub);
-                if(sub) gC[sub.codigoPadre] = (gC[sub.codigoPadre] || 0) + g.monto;
-            });
-            baseDatos.CarrduciMetal.gastos.filter(g => g.fecha.startsWith(periodoActual)).forEach(g => {
-                const sub = baseDatos.CarrduciMetal.subcuentas.find(s => s.codigoSub === g.codigoSub);
-                if(sub) gM[sub.codigoPadre] = (gM[sub.codigoPadre] || 0) + g.monto;
-            });
+            baseDatos.Carrduci.gastos.forEach(g => { gC[g.codigo] = (gC[g.codigo] || 0) + g.monto; });
+            baseDatos.CarrduciMetal.gastos.forEach(g => { gM[g.codigo] = (gM[g.codigo] || 0) + g.monto; });
 
             Object.values(mapa).forEach(m => {
                 const pres = m.pC + m.pM;
                 const c = gC[m.cod] || 0;
                 const met = gM[m.cod] || 0;
                 const tot = c + met;
-                csv += `"${periodoActual}","${m.cod}","${m.desc}",${pres},${c},${met},${tot},${pres - tot}\n`;
+                csv += `"${m.cod}","${m.desc}",${pres},${c},${met},${tot},${pres - tot}\n`;
             });
 
             const blob = new Blob([csv], { type: 'text/csv' });
             const a = document.createElement('a');
             a.href = URL.createObjectURL(blob);
-            a.download = `Reporte_Presupuestal_${periodoActual}.csv`;
+            a.download = 'Reporte_Presupuestal.csv';
             a.click();
         }
     </script>
