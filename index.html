@@ -71,9 +71,9 @@
                     <i data-lucide="building-2" class="w-4 h-4"></i>
                     <span>Empresa en pantalla:</span>
                 </span>
-                <select id="empresaSelect" class="bg-slate-800 text-white border border-slate-700 text-xs rounded-lg px-3 py-2 font-bold focus:outline-none">
-                    <option value="Carruci">Carruci S.A. de C.V.</option>
-                    <option value="CarruciMetal">Carruci Metal</option>
+                <select id="empresaSelect" onchange="cambiarEmpresa()" class="bg-slate-800 text-white border border-slate-700 text-xs rounded-lg px-3 py-2 font-bold focus:outline-none">
+                    <option value="Carrduci">Carruci S.A. de C.V.</option>
+                    <option value="CarrduciMetal">Carruci Metal</option>
                 </select>
             </div>
         </header>
@@ -124,25 +124,25 @@
             </div>
         </div>
 
-        <!-- CONTENIDO PRINCIPAL: FORMULARIO Y TABLAS -->
+        <!-- CONTENIDO PRINCIPAL -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             
             <!-- FORMULARIO REGISTRAR GASTO -->
             <div class="bg-emerald-50/40 border border-emerald-100 p-5 rounded-xl shadow-sm">
                 <h3 class="text-xs font-bold text-emerald-800 uppercase tracking-wider flex items-center space-x-1 mb-4">
                     <i data-lucide="plus-circle" class="w-4 h-4 text-emerald-600"></i>
-                    <span>Registrar Gasto Diario ( CARRDUCI )</span>
+                    <span id="formTitulo">Registrar Gasto Diario ( CARRDUCI )</span>
                 </h3>
 
-                <form class="space-y-3 text-xs">
+                <form id="gastoForm" onsubmit="registrarGasto(event)" class="space-y-3 text-xs">
                     <div class="grid grid-cols-2 gap-2">
                         <div>
                             <label class="block font-medium text-slate-600 mb-1">Fecha:</label>
-                            <input type="date" class="w-full border border-slate-300 rounded-lg p-2 bg-white text-slate-700">
+                            <input type="date" id="inputFecha" required class="w-full border border-slate-300 rounded-lg p-2 bg-white text-slate-700">
                         </div>
                         <div>
                             <label class="block font-medium text-slate-600 mb-1">Código Partida:</label>
-                            <select class="w-full border border-slate-300 rounded-lg p-2 bg-white text-slate-700">
+                            <select id="selectPartida" required class="w-full border border-slate-300 rounded-lg p-2 bg-white text-slate-700">
                                 <option value="">Seleccionar...</option>
                             </select>
                         </div>
@@ -151,20 +151,20 @@
                     <div class="grid grid-cols-2 gap-2">
                         <div>
                             <label class="block font-medium text-slate-600 mb-1">Concepto / Detalle:</label>
-                            <input type="text" placeholder="Ej. Pago Proveedor X" class="w-full border border-slate-300 rounded-lg p-2 bg-white">
+                            <input type="text" id="inputConcepto" required placeholder="Ej. Pago Proveedor X" class="w-full border border-slate-300 rounded-lg p-2 bg-white">
                         </div>
                         <div>
                             <label class="block font-medium text-slate-600 mb-1">Monto ($):</label>
-                            <input type="number" placeholder="0.00" class="w-full border border-slate-300 rounded-lg p-2 bg-white">
+                            <input type="number" step="0.01" id="inputMonto" required placeholder="0.00" class="w-full border border-slate-300 rounded-lg p-2 bg-white">
                         </div>
                     </div>
 
                     <div>
                         <label class="block font-medium text-slate-600 mb-1">Adjuntar Foto / Factura (Imagen):</label>
-                        <input type="file" class="w-full border border-slate-300 rounded-lg p-1.5 bg-white text-xs text-slate-500">
+                        <input type="file" id="inputFactura" class="w-full border border-slate-300 rounded-lg p-1.5 bg-white text-xs text-slate-500">
                     </div>
 
-                    <button type="button" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-lg text-xs mt-2 transition">
+                    <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-lg text-xs mt-2 transition">
                         Aplicar Gasto
                     </button>
                 </form>
@@ -175,7 +175,7 @@
                 
                 <!-- PRESUPUESTO INDIVIDUAL -->
                 <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-                    <h3 class="text-xs font-bold text-slate-500 uppercase mb-3">Presupuesto Individual del Mes (CARRDUCI)</h3>
+                    <h3 class="text-xs font-bold text-slate-500 uppercase mb-3" id="presupuestoTitulo">Presupuesto Individual del Mes (CARRDUCI)</h3>
                     <div class="overflow-x-auto">
                         <table class="w-full text-left text-xs">
                             <thead>
@@ -188,10 +188,8 @@
                                     <th class="py-2">Desglose</th>
                                 </tr>
                             </thead>
-                            <tbody class="divide-y divide-slate-100 text-slate-600">
-                                <tr>
-                                    <td colspan="6" class="py-4 text-center text-slate-400 italic">No hay datos registrados</td>
-                                </tr>
+                            <tbody id="tablaPresupuesto" class="divide-y divide-slate-100 text-slate-600">
+                                <!-- Dinámico -->
                             </tbody>
                         </table>
                     </div>
@@ -203,10 +201,10 @@
                         <h3 class="text-xs font-bold text-slate-500 uppercase">Bitácora de Gastos Diarios</h3>
                         <div class="flex items-center space-x-2 text-xs">
                             <span class="text-slate-400">Filtrar por Código:</span>
-                            <select class="border border-slate-300 rounded px-2 py-1 bg-white text-slate-600">
-                                <option>-- Todos los Códigos --</option>
+                            <select id="filtroCodigo" onchange="renderizarTablas()" class="border border-slate-300 rounded px-2 py-1 bg-white text-slate-600">
+                                <option value="">-- Todos los Códigos --</option>
                             </select>
-                            <button class="text-red-500 font-semibold hover:underline ml-2">Limpiar Gastos</button>
+                            <button onclick="limpiarGastos()" class="text-red-500 font-semibold hover:underline ml-2">Limpiar Gastos</button>
                         </div>
                     </div>
 
@@ -222,10 +220,8 @@
                                     <th class="py-2">Borrar</th>
                                 </tr>
                             </thead>
-                            <tbody class="divide-y divide-slate-100 text-slate-600">
-                                <tr>
-                                    <td colspan="6" class="py-4 text-center text-slate-400 italic">Sin registros de gastos</td>
-                                </tr>
+                            <tbody id="tablaBitacora" class="divide-y divide-slate-100 text-slate-600">
+                                <!-- Dinámico -->
                             </tbody>
                         </table>
                     </div>
@@ -236,18 +232,157 @@
 
     </div>
 
-    <!-- SCRIPT DE JAVASCRIPT CORREGIDO Y ENCAPSULADO -->
+    <!-- MOTOR JAVASCRIPT COMPLETO -->
     <script>
-        // Inicializar iconos de Lucide
         lucide.createIcons();
 
-        // Base de datos de ejemplo
+        // Estado inicial de la base de datos
         let baseDatos = {
-            Carrduci: { partidas: [], gastos: [] },
-            CarrduciMetal: { partidas: [], gastos: [] }
+            ingresoGlobal: 250000.00,
+            Carrduci: {
+                partidas: [
+                    { codigo: '601-03', descripcion: 'Servicios Públicos (Luz, Agua)', monto: 18000 },
+                    { codigo: '602-01', descripcion: 'Papelería y Consumibles', monto: 4000 },
+                    { codigo: '604-01', descripcion: 'Licencias y Software', monto: 12000 }
+                ],
+                gastos: []
+            },
+            CarrduciMetal: {
+                partidas: [
+                    { codigo: '601-03', descripcion: 'Servicios Públicos (Luz, Agua)', monto: 20000 },
+                    { codigo: '603-01', descripcion: 'Mantenimiento de Maquinaria', monto: 18000 }
+                ],
+                gastos: []
+            }
         };
 
-        // Función para exportar CSV (Tomada exactamente de tu código original)
+        let empresaActual = 'Carrduci';
+
+        function init() {
+            document.getElementById('inputFecha').valueAsDate = new Date();
+            actualizarSelects();
+            renderizarTablas();
+            actualizarMetricas();
+        }
+
+        function cambiarEmpresa() {
+            empresaActual = document.getElementById('empresaSelect').value;
+            const nombreEmpresa = empresaActual === 'Carrduci' ? 'CARRDUCI' : 'CARRDUCI METAL';
+            
+            document.getElementById('formTitulo').innerText = `Registrar Gasto Diario ( ${nombreEmpresa} )`;
+            document.getElementById('presupuestoTitulo').innerText = `Presupuesto Individual del Mes (${nombreEmpresa})`;
+            
+            actualizarSelects();
+            renderizarTablas();
+            actualizarMetricas();
+        }
+
+        function actualizarSelects() {
+            const selectPartida = document.getElementById('selectPartida');
+            const filtroCodigo = document.getElementById('filtroCodigo');
+            
+            selectPartida.innerHTML = '<option value="">Seleccionar...</option>';
+            filtroCodigo.innerHTML = '<option value="">-- Todos los Códigos --</option>';
+
+            const partidas = baseDatos[empresaActual].partidas;
+            partidas.forEach(p => {
+                selectPartida.innerHTML += `<option value="${p.codigo}">${p.codigo} - ${p.descripcion}</option>`;
+                filtroCodigo.innerHTML += `<option value="${p.codigo}">${p.codigo}</option>`;
+            });
+        }
+
+        function registrarGasto(e) {
+            e.preventDefault();
+            const fecha = document.getElementById('inputFecha').value;
+            const codigo = document.getElementById('selectPartida').value;
+            const concepto = document.getElementById('inputConcepto').value;
+            const monto = parseFloat(document.getElementById('inputMonto').value);
+
+            baseDatos[empresaActual].gastos.push({ id: Date.now(), fecha, codigo, concepto, monto });
+
+            document.getElementById('inputConcepto').value = '';
+            document.getElementById('inputMonto').value = '';
+
+            renderizarTablas();
+            actualizarMetricas();
+        }
+
+        function borrarGasto(id) {
+            baseDatos[empresaActual].gastos = baseDatos[empresaActual].gastos.filter(g => g.id !== id);
+            renderizarTablas();
+            actualizarMetricas();
+        }
+
+        function limpiarGastos() {
+            if (confirm("¿Estás seguro de borrar todos los gastos de esta empresa?")) {
+                baseDatos[empresaActual].gastos = [];
+                renderizarTablas();
+                actualizarMetricas();
+            }
+        }
+
+        function renderizarTablas() {
+            const tablaPresupuesto = document.getElementById('tablaPresupuesto');
+            const tablaBitacora = document.getElementById('tablaBitacora');
+            const filtro = document.getElementById('filtroCodigo').value;
+
+            // Render Presupuesto
+            tablaPresupuesto.innerHTML = '';
+            baseDatos[empresaActual].partidas.forEach(p => {
+                const gastosPartida = baseDatos[empresaActual].gastos
+                    .filter(g => g.codigo === p.codigo)
+                    .reduce((acc, g) => acc + g.monto, 0);
+
+                const restante = p.monto - gastosPartida;
+                
+                tablaPresupuesto.innerHTML += `
+                    <tr class="hover:bg-slate-50">
+                        <td class="py-2 font-bold">${p.codigo}</td>
+                        <td class="py-2">${p.descripcion}</td>
+                        <td class="py-2 font-semibold">$${p.monto.toFixed(2)}</td>
+                        <td class="py-2 text-amber-600 font-semibold">$${gastosPartida.toFixed(2)}</td>
+                        <td class="py-2 ${restante < 0 ? 'text-red-500' : 'text-emerald-600'} font-bold">$${restante.toFixed(2)}</td>
+                        <td class="py-2 text-slate-400">Ver</td>
+                    </tr>
+                `;
+            });
+
+            // Render Bitácora
+            tablaBitacora.innerHTML = '';
+            let gastos = baseDatos[empresaActual].gastos;
+            if (filtro) gastos = gastos.filter(g => g.codigo === filtro);
+
+            if (gastos.length === 0) {
+                tablaBitacora.innerHTML = `<tr><td colspan="6" class="py-4 text-center text-slate-400 italic">Sin registros de gastos</td></tr>`;
+            } else {
+                gastos.forEach(g => {
+                    tablaBitacora.innerHTML += `
+                        <tr class="hover:bg-slate-50">
+                            <td class="py-2">${g.fecha}</td>
+                            <td class="py-2 font-bold">${g.codigo}</td>
+                            <td class="py-2">${g.concepto}</td>
+                            <td class="py-2 text-amber-600 font-bold">$${g.monto.toFixed(2)}</td>
+                            <td class="py-2 text-slate-400 italic">Sin archivo</td>
+                            <td class="py-2">
+                                <button onclick="borrarGasto(${g.id})" class="text-red-500 hover:text-red-700 font-bold">✕</button>
+                            </td>
+                        </tr>
+                    `;
+                });
+            }
+        }
+
+        function actualizarMetricas() {
+            const presTotal = baseDatos[empresaActual].partidas.reduce((acc, p) => acc + p.monto, 0);
+            const ejercidoTotal = baseDatos[empresaActual].gastos.reduce((acc, g) => acc + g.monto, 0);
+            const remanente = presTotal - ejercidoTotal;
+
+            document.getElementById('ingresoGlobal').innerText = `$${baseDatos.ingresoGlobal.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
+            document.getElementById('totalPresupuestado').innerText = `$${presTotal.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
+            document.getElementById('totalEjercido').innerText = `$${ejercidoTotal.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
+            document.getElementById('disponibleRemanente').innerText = `$${remanente.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
+        }
+
         function exportarCSV() {
             let csv = "CONSOLIDADO DE PRESUPUESTOS Y GASTOS - CARRDUCI Y CARRDUCI METAL\n\n";
             csv += "CODIGO,CONCEPTO DEL CODIGO,PRESUPUESTO MENSUAL,GASTO CARRDUCI,GASTO CARRDUCI METAL,IMPORTE RESTANTE,PORCENTAJE GASTADO\n";
@@ -265,7 +400,6 @@
             });
 
             let gC = {}, gM = {};
-
             baseDatos.Carrduci.gastos.forEach(g => { gC[g.codigo] = (gC[g.codigo] || 0) + g.monto; });
             baseDatos.CarrduciMetal.gastos.forEach(g => { gM[g.codigo] = (gM[g.codigo] || 0) + g.monto; });
 
@@ -286,6 +420,9 @@
             a.setAttribute('download', 'Consolidado_Presupuestal_Carrduci.csv');
             a.click();
         }
+
+        // Cargar eventos
+        window.onload = init;
     </script>
 </body>
 </html>
