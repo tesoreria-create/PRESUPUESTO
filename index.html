@@ -35,7 +35,7 @@ HTML
             <!-- Selector de Razón Social Operativa -->
             <div class="flex items-center gap-3 bg-slate-800 p-2 rounded-lg border border-slate-700 no-print">
                 <label class="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
-                    <i class="fa-solid fa-building text-indigo-400"></i> Captura para:
+                    <i class="fa-solid fa-building text-indigo-400"></i> Empresa en pantalla:
                 </label>
                 <select id="selectEmpresa" onchange="cambiarEmpresa()" class="bg-slate-900 text-white text-xs font-bold py-1.5 px-3 rounded border border-slate-600 focus:outline-none focus:border-indigo-500">
                     <option value="Carrduci">Carrduci S.A. de C.V.</option>
@@ -46,23 +46,22 @@ HTML
 
         <!-- BARRA DE NAVEGACIÓN DE PESTAÑAS -->
         <div class="bg-slate-200 border-b border-slate-300 flex flex-wrap justify-between items-center px-4 no-print">
-            <div class="flex gap-2">
-                <button id="tabOperativo" onclick="switchTab('operativo')" class="py-3 px-4 text-xs font-bold border-b-2 border-indigo-600 text-indigo-700 bg-white transition flex items-center gap-2">
-                    <i class="fa-solid fa-list-check"></i> 1. Captura Operativa y Gastos
+            <div class="flex flex-wrap gap-1 md:gap-2">
+                <button id="tabOperativo" onclick="switchTab('operativo')" class="py-3 px-3 text-xs font-bold border-b-2 border-indigo-600 text-indigo-700 bg-white transition flex items-center gap-2">
+                    <i class="fa-solid fa-list-check"></i> 1. Captura y Bitácora de Gastos
                 </button>
-                <button id="tabConsolidado" onclick="switchTab('consolidado')" class="py-3 px-4 text-xs font-bold border-b-2 border-transparent text-slate-600 hover:text-slate-900 transition flex items-center gap-2">
-                    <i class="fa-solid fa-table-columns"></i> 2. Comparativo Consolidado (Ambas Razones)
+                <button id="tabCatalogo" onclick="switchTab('catalogo')" class="py-3 px-3 text-xs font-bold border-b-2 border-transparent text-slate-600 hover:text-slate-900 transition flex items-center gap-2">
+                    <i class="fa-solid fa-folder-plus"></i> 2. Catálogo y Presupuestos Mensuales
                 </button>
-                <button id="tabEjecutivo" onclick="switchTab('ejecutivo')" class="py-3 px-4 text-xs font-bold border-b-2 border-transparent text-slate-600 hover:text-slate-900 transition flex items-center gap-2">
-                    <i class="fa-solid fa-user-tie"></i> 3. Tablero Dirección (Gráficos)
+                <button id="tabConsolidado" onclick="switchTab('consolidado')" class="py-3 px-3 text-xs font-bold border-b-2 border-transparent text-slate-600 hover:text-slate-900 transition flex items-center gap-2">
+                    <i class="fa-solid fa-table-columns"></i> 3. Comparativo Consolidado
+                </button>
+                <button id="tabEjecutivo" onclick="switchTab('ejecutivo')" class="py-3 px-3 text-xs font-bold border-b-2 border-transparent text-slate-600 hover:text-slate-900 transition flex items-center gap-2">
+                    <i class="fa-solid fa-user-tie"></i> 4. Tablero Dirección (Gráficos)
                 </button>
             </div>
             
             <div class="flex gap-2 py-2">
-                <label class="cursor-pointer bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold py-1.5 px-3 rounded transition flex items-center gap-1.5 shadow-sm">
-                    <i class="fa-solid fa-file-import"></i> Cargar Catálogo (CSV)
-                    <input type="file" accept=".csv" onchange="cargarCatalogoCSV(event)" class="hidden">
-                </label>
                 <button onclick="exportarCSV()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold py-1.5 px-3 rounded transition flex items-center gap-1.5 shadow-sm">
                     <i class="fa-solid fa-file-excel"></i> Exportar
                 </button>
@@ -89,50 +88,14 @@ HTML
             </div>
         </div>
 
-        <!-- ==================== PESTAÑA 1: CAPTURA OPERATIVA ==================== -->
+        <!-- ==================== PESTAÑA 1: CAPTURA OPERATIVA Y GASTOS ==================== -->
         <div id="viewOperativo" class="p-4 md:p-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
             
-            <!-- FORMULARIOS -->
+            <!-- FORMULARIO DE GASTOS DIARIOS -->
             <div class="lg:col-span-1 space-y-5 no-print">
-                <!-- Ingreso Base -->
-                <div class="bg-indigo-50 p-4 rounded-lg border border-indigo-100">
-                    <h2 class="text-xs font-bold uppercase tracking-wider text-indigo-900 mb-2 flex items-center gap-1.5">
-                        <i class="fa-solid fa-wallet"></i> Ingreso Base (<span id="lblEmpresaIngreso">Carrduci</span>)
-                    </h2>
-                    <input type="number" id="ingresoBase" value="60000" min="0" oninput="guardarIngreso()" 
-                        class="w-full p-2 border border-indigo-200 rounded-lg text-sm font-bold focus:ring-2 focus:ring-indigo-500">
-                </div>
-
-                <!-- Partida Presupuestal -->
-                <div class="bg-slate-50 p-4 rounded-lg border border-slate-200 space-y-3">
-                    <h2 class="text-xs font-bold uppercase tracking-wider text-slate-900 flex items-center gap-1.5">
-                        <i class="fa-solid fa-plus-circle"></i> + Código Presupuestal
-                    </h2>
-                    <form onsubmit="agregarPartida(event)" class="space-y-2.5">
-                        <div class="grid grid-cols-3 gap-2">
-                            <div>
-                                <label class="block text-[10px] font-bold text-slate-600">Código:</label>
-                                <input type="text" id="partidaCodigo" placeholder="101" required class="w-full p-2 border border-slate-300 rounded text-xs uppercase">
-                            </div>
-                            <div class="col-span-2">
-                                <label class="block text-[10px] font-bold text-slate-600">Monto Presupuesto ($):</label>
-                                <input type="number" step="0.01" id="partidaMonto" placeholder="0.00" required class="w-full p-2 border border-slate-300 rounded text-xs">
-                            </div>
-                        </div>
-                        <div>
-                            <label class="block text-[10px] font-bold text-slate-600">Concepto / Descripción del Código:</label>
-                            <input type="text" id="partidaDescripcion" placeholder="Ej. Materiales de construcción" required class="w-full p-2 border border-slate-300 rounded text-xs">
-                        </div>
-                        <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 rounded text-xs shadow transition">
-                            Guardar Código
-                        </button>
-                    </form>
-                </div>
-
-                <!-- Formulario Gasto Diario -->
                 <div class="bg-emerald-50 p-4 rounded-lg border border-emerald-200 space-y-3">
                     <h2 class="text-xs font-bold uppercase tracking-wider text-emerald-900 flex items-center gap-1.5">
-                        <i class="fa-solid fa-receipt"></i> + Registrar Gasto Diario
+                        <i class="fa-solid fa-receipt"></i> + Registrar Gasto Diario (<span id="lblEmpresaGasto">Carrduci</span>)
                     </h2>
                     <form onsubmit="agregarGastoDiario(event)" class="space-y-2.5">
                         <div class="grid grid-cols-2 gap-2">
@@ -159,7 +122,7 @@ HTML
                         </div>
                         
                         <div>
-                            <label class="block text-[10px] font-bold text-slate-700">Adjuntar Foto / Factura Pagada (Imagen):</label>
+                            <label class="block text-[10px] font-bold text-slate-700">Adjuntar Foto / Factura (Imagen):</label>
                             <input type="file" id="gastoFoto" accept="image/*" class="w-full p-1 border border-slate-300 rounded text-[11px] bg-white">
                         </div>
 
@@ -170,17 +133,16 @@ HTML
                 </div>
             </div>
 
-            <!-- TABLAS DE DESGLOSE INDIVIDUAL -->
+            <!-- TABLAS DE DESGLOSE INDIVIDUAL Y BITÁCORA CON FILTRO -->
             <div class="lg:col-span-2 space-y-6">
                 <!-- Estado por Código -->
                 <div>
                     <div class="flex justify-between items-center mb-2">
                         <h2 class="text-xs font-bold uppercase tracking-wider text-slate-900">
-                            Presupuesto Individual (<span id="lblEmpresaTabla">Carrduci</span>)
+                            Presupuesto Individual del Mes (<span id="lblEmpresaTabla">Carrduci</span>)
                         </h2>
-                        <button onclick="borrarPartidas()" class="text-[11px] text-red-600 hover:underline no-print">Borrar Códigos</button>
                     </div>
-                    <div class="overflow-x-auto max-h-64 bg-white rounded-lg border border-slate-200 shadow-sm">
+                    <div class="overflow-x-auto max-h-56 bg-white rounded-lg border border-slate-200 shadow-sm">
                         <table class="w-full text-left text-xs text-slate-600">
                             <thead class="bg-slate-100 text-slate-700 font-bold uppercase sticky top-0 border-b border-slate-200">
                                 <tr>
@@ -190,7 +152,6 @@ HTML
                                     <th class="p-2.5 text-right">Gastado Real</th>
                                     <th class="p-2.5 text-right">Restante</th>
                                     <th class="p-2.5 text-center">Desglose</th>
-                                    <th class="p-2.5 text-center no-print">Acción</th>
                                 </tr>
                             </thead>
                             <tbody id="tablaPartidasBody" class="divide-y divide-slate-100">
@@ -200,13 +161,21 @@ HTML
                     </div>
                 </div>
 
-                <!-- Bitácora de Gastos con Comprobantes -->
+                <!-- Bitácora de Gastos con Filtro por Código -->
                 <div>
-                    <div class="flex justify-between items-center mb-2">
+                    <div class="flex flex-wrap justify-between items-center mb-2 gap-2">
                         <h2 class="text-xs font-bold uppercase tracking-wider text-slate-900">
-                            Bitácora de Gastos Diarios y Facturas
+                            Bitácora de Gastos Diarios
                         </h2>
-                        <button onclick="borrarGastos()" class="text-[11px] text-red-600 hover:underline no-print">Limpiar Gastos</button>
+                        
+                        <!-- FILTRO DE BITÁCORA -->
+                        <div class="flex items-center gap-2">
+                            <label class="text-[11px] font-bold text-slate-600">Filtrar por Código:</label>
+                            <select id="filtroCodigoBitacora" onchange="renderTablaGastos()" class="bg-white border border-slate-300 rounded text-xs p-1 font-semibold">
+                                <option value="TODOS">-- Todos los Códigos --</option>
+                            </select>
+                            <button onclick="borrarGastos()" class="text-[11px] text-red-600 hover:underline no-print ml-2">Limpiar Gastos</button>
+                        </div>
                     </div>
                     <div class="overflow-x-auto max-h-60 bg-white rounded-lg border border-slate-200 shadow-sm">
                         <table class="w-full text-left text-xs text-slate-600">
@@ -216,7 +185,7 @@ HTML
                                     <th class="p-2.5">Código</th>
                                     <th class="p-2.5">Concepto</th>
                                     <th class="p-2.5 text-right">Monto</th>
-                                    <th class="p-2.5 text-center">Factura / Imagen</th>
+                                    <th class="p-2.5 text-center">Factura</th>
                                     <th class="p-2.5 text-center no-print">Borrar</th>
                                 </tr>
                             </thead>
@@ -230,12 +199,90 @@ HTML
 
         </div>
 
-        <!-- ==================== PESTAÑA 2: CONSOLIDADO ==================== -->
+        <!-- ==================== PESTAÑA 2: CATÁLOGO Y PRESUPUESTOS MENSUALES ==================== -->
+        <div id="viewCatalogo" class="p-4 md:p-6 space-y-6 hidden">
+            
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- FORMULARIOS CATÁLOGO Y PRESUPUESTO -->
+                <div class="space-y-5">
+                    <!-- Ingreso Base -->
+                    <div class="bg-indigo-50 p-4 rounded-lg border border-indigo-100">
+                        <h2 class="text-xs font-bold uppercase tracking-wider text-indigo-900 mb-2 flex items-center gap-1.5">
+                            <i class="fa-solid fa-wallet"></i> Ingreso Base (<span id="lblEmpresaIngreso">Carrduci</span>)
+                        </h2>
+                        <input type="number" id="ingresoBase" value="60000" min="0" oninput="guardarIngreso()" 
+                            class="w-full p-2 border border-indigo-200 rounded-lg text-sm font-bold focus:ring-2 focus:ring-indigo-500">
+                    </div>
+
+                    <!-- Alta de Código Único -->
+                    <div class="bg-slate-50 p-4 rounded-lg border border-slate-200 space-y-3">
+                        <h2 class="text-xs font-bold uppercase tracking-wider text-slate-900 flex items-center gap-1.5">
+                            <i class="fa-solid fa-plus-circle"></i> Crear Nuevo Código Único
+                        </h2>
+                        <form onsubmit="agregarPartidaCat(event)" class="space-y-2.5">
+                            <div>
+                                <label class="block text-[10px] font-bold text-slate-600">Código (No se podrá modificar ni duplicar):</label>
+                                <input type="text" id="catCodigo" placeholder="Ej. 101" required class="w-full p-2 border border-slate-300 rounded text-xs uppercase font-bold">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold text-slate-600">Concepto / Nombre del Código:</label>
+                                <input type="text" id="catDescripcion" placeholder="Ej. Materiales de Construcción" required class="w-full p-2 border border-slate-300 rounded text-xs">
+                            </div>
+                            <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 rounded text-xs shadow transition">
+                                Dar de Alta Código
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Cargar Catálogo desde CSV/Excel -->
+                    <div class="bg-slate-50 p-4 rounded-lg border border-slate-200 space-y-2">
+                        <h2 class="text-xs font-bold uppercase tracking-wider text-slate-900 flex items-center gap-1.5">
+                            <i class="fa-solid fa-file-csv"></i> Cargar Catálogo (Excel / CSV)
+                        </h2>
+                        <p class="text-[11px] text-slate-500">Formato del CSV: <code>Código, Concepto</code></p>
+                        <label class="cursor-pointer bg-slate-800 hover:bg-slate-900 text-white text-xs font-semibold py-2 px-3 rounded transition block text-center shadow-sm">
+                            <i class="fa-solid fa-upload"></i> Subir Archivo CSV
+                            <input type="file" accept=".csv" onchange="cargarCatalogoCSV(event)" class="hidden">
+                        </label>
+                    </div>
+                </div>
+
+                <!-- TABLA EDITABLE DE PRESUPUESTOS MENSUALES POR CÓDIGO -->
+                <div class="lg:col-span-2 space-y-3">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <h2 class="text-sm font-bold text-slate-900">Catálogo Base y Asignación de Presupuesto Mensual</h2>
+                            <p class="text-xs text-slate-500">Asigna o cambia los montos de este mes independientemente del catálogo.</p>
+                        </div>
+                        <button onclick="borrarPartidas()" class="text-[11px] text-red-600 hover:underline no-print">Borrar Todo el Catálogo</button>
+                    </div>
+
+                    <div class="overflow-x-auto max-h-[500px] bg-white rounded-lg border border-slate-200 shadow-sm">
+                        <table class="w-full text-left text-xs text-slate-600">
+                            <thead class="bg-slate-800 text-white font-bold uppercase sticky top-0">
+                                <tr>
+                                    <th class="p-3">Código</th>
+                                    <th class="p-3">Concepto Único</th>
+                                    <th class="p-3 text-right">Presupuesto Mensual ($)</th>
+                                    <th class="p-3 text-center no-print">Eliminar</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tablaGestionCatBody" class="divide-y divide-slate-200 font-medium">
+                                <!-- Dinámico -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- ==================== PESTAÑA 3: CONSOLIDADO ==================== -->
         <div id="viewConsolidado" class="p-4 md:p-6 space-y-4 hidden">
             <div class="flex justify-between items-center bg-slate-100 p-4 rounded-lg border border-slate-200">
                 <div>
                     <h2 class="text-base font-bold text-slate-900">Tabla Comparativa Consolidada de Ambas Razones Sociales</h2>
-                    <p class="text-xs text-slate-500">Desglose comparativo: Presupuesto Mensual vs. Gasto Carrduci vs. Gasto Carrduci Metal</p>
+                    <p class="text-xs text-slate-500">Sincronización en tiempo real: Presupuesto Mensual vs. Gasto Carrduci vs. Gasto Carrduci Metal</p>
                 </div>
                 <button onclick="window.print()" class="bg-slate-800 hover:bg-slate-900 text-white text-xs font-bold py-2 px-3 rounded shadow transition no-print">
                     <i class="fa-solid fa-print"></i> Imprimir Tabla
@@ -265,12 +312,21 @@ HTML
             </div>
         </div>
 
-        <!-- ==================== PESTAÑA 3: TABLERO EJECUTIVO ==================== -->
+        <!-- ==================== PESTAÑA 4: TABLERO EJECUTIVO ==================== -->
         <div id="viewEjecutivo" class="p-4 md:p-6 space-y-6 hidden">
-            <div class="flex justify-between items-center bg-slate-100 p-4 rounded-lg border border-slate-200">
+            <div class="flex flex-wrap justify-between items-center bg-slate-100 p-4 rounded-lg border border-slate-200 gap-4">
                 <div>
                     <h2 class="text-base font-bold text-slate-900">Proyecciones y Reporte Estadístico para Dirección General</h2>
-                    <p class="text-xs text-slate-500">Proyección estratégica de gastos a 3, 6 y 12 meses con histórico de 3 meses</p>
+                    <p class="text-xs text-slate-500">Filtrado inteligente por códigos individuales o múltiples</p>
+                </div>
+
+                <!-- FILTRO MULTI-CÓDIGO PARA GRÁFICOS -->
+                <div class="flex items-center gap-2 bg-white p-2 rounded border border-slate-300">
+                    <label class="text-xs font-bold text-slate-700"><i class="fa-solid fa-filter text-indigo-600"></i> Filtrar Gráfico:</label>
+                    <select id="filtroGraficoCodigo" multiple onchange="renderGraficosEjecutivos()" class="text-xs border rounded p-1 max-h-20 w-48 font-semibold">
+                        <!-- Dinámico -->
+                    </select>
+                    <span class="text-[10px] text-slate-400 font-normal">(Usa Ctrl para seleccionar varios)</span>
                 </div>
             </div>
 
@@ -315,15 +371,15 @@ HTML
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div class="bg-white p-4 rounded-lg border border-slate-200 shadow-sm flex flex-col items-center">
-                    <h3 class="text-xs font-bold uppercase tracking-wider text-slate-700 mb-3">Gasto por Partida vs. Presupuesto</h3>
-                    <div class="w-full h-60">
+                    <h3 class="text-xs font-bold uppercase tracking-wider text-slate-700 mb-3">Gasto por Partida Seleccionada vs. Presupuesto</h3>
+                    <div class="w-full h-64">
                         <canvas id="graficoBarrasEjecutivo"></canvas>
                     </div>
                 </div>
 
                 <div class="bg-white p-4 rounded-lg border border-slate-200 shadow-sm flex flex-col items-center">
                     <h3 class="text-xs font-bold uppercase tracking-wider text-slate-700 mb-3">Tendencia y Proyección Proyectada</h3>
-                    <div class="w-full h-60">
+                    <div class="w-full h-64">
                         <canvas id="graficoProyeccionLinea"></canvas>
                     </div>
                 </div>
@@ -388,7 +444,7 @@ HTML
         let chartBarras = null;
         let chartLinea = null;
 
-        let baseDatos = JSON.parse(localStorage.getItem('corp_presupuesto_v3_db')) || {
+        let baseDatos = JSON.parse(localStorage.getItem('corp_presupuesto_v4_db')) || {
             Carrduci: {
                 ingreso: 60000,
                 partidas: [
@@ -420,36 +476,31 @@ HTML
         }
 
         function guardarDatos() {
-            localStorage.setItem('corp_presupuesto_v3_db', JSON.stringify(baseDatos));
+            localStorage.setItem('corp_presupuesto_v4_db', JSON.stringify(baseDatos));
         }
 
         function switchTab(tab) {
-            const vOperativo = document.getElementById('viewOperativo');
-            const vConsolidado = document.getElementById('viewConsolidado');
-            const vEjecutivo = document.getElementById('viewEjecutivo');
+            const views = ['viewOperativo', 'viewCatalogo', 'viewConsolidado', 'viewEjecutivo'];
+            const tabs = ['tabOperativo', 'tabCatalogo', 'tabConsolidado', 'tabEjecutivo'];
 
-            const bOp = document.getElementById('tabOperativo');
-            const bCon = document.getElementById('tabConsolidado');
-            const bEj = document.getElementById('tabEjecutivo');
-
-            vOperativo.classList.add('hidden');
-            vConsolidado.classList.add('hidden');
-            vEjecutivo.classList.add('hidden');
-
-            bOp.className = "py-3 px-4 text-xs font-bold border-b-2 border-transparent text-slate-600 hover:text-slate-900 transition flex items-center gap-2";
-            bCon.className = "py-3 px-4 text-xs font-bold border-b-2 border-transparent text-slate-600 hover:text-slate-900 transition flex items-center gap-2";
-            bEj.className = "py-3 px-4 text-xs font-bold border-b-2 border-transparent text-slate-600 hover:text-slate-900 transition flex items-center gap-2";
+            views.forEach(v => document.getElementById(v).classList.add('hidden'));
+            tabs.forEach(t => document.getElementById(t).className = "py-3 px-3 text-xs font-bold border-b-2 border-transparent text-slate-600 hover:text-slate-900 transition flex items-center gap-2");
 
             if(tab === 'operativo') {
-                vOperativo.classList.remove('hidden');
-                bOp.className = "py-3 px-4 text-xs font-bold border-b-2 border-indigo-600 text-indigo-700 bg-white transition flex items-center gap-2";
+                document.getElementById('viewOperativo').classList.remove('hidden');
+                document.getElementById('tabOperativo').className = "py-3 px-3 text-xs font-bold border-b-2 border-indigo-600 text-indigo-700 bg-white transition flex items-center gap-2";
+            } else if(tab === 'catalogo') {
+                document.getElementById('viewCatalogo').classList.remove('hidden');
+                document.getElementById('tabCatalogo').className = "py-3 px-3 text-xs font-bold border-b-2 border-indigo-600 text-indigo-700 bg-white transition flex items-center gap-2";
+                renderGestionCat();
             } else if(tab === 'consolidado') {
-                vConsolidado.classList.remove('hidden');
-                bCon.className = "py-3 px-4 text-xs font-bold border-b-2 border-indigo-600 text-indigo-700 bg-white transition flex items-center gap-2";
+                document.getElementById('viewConsolidado').classList.remove('hidden');
+                document.getElementById('tabConsolidado').className = "py-3 px-3 text-xs font-bold border-b-2 border-indigo-600 text-indigo-700 bg-white transition flex items-center gap-2";
                 renderTablaConsolidada();
             } else if(tab === 'ejecutivo') {
-                vEjecutivo.classList.remove('hidden');
-                bEj.className = "py-3 px-4 text-xs font-bold border-b-2 border-indigo-600 text-indigo-700 bg-white transition flex items-center gap-2";
+                document.getElementById('viewEjecutivo').classList.remove('hidden');
+                document.getElementById('tabEjecutivo').className = "py-3 px-3 text-xs font-bold border-b-2 border-indigo-600 text-indigo-700 bg-white transition flex items-center gap-2";
+                poblarFiltroGrafico();
                 renderGraficosEjecutivos();
             }
         }
@@ -460,33 +511,43 @@ HTML
             actualizarTodo();
         }
 
-        function agregarPartida(e) {
+        // AGREGAR CÓDIGO SIN DUPLICAR (PESTAÑA CATÁLOGO)
+        function agregarPartidaCat(e) {
             e.preventDefault();
-            const codigo = document.getElementById('partidaCodigo').value.trim().toUpperCase();
-            const descripcion = document.getElementById('partidaDescripcion').value.trim();
-            const monto = parseFloat(document.getElementById('partidaMonto').value) || 0;
+            const codigo = document.getElementById('catCodigo').value.trim().toUpperCase();
+            const descripcion = document.getElementById('catDescripcion').value.trim();
 
             const partidas = baseDatos[empresaActual].partidas;
             if(partidas.some(p => p.codigo === codigo)) {
-                alert(`El código ${codigo} ya existe.`);
+                alert(`⚠️ El código '${codigo}' ya existe en el catálogo. No se puede duplicar.`);
                 return;
             }
 
-            partidas.push({ codigo, descripcion, monto });
+            partidas.push({ codigo, descripcion, monto: 0 });
             guardarDatos();
 
-            document.getElementById('partidaCodigo').value = '';
-            document.getElementById('partidaDescripcion').value = '';
-            document.getElementById('partidaMonto').value = '';
+            document.getElementById('catCodigo').value = '';
+            document.getElementById('catDescripcion').value = '';
 
             actualizarTodo();
+            renderGestionCat();
+        }
+
+        function actualizarMontoPartida(codigo, nuevoMonto) {
+            const partida = baseDatos[empresaActual].partidas.find(p => p.codigo === codigo);
+            if(partida) {
+                partida.monto = parseFloat(nuevoMonto) || 0;
+                guardarDatos();
+                actualizarTodo();
+            }
         }
 
         function eliminarPartida(codigo) {
-            if(confirm(`¿Deseas eliminar el código ${codigo}?`)) {
+            if(confirm(`¿Deseas eliminar el código ${codigo}? Se eliminará del presupuesto.`)) {
                 baseDatos[empresaActual].partidas = baseDatos[empresaActual].partidas.filter(p => p.codigo !== codigo);
                 guardarDatos();
                 actualizarTodo();
+                renderGestionCat();
             }
         }
 
@@ -499,7 +560,7 @@ HTML
             const fileInput = document.getElementById('gastoFoto');
 
             if(!codigo) {
-                alert("Debes tener códigos de presupuesto registrados.");
+                alert("Debes dar de alta códigos presupuestales en la pestaña 'Catálogo' primero.");
                 return;
             }
 
@@ -537,15 +598,16 @@ HTML
         }
 
         function borrarPartidas() {
-            if(confirm("¿Seguro que deseas borrar las partidas de esta empresa?")) {
+            if(confirm("¿Seguro que deseas borrar TODO el catálogo de esta empresa?")) {
                 baseDatos[empresaActual].partidas = [];
                 guardarDatos();
                 actualizarTodo();
+                renderGestionCat();
             }
         }
 
         function borrarGastos() {
-            if(confirm("¿Seguro que deseas borrar el historial de gastos de esta empresa?")) {
+            if(confirm("¿Seguro que deseas borrar todos los gastos registrados en esta empresa?")) {
                 baseDatos[empresaActual].gastos = [];
                 guardarDatos();
                 actualizarTodo();
@@ -562,7 +624,6 @@ HTML
             document.getElementById('modalFactura').classList.add('hidden');
         }
 
-        // FUNCIONES PARA EL NUEVO DESGLOSE DE COMPRAS
         function abrirDesgloseCodigo(codigo) {
             const datos = baseDatos[empresaActual];
             const partida = datos.partidas.find(p => p.codigo === codigo);
@@ -605,70 +666,49 @@ HTML
             document.getElementById('modalDesglose').classList.add('hidden');
         }
 
-        function actualizarTodo() {
-            const datos = baseDatos[empresaActual];
-            document.getElementById('ingresoBase').value = datos.ingreso;
-            document.getElementById('lblEmpresaIngreso').innerText = empresaActual;
-            document.getElementById('lblEmpresaTabla').innerText = empresaActual;
+        function renderGestionCat() {
+            const tbody = document.getElementById('tablaGestionCatBody');
+            tbody.innerHTML = '';
+            const partidas = baseDatos[empresaActual].partidas;
 
-            let totalPresupuestado = 0;
-            let totalEjercido = 0;
-
-            let gastadoPorCodigo = {};
-            datos.gastos.forEach(g => {
-                totalEjercido += g.monto;
-                gastadoPorCodigo[g.codigo] = (gastadoPorCodigo[g.codigo] || 0) + g.monto;
-            });
-
-            // TABLA PARTIDAS
-            const tbodyPartidas = document.getElementById('tablaPartidasBody');
-            tbodyPartidas.innerHTML = '';
-            const selectCodigo = document.getElementById('gastoSelectCodigo');
-            selectCodigo.innerHTML = '';
-
-            datos.partidas.forEach(p => {
-                totalPresupuestado += p.monto;
-                const gastado = gastadoPorCodigo[p.codigo] || 0;
-                const restante = p.monto - gastado;
-
-                const opt = document.createElement('option');
-                opt.value = p.codigo;
-                opt.innerText = `${p.codigo} - ${p.descripcion}`;
-                selectCodigo.appendChild(opt);
-
+            partidas.forEach(p => {
                 const tr = document.createElement('tr');
                 tr.className = "hover:bg-slate-50";
                 tr.innerHTML = `
-                    <td class="p-2.5 font-bold text-indigo-700">${p.codigo}</td>
-                    <td class="p-2.5 font-medium text-slate-800">${p.descripcion}</td>
-                    <td class="p-2.5 text-right font-semibold">$${p.monto.toLocaleString('es-MX', {minimumFractionDigits: 2})}</td>
-                    <td class="p-2.5 text-right font-semibold text-red-600">$${gastado.toLocaleString('es-MX', {minimumFractionDigits: 2})}</td>
-                    <td class="p-2.5 text-right font-bold ${restante >= 0 ? 'text-emerald-600' : 'text-red-700'}">$${restante.toLocaleString('es-MX', {minimumFractionDigits: 2})}</td>
-                    <td class="p-2.5 text-center">
-                        <button onclick="abrirDesgloseCodigo('${p.codigo}')" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 px-2 py-1 rounded text-[11px] font-bold border border-indigo-200 shadow-sm transition flex items-center justify-center gap-1 mx-auto">
-                            <i class="fa-solid fa-magnifying-glass"></i> Ver Desglose
-                        </button>
+                    <td class="p-3 font-bold text-indigo-700">${p.codigo}</td>
+                    <td class="p-3 text-slate-800 font-semibold">${p.descripcion}</td>
+                    <td class="p-3 text-right">
+                        <input type="number" step="0.01" value="${p.monto}" onchange="actualizarMontoPartida('${p.codigo}', this.value)"
+                            class="w-32 p-1.5 border border-slate-300 rounded text-right font-bold text-slate-800 focus:ring-2 focus:ring-indigo-500">
                     </td>
-                    <td class="p-2.5 text-center no-print">
-                        <button onclick="eliminarPartida('${p.codigo}')" class="text-slate-400 hover:text-red-600 font-bold px-1">✕</button>
+                    <td class="p-3 text-center no-print">
+                        <button onclick="eliminarPartida('${p.codigo}')" class="text-slate-400 hover:text-red-600 font-bold px-2">✕</button>
                     </td>
                 `;
-                tbodyPartidas.appendChild(tr);
+                tbody.appendChild(tr);
             });
 
-            if(datos.partidas.length === 0) {
-                tbodyPartidas.innerHTML = `<tr><td colspan="7" class="p-4 text-center text-slate-400">No hay códigos en el catálogo. Carga un CSV o agrégalos a la izquierda.</td></tr>`;
+            if(partidas.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="4" class="p-6 text-center text-slate-400">El catálogo está vacío. Crea códigos nuevos o sube un archivo CSV.</td></tr>`;
             }
+        }
 
-            // TABLA GASTOS
+        function renderTablaGastos() {
+            const datos = baseDatos[empresaActual];
             const tbodyGastos = document.getElementById('tablaGastosBody');
             tbodyGastos.innerHTML = '';
-            datos.gastos.forEach(g => {
+
+            const filtro = document.getElementById('filtroCodigoBitacora').value;
+            const gastosFiltrados = filtro === 'TODOS' 
+                ? datos.gastos 
+                : datos.gastos.filter(g => g.codigo === filtro);
+
+            gastosFiltrados.forEach(g => {
                 const tr = document.createElement('tr');
                 tr.className = "hover:bg-slate-50";
                 const btnFoto = g.imagen 
-                    ? `<button onclick="verFactura('${g.imagen}', '${g.concepto}')" class="bg-indigo-100 text-indigo-700 hover:bg-indigo-200 px-2 py-0.5 rounded text-[10px] font-bold"><i class="fa-solid fa-image"></i> Ver Factura</button>`
-                    : `<span class="text-slate-300 text-[10px]">Sin comprobante</span>`;
+                    ? `<button onclick="verFactura('${g.imagen}', '${g.concepto}')" class="bg-indigo-100 text-indigo-700 hover:bg-indigo-200 px-2 py-0.5 rounded text-[10px] font-bold"><i class="fa-solid fa-image"></i> Factura</button>`
+                    : `<span class="text-slate-300 text-[10px]">Sin foto</span>`;
 
                 tr.innerHTML = `
                     <td class="p-2.5 whitespace-nowrap">${g.fecha}</td>
@@ -683,9 +723,79 @@ HTML
                 tbodyGastos.appendChild(tr);
             });
 
-            if(datos.gastos.length === 0) {
-                tbodyGastos.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-400">No hay gastos en la bitácora.</td></tr>`;
+            if(gastosFiltrados.length === 0) {
+                tbodyGastos.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-400">No hay gastos registrados para el criterio seleccionado.</td></tr>`;
             }
+        }
+
+        function actualizarTodo() {
+            const datos = baseDatos[empresaActual];
+            document.getElementById('ingresoBase').value = datos.ingreso;
+            document.getElementById('lblEmpresaIngreso').innerText = empresaActual;
+            document.getElementById('lblEmpresaTabla').innerText = empresaActual;
+            document.getElementById('lblEmpresaGasto').innerText = empresaActual;
+
+            let totalPresupuestado = 0;
+            let totalEjercido = 0;
+
+            let gastadoPorCodigo = {};
+            datos.gastos.forEach(g => {
+                totalEjercido += g.monto;
+                gastadoPorCodigo[g.codigo] = (gastadoPorCodigo[g.codigo] || 0) + g.monto;
+            });
+
+            // Llenar Select de Bitácora y Gastos
+            const selectCodigo = document.getElementById('gastoSelectCodigo');
+            const filtroBitacora = document.getElementById('filtroCodigoBitacora');
+            
+            const valorFiltroPrevio = filtroBitacora.value;
+
+            selectCodigo.innerHTML = '';
+            filtroBitacora.innerHTML = '<option value="TODOS">-- Todos los Códigos --</option>';
+
+            // TABLA PARTIDAS OPERATIVA
+            const tbodyPartidas = document.getElementById('tablaPartidasBody');
+            tbodyPartidas.innerHTML = '';
+
+            datos.partidas.forEach(p => {
+                totalPresupuestado += p.monto;
+                const gastado = gastadoPorCodigo[p.codigo] || 0;
+                const restante = p.monto - gastado;
+
+                // Opciones Select
+                const opt = document.createElement('option');
+                opt.value = p.codigo;
+                opt.innerText = `${p.codigo} - ${p.descripcion}`;
+                selectCodigo.appendChild(opt);
+
+                const optFiltro = document.createElement('option');
+                optFiltro.value = p.codigo;
+                optFiltro.innerText = `${p.codigo} - ${p.descripcion}`;
+                filtroBitacora.appendChild(optFiltro);
+
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50";
+                tr.innerHTML = `
+                    <td class="p-2.5 font-bold text-indigo-700">${p.codigo}</td>
+                    <td class="p-2.5 font-medium text-slate-800">${p.descripcion}</td>
+                    <td class="p-2.5 text-right font-semibold">$${p.monto.toLocaleString('es-MX', {minimumFractionDigits: 2})}</td>
+                    <td class="p-2.5 text-right font-semibold text-red-600">$${gastado.toLocaleString('es-MX', {minimumFractionDigits: 2})}</td>
+                    <td class="p-2.5 text-right font-bold ${restante >= 0 ? 'text-emerald-600' : 'text-red-700'}">$${restante.toLocaleString('es-MX', {minimumFractionDigits: 2})}</td>
+                    <td class="p-2.5 text-center">
+                        <button onclick="abrirDesgloseCodigo('${p.codigo}')" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 px-2 py-1 rounded text-[11px] font-bold border border-indigo-200 shadow-sm transition flex items-center justify-center gap-1 mx-auto">
+                            <i class="fa-solid fa-magnifying-glass"></i> Desglose
+                        </button>
+                    </td>
+                `;
+                tbodyPartidas.appendChild(tr);
+            });
+
+            if(datos.partidas.length === 0) {
+                tbodyPartidas.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-400">No hay códigos en el catálogo. Ve a la pestaña 'Catálogo' para agregarlos.</td></tr>`;
+            }
+
+            filtroBitacora.value = valorFiltroPrevio || 'TODOS';
+            renderTablaGastos();
 
             // RESUMEN SUPERIOR
             const remanente = totalPresupuestado - totalEjercido;
@@ -697,6 +807,7 @@ HTML
             actualizarTablasEjecutivas(totalPresupuestado, totalEjercido);
         }
 
+        // CONSOLIDADO SINCRONIZADO REAL
         function renderTablaConsolidada() {
             const tbody = document.getElementById('tablaConsolidadaBody');
             const tfoot = document.getElementById('tablaConsolidadaFoot');
@@ -777,7 +888,7 @@ HTML
             `;
 
             if (Object.keys(codigosMapa).length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" class="p-6 text-center text-slate-400">No hay partidas registradas en ninguna de las dos empresas.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="7" class="p-6 text-center text-slate-400">No hay partidas registradas en el catálogo de ninguna empresa.</td></tr>`;
             }
         }
 
@@ -795,8 +906,33 @@ HTML
             `;
         }
 
+        function poblarFiltroGrafico() {
+            const select = document.getElementById('filtroGraficoCodigo');
+            select.innerHTML = '';
+            const partidas = baseDatos[empresaActual].partidas;
+
+            partidas.forEach(p => {
+                const opt = document.createElement('option');
+                opt.value = p.codigo;
+                opt.innerText = `${p.codigo} - ${p.descripcion}`;
+                opt.selected = true; // Por defecto seleccionados todos
+                select.appendChild(opt);
+            });
+        }
+
+        // GRÁFICOS CON FILTRADO MULTI-CÓDIGO
         function renderGraficosEjecutivos() {
             const datos = baseDatos[empresaActual];
+
+            // Obtener seleccionados
+            const selectFiltro = document.getElementById('filtroGraficoCodigo');
+            const codigosSeleccionados = Array.from(selectFiltro.selectedOptions).map(option => option.value);
+
+            let partidasFiltradas = datos.partidas;
+            if (codigosSeleccionados.length > 0) {
+                partidasFiltradas = datos.partidas.filter(p => codigosSeleccionados.includes(p.codigo));
+            }
+
             let gastadoPorCodigo = {};
             datos.gastos.forEach(g => {
                 gastadoPorCodigo[g.codigo] = (gastadoPorCodigo[g.codigo] || 0) + g.monto;
@@ -808,10 +944,10 @@ HTML
             chartBarras = new Chart(ctx1, {
                 type: 'bar',
                 data: {
-                    labels: datos.partidas.map(p => p.codigo),
+                    labels: partidasFiltradas.map(p => p.codigo),
                     datasets: [
-                        { label: 'Presupuesto', data: datos.partidas.map(p => p.monto), backgroundColor: '#6366f1' },
-                        { label: 'Gasto Real', data: datos.partidas.map(p => gastadoPorCodigo[p.codigo] || 0), backgroundColor: '#f87171' }
+                        { label: 'Presupuesto', data: partidasFiltradas.map(p => p.monto), backgroundColor: '#6366f1' },
+                        { label: 'Gasto Real', data: partidasFiltradas.map(p => gastadoPorCodigo[p.codigo] || 0), backgroundColor: '#f87171' }
                     ]
                 },
                 options: { responsive: true, maintainAspectRatio: false }
@@ -820,14 +956,14 @@ HTML
             const ctx2 = document.getElementById('graficoProyeccionLinea').getContext('2d');
             if(chartLinea) chartLinea.destroy();
 
-            const sumPresupuesto = datos.partidas.reduce((a, b) => a + b.monto, 0);
+            const sumPresupuesto = partidasFiltradas.reduce((a, b) => a + b.monto, 0);
 
             chartLinea = new Chart(ctx2, {
                 type: 'line',
                 data: {
                     labels: ['Mes 1', 'Mes 3', 'Mes 6', 'Mes 9', 'Mes 12'],
                     datasets: [{
-                        label: 'Acumulado Proyectado ($)',
+                        label: 'Acumulado Seleccionado ($)',
                         data: [sumPresupuesto, sumPresupuesto*3, sumPresupuesto*6, sumPresupuesto*9, sumPresupuesto*12],
                         borderColor: '#10b981',
                         backgroundColor: 'rgba(16, 185, 129, 0.1)',
@@ -839,6 +975,7 @@ HTML
             });
         }
 
+        // CARGAR CATÁLOGO DE EXCEL / CSV
         function cargarCatalogoCSV(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -866,7 +1003,8 @@ HTML
 
                 guardarDatos();
                 actualizarTodo();
-                alert(`Se importaron ${agregados} códigos exitosamente.`);
+                renderGestionCat();
+                alert(`✅ Se importaron ${agregados} códigos sin duplicar.`);
             };
             reader.readAsText(file);
         }
