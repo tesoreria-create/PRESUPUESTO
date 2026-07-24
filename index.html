@@ -1,3 +1,4 @@
+HTML
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -43,21 +44,10 @@
     .stat-card-teal {
       border-left: 4px solid var(--secondary-color);
     }
-    .btn-primary-custom {
-      background-color: var(--primary-color);
-      color: white;
-    }
-    .btn-primary-custom:hover {
-      background-color: #1e293b;
-      color: white;
-    }
     .nav-tabs .nav-link.active {
       font-weight: bold;
       color: var(--primary-color);
       border-bottom: 3px solid var(--primary-color);
-    }
-    .table-hover tbody tr:hover {
-      background-color: #f1f5f9;
     }
     .code-badge {
       background-color: #e0f2fe;
@@ -389,7 +379,7 @@
     document.addEventListener("DOMContentLoaded", function() {
       renderCatalogo();
       actualizarDropdownsCodigos();
-      agregarFilaPresupuesto(); // Fila inicial
+      agregarFilaPresupuesto();
       renderTablaAcumulada();
       actualizarGraficaDireccion();
     });
@@ -457,7 +447,6 @@
 
     function cargarCatalogoDesdeExcel() {
       const input = document.getElementById('excelFileInput');
-      const alertDiv = document.getElementById('alertExcel');
 
       if (!input.files || input.files.length === 0) {
         mostrarAlertaExcel("Por favor seleccione un archivo de Excel.", "alert-danger");
@@ -517,7 +506,6 @@
     }
 
     function actualizarDropdownsCodigos() {
-      // 1. Selects en la tabla de captura
       const selects = document.querySelectorAll('.select-codigo');
       selects.forEach(select => {
         const val = select.value;
@@ -531,7 +519,6 @@
         select.value = val;
       });
 
-      // 2. Multiselect en el Tablero de Dirección
       const selectFiltro = document.getElementById('selectFiltroCodigos');
       if (selectFiltro) {
         const seleccionados = Array.from(selectFiltro.selectedOptions).map(o => o.value);
@@ -638,7 +625,6 @@
 
       if (agregados > 0) {
         alert(`Se guardaron ${agregados} registro(s) de presupuesto exitosamente.`);
-        // Reiniciar la tabla de captura a 1 fila vacía
         document.getElementById('tbodyPresupuestoMultiple').innerHTML = "";
         agregarFilaPresupuesto();
         calcularTotalCaptura();
@@ -704,14 +690,12 @@
       const selectFiltro = document.getElementById('selectFiltroCodigos');
       const codigosSeleccionados = Array.from(selectFiltro.selectedOptions).map(opt => opt.value);
 
-      // Si no hay ninguno seleccionado explícitamente, tomamos todos
       const aplicarFiltro = codigosSeleccionados.length > 0;
       
       const registrosFiltrados = aplicarFiltro
         ? registrosPresupuesto.filter(r => codigosSeleccionados.includes(r.codigo))
         : registrosPresupuesto;
 
-      // KPI TOTALES
       const totalGlobal = registrosPresupuesto.reduce((sum, r) => sum + r.importe, 0);
       const totalFiltrado = registrosFiltrados.reduce((sum, r) => sum + r.importe, 0);
 
@@ -719,7 +703,6 @@
       document.getElementById('kpiTotalFiltrado').textContent = `$${totalFiltrado.toLocaleString('es-MX', { minimumFractionDigits: 2 })}`;
       document.getElementById('kpiNumConceptos').textContent = registrosFiltrados.length;
 
-      // Agrupar y sumar por código
       const acumuladoPorCodigo = {};
       const conteoPorCodigo = {};
 
@@ -732,7 +715,6 @@
         conteoPorCodigo[r.codigo] += 1;
       });
 
-      // Preparar etiquetas y datos para la gráfica
       const codigosProcesados = Object.keys(acumuladoPorCodigo).sort();
       const labels = codigosProcesados.map(cod => {
         const cat = catalogoCodigos.find(c => c.codigo === cod);
@@ -740,7 +722,6 @@
       });
       const dataValues = codigosProcesados.map(cod => acumuladoPorCodigo[cod]);
 
-      // Renderizar Resumen en Tabla
       const tbodyResumen = document.getElementById("tbodyResumenDireccion");
       tbodyResumen.innerHTML = "";
 
@@ -760,7 +741,6 @@
         });
       }
 
-      // Actualizar Chart.js Canvas
       const ctx = document.getElementById('graficaDireccionCanvas').getContext('2d');
 
       if (miGraficaDireccion) {
@@ -784,10 +764,7 @@
           responsive: true,
           maintainAspectRatio: false,
           plugins: {
-            legend: {
-              display: true,
-              position: 'top'
-            },
+            legend: { display: true, position: 'top' },
             tooltip: {
               callbacks: {
                 label: function(context) {
