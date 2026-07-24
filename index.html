@@ -214,14 +214,14 @@
                         </div>
                     </div>
 
-                    <!-- Bitácora de Gastos con Buscador -->
+                    <!-- Bitácora de Gastos -->
                     <div class="bg-white p-6 rounded-xl border border-slate-200/80 shadow-sm">
                         <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 mb-4 pb-3 border-b border-slate-100">
                             <h3 class="text-xs font-bold text-slate-700 uppercase">Bitácora de Gastos</h3>
                             
                             <div class="flex flex-wrap items-center gap-2 text-xs w-full md:w-auto">
                                 <div class="relative flex-1 md:w-56">
-                                    <input type="text" id="inputBuscador" onkeyup="renderizarTablas()" placeholder="🔍 Buscar palabra, número, concepto..." class="w-full pl-8 pr-3 py-1 border border-slate-200 rounded-lg bg-slate-50 text-slate-700 focus:outline-none focus:ring-1 focus:ring-blue-500 text-xs">
+                                    <input type="text" id="inputBuscador" onkeyup="renderizarTablas()" placeholder="🔍 Buscar concepto..." class="w-full pl-8 pr-3 py-1 border border-slate-200 rounded-lg bg-slate-50 text-slate-700 focus:outline-none focus:ring-1 focus:ring-blue-500 text-xs">
                                 </div>
                                 <input type="date" id="filtroFechaDia" onchange="renderizarTablas()" class="border border-slate-200 rounded-lg px-2 py-1 bg-slate-50 text-slate-700 focus:outline-none" title="Filtrar por día exacto">
                             </div>
@@ -252,7 +252,7 @@
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     <div class="bg-white p-6 rounded-xl border border-slate-200/80 shadow-sm h-fit space-y-5">
                         
-                        <!-- Formulario Alta Código Principal -->
+                        <!-- Alta Código Principal -->
                         <div>
                             <h3 class="text-xs font-bold text-slate-700 uppercase mb-3 pb-2 border-b border-slate-100">1. Alta de Código Principal</h3>
                             <form onsubmit="agregarCodigoPrincipal(event)" class="space-y-3 text-xs">
@@ -270,7 +270,7 @@
                             </form>
                         </div>
 
-                        <!-- Formulario Alta Subcuenta -->
+                        <!-- Alta Subcuenta -->
                         <div class="pt-3 border-t border-slate-200">
                             <h3 class="text-xs font-bold text-blue-600 uppercase mb-3 pb-2 border-b border-slate-100">2. Alta de Subcuenta con Monto</h3>
                             <form onsubmit="agregarSubcuenta(event)" class="space-y-3 text-xs">
@@ -324,13 +324,12 @@
                     </div>
                 </div>
 
-                <!-- SECCIÓN ADMINISTRADOR DE CLASIFICACIONES Y FORMAS DE PAGO -->
+                <!-- ADMIN CLASIFICACIONES Y PAGOS -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-slate-200">
-                    <!-- Administrar Clasificaciones -->
                     <div class="bg-white p-6 rounded-xl border border-slate-200/80 shadow-sm">
                         <h3 class="text-xs font-bold text-slate-700 uppercase mb-3 pb-2 border-b border-slate-100">Administrar Clasificaciones de Gasto</h3>
                         <form onsubmit="agregarClasificacion(event)" class="flex gap-2 mb-4">
-                            <input type="text" id="nuevaClasificacionInput" required placeholder="Nueva Clasificación (ej. Mantenimiento)" class="flex-1 border border-slate-200 rounded-lg p-2 text-xs bg-slate-50 focus:bg-white focus:outline-none">
+                            <input type="text" id="nuevaClasificacionInput" required placeholder="Nueva Clasificación" class="flex-1 border border-slate-200 rounded-lg p-2 text-xs bg-slate-50 focus:bg-white focus:outline-none">
                             <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded-lg text-xs transition">Agregar</button>
                         </form>
                         <div class="overflow-x-auto">
@@ -346,11 +345,10 @@
                         </div>
                     </div>
 
-                    <!-- Administrar Formas de Pago -->
                     <div class="bg-white p-6 rounded-xl border border-slate-200/80 shadow-sm">
                         <h3 class="text-xs font-bold text-slate-700 uppercase mb-3 pb-2 border-b border-slate-100">Administrar Formas de Pago</h3>
                         <form onsubmit="agregarFormaPago(event)" class="flex gap-2 mb-4">
-                            <input type="text" id="nuevaFormaPagoInput" required placeholder="Nueva Forma de Pago (ej. Tarjeta de Crédito)" class="flex-1 border border-slate-200 rounded-lg p-2 text-xs bg-slate-50 focus:bg-white focus:outline-none">
+                            <input type="text" id="nuevaFormaPagoInput" required placeholder="Nueva Forma de Pago" class="flex-1 border border-slate-200 rounded-lg p-2 text-xs bg-slate-50 focus:bg-white focus:outline-none">
                             <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded-lg text-xs transition">Agregar</button>
                         </form>
                         <div class="overflow-x-auto">
@@ -369,34 +367,72 @@
 
             </div>
 
-            <!-- PESTAÑA 3: COMPARATIVO CONSOLIDADO -->
-            <div id="pestana3" class="bg-white p-6 rounded-xl border border-slate-200/80 shadow-sm hidden">
-                <div class="mb-4 pb-3 border-b border-slate-100 flex justify-between items-center">
+            <!-- PESTAÑA 3: COMPARATIVO CONSOLIDADO (DISEÑO FORMAL DE PRESENTACIÓN) -->
+            <div id="pestana3" class="space-y-6 hidden">
+                
+                <!-- Encabezado Corporativo de Presentación -->
+                <div class="bg-gradient-to-r from-[#001529] to-slate-800 rounded-xl p-6 text-white shadow-lg flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-l-4 border-blue-500">
                     <div>
-                        <h3 class="text-xs font-bold text-slate-700 uppercase">Consolidado Multiempresa</h3>
-                        <p class="text-[11px] text-slate-400">Comparativa Global del Mes por Código Padre: Carrduci S.A. vs Carrduci Metal</p>
+                        <div class="flex items-center space-x-2 text-blue-400 text-xs font-semibold uppercase tracking-wider mb-1">
+                            <i data-lucide="building-2" class="w-4 h-4"></i>
+                            <span>Informe Ejecutivo Grupo Corporativo</span>
+                        </div>
+                        <h2 class="text-xl font-bold tracking-tight text-white">Estado Consolidado Presupuestal Multiempresa</h2>
+                        <p class="text-xs text-slate-300 mt-1">Comparativa de ejecución presupuestal: <strong class="text-white">Carrduci S.A. de C.V.</strong> vs <strong class="text-white">Carrduci Metal</strong></p>
                     </div>
-                    <span class="bg-blue-50 text-blue-600 text-[11px] font-semibold px-2.5 py-1 rounded border border-blue-100">Visión Corporativa</span>
+                    <div class="bg-white/10 backdrop-blur-md px-4 py-2.5 rounded-lg border border-white/10 text-right">
+                        <span class="text-[10px] uppercase font-medium text-slate-300 block">Estado General Corporativo</span>
+                        <span id="badgeEstadoSaludGlobal" class="text-xs font-bold text-emerald-400">🟢 Saludable</span>
+                    </div>
                 </div>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left text-xs">
-                        <thead>
-                            <tr class="bg-slate-100 text-slate-600 uppercase text-[10px] font-bold">
-                                <th class="py-3 px-4 rounded-l">Código Padre</th>
-                                <th class="py-3 px-4">Concepto Rubro</th>
-                                <th class="py-3 px-4 text-right">Presupuesto Mes Total</th>
-                                <th class="py-3 px-4 text-right">Gasto Carrduci</th>
-                                <th class="py-3 px-4 text-right">Gasto Carrduci Metal</th>
-                                <th class="py-3 px-4 text-right">Gasto Acumulado Mes</th>
-                                <th class="py-3 px-4 text-right rounded-r">Disponible Global</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tablaConsolidado" class="divide-y divide-slate-100 text-slate-700"></tbody>
-                    </table>
+
+                <!-- Tarjetas Ejecutivas Consolidadas -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+                    <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+                        <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Presupuesto Asignado Grupo</span>
+                        <div class="text-2xl font-bold text-slate-800 mt-1 font-mono" id="consolidadoPresTotal">$0.00</div>
+                    </div>
+                    <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+                        <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Gasto Total Acumulado</span>
+                        <div class="text-2xl font-bold text-amber-600 mt-1 font-mono" id="consolidadoGastoTotal">$0.00</div>
+                    </div>
+                    <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+                        <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Disponible Remanente Corporativo</span>
+                        <div class="text-2xl font-bold text-emerald-600 mt-1 font-mono" id="consolidadoDispTotal">$0.00</div>
+                    </div>
+                </div>
+
+                <!-- Tabla Formal de Presentación -->
+                <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+                    <div class="p-5 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center">
+                        <h3 class="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center space-x-2">
+                            <i data-lucide="table" class="w-4 h-4 text-blue-600"></i>
+                            <span>Desglose por Rubro Presupuestal y Entidad</span>
+                        </h3>
+                        <span class="text-xs text-slate-500 font-mono" id="consolidadoFechaEmision">Emisión: Período Activo</span>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse text-xs">
+                            <thead>
+                                <tr class="bg-slate-100/80 text-slate-700 uppercase text-[10px] font-bold border-b border-slate-200">
+                                    <th class="py-3.5 px-4">Código</th>
+                                    <th class="py-3.5 px-4">Rubro / Partida</th>
+                                    <th class="py-3.5 px-4 text-right">Presupuesto Consolidado</th>
+                                    <th class="py-3.5 px-4 text-right text-blue-800 bg-blue-50/50">Gasto Carrduci</th>
+                                    <th class="py-3.5 px-4 text-right text-indigo-800 bg-indigo-50/50">Gasto Carrduci Metal</th>
+                                    <th class="py-3.5 px-4 text-right">Gasto Acumulado</th>
+                                    <th class="py-3.5 px-4 text-right font-bold">Disponible Global ($)</th>
+                                    <th class="py-3.5 px-4 text-center font-bold">Disponible (%)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tablaConsolidado" class="divide-y divide-slate-100 text-slate-700 font-medium"></tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
 
-            <!-- PESTAÑA 4: TABLERO DE DIRECCIÓN -->
+            <!-- PESTAÑA 4: TABLERO DE DIRECCIÓN (CON IA FINANCIAL ADVISOR) -->
             <div id="pestana4" class="space-y-6 hidden">
                 <div class="bg-white p-6 rounded-xl border border-slate-200/80 shadow-sm space-y-4">
                     <div class="flex flex-col lg:flex-row justify-between lg:items-center gap-3 pb-3 border-b border-slate-100">
@@ -435,6 +471,22 @@
                     <div class="bg-white p-5 rounded-xl border border-slate-200/80 shadow-sm">
                         <span class="text-xs font-medium text-slate-400">Transacciones del Mes</span>
                         <div class="text-2xl font-bold text-slate-800 mt-1 font-mono" id="kpiNumTransacciones">0</div>
+                    </div>
+                </div>
+
+                <!-- SECCIÓN DE RECOMENDACIONES FINANCIERAS DE IA -->
+                <div class="bg-gradient-to-r from-blue-900 via-indigo-900 to-slate-900 text-white rounded-xl p-6 shadow-md border border-indigo-800">
+                    <div class="flex items-center space-x-3 mb-4 pb-3 border-b border-indigo-700/60">
+                        <div class="p-2 bg-indigo-500/20 rounded-lg text-indigo-300 border border-indigo-400/30">
+                            <i data-lucide="sparkles" class="w-5 h-5 text-indigo-300"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-sm font-bold uppercase tracking-wide text-indigo-200">Recomendaciones Inteligentes Financieras (IA Consultada)</h3>
+                            <p class="text-[11px] text-slate-300">Análisis diagnóstico para optimizar la salud financiera del grupo</p>
+                        </div>
+                    </div>
+                    <div id="contenedorRecomendacionesIA" class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+                        <!-- Se llena dinámicamente -->
                     </div>
                 </div>
 
@@ -522,6 +574,7 @@
             periodoActual = `${anio}-${mes}`;
             
             document.getElementById('badgeMesActual').innerText = `Período ${periodoActual}`;
+            document.getElementById('consolidadoFechaEmision').innerText = `Período Activo: ${periodoActual}`;
             renderizarTodo();
         }
 
@@ -657,7 +710,7 @@
             renderizarTodo();
         }
 
-        /* FUNCIONES DE EDICIÓN Y ALTA DE CLASIFICACIONES Y FORMAS DE PAGO */
+        /* GERENCIA DE CLASIFICACIONES Y PAGOS */
         function agregarClasificacion(e) {
             e.preventDefault();
             const val = document.getElementById('nuevaClasificacionInput').value.trim();
@@ -674,11 +727,8 @@
             if(val) {
                 const viejo = baseDatos.clasificaciones[index];
                 baseDatos.clasificaciones[index] = val;
-                // Actualizar referencias en los gastos guardados
                 ['Carrduci', 'CarrduciMetal'].forEach(emp => {
-                    baseDatos[emp].gastos.forEach(g => {
-                        if(g.clasificacion === viejo) g.clasificacion = val;
-                    });
+                    baseDatos[emp].gastos.forEach(g => { if(g.clasificacion === viejo) g.clasificacion = val; });
                 });
                 actualizarSelects();
                 renderizarTodo();
@@ -707,11 +757,8 @@
             if(val) {
                 const viejo = baseDatos.formasPago[index];
                 baseDatos.formasPago[index] = val;
-                // Actualizar referencias en los gastos guardados
                 ['Carrduci', 'CarrduciMetal'].forEach(emp => {
-                    baseDatos[emp].gastos.forEach(g => {
-                        if(g.formaPago === viejo) g.formaPago = val;
-                    });
+                    baseDatos[emp].gastos.forEach(g => { if(g.formaPago === viejo) g.formaPago = val; });
                 });
                 actualizarSelects();
                 renderizarTodo();
@@ -843,7 +890,7 @@
             }
 
             if(lista.length === 0) {
-                tBit.innerHTML = `<tr><td colspan="7" class="py-6 text-center text-slate-400 italic">No hay registros que coincidan con la búsqueda o filtro</td></tr>`;
+                tBit.innerHTML = `<tr><td colspan="7" class="py-6 text-center text-slate-400 italic">No hay registros en el período especificado</td></tr>`;
             } else {
                 lista.forEach(g => {
                     tBit.innerHTML += `
@@ -887,6 +934,7 @@
             });
         }
 
+        /* RENDERIZADO FORMAL DE PRESENTACIÓN DEL CONSOLIDADO MULTIEMPRESA CON % DISPONIBLE */
         function renderizarConsolidado() {
             const tCon = document.getElementById('tablaConsolidado');
             tCon.innerHTML = '';
@@ -914,24 +962,61 @@
                 if(sub) gM[sub.codigoPadre] = (gM[sub.codigoPadre] || 0) + g.monto;
             });
 
+            let granPresupuesto = 0;
+            let granGasto = 0;
+
             Object.values(mapa).forEach(m => {
                 const presTot = m.pC + m.pM;
                 const gasto1 = gC[m.cod] || 0;
                 const gasto2 = gM[m.cod] || 0;
                 const totalGasto = gasto1 + gasto2;
-                const rest = presTot - totalGasto;
+                const dispMonto = presTot - totalGasto;
+                
+                // Cálculo del % disponible global
+                const pctDisponible = presTot > 0 ? (dispMonto / presTot) * 100 : 0;
+                
+                granPresupuesto += presTot;
+                granGasto += totalGasto;
+
+                let badgeColorDisp = 'bg-emerald-50 text-emerald-700 border-emerald-200';
+                if(pctDisponible < 20 && pctDisponible >= 0) badgeColorDisp = 'bg-amber-50 text-amber-700 border-amber-200';
+                if(pctDisponible < 0) badgeColorDisp = 'bg-red-50 text-red-700 border-red-200';
 
                 tCon.innerHTML += `
-                <tr class="hover:bg-slate-50 transition">
+                <tr class="hover:bg-slate-50/80 transition">
                     <td class="py-3.5 px-4 font-bold text-slate-800 font-mono">${m.cod}</td>
-                    <td class="py-3.5 px-4 text-slate-600">${m.desc}</td>
-                    <td class="py-3.5 px-4 text-right font-semibold font-mono text-slate-700">$${presTot.toLocaleString('en-US',{minimumFractionDigits:2})}</td>
-                    <td class="py-3.5 px-4 text-right text-amber-600 font-mono">$${gasto1.toLocaleString('en-US',{minimumFractionDigits:2})}</td>
-                    <td class="py-3.5 px-4 text-right text-amber-600 font-mono">$${gasto2.toLocaleString('en-US',{minimumFractionDigits:2})}</td>
-                    <td class="py-3.5 px-4 text-right font-bold text-slate-800 font-mono">$${totalGasto.toLocaleString('en-US',{minimumFractionDigits:2})}</td>
-                    <td class="py-3.5 px-4 text-right font-bold text-emerald-600 font-mono">$${rest.toLocaleString('en-US',{minimumFractionDigits:2})}</td>
+                    <td class="py-3.5 px-4 text-slate-700 font-semibold">${m.desc}</td>
+                    <td class="py-3.5 px-4 text-right font-mono font-semibold text-slate-800">$${presTot.toLocaleString('en-US',{minimumFractionDigits:2})}</td>
+                    <td class="py-3.5 px-4 text-right font-mono text-blue-900 bg-blue-50/30 font-semibold">$${gasto1.toLocaleString('en-US',{minimumFractionDigits:2})}</td>
+                    <td class="py-3.5 px-4 text-right font-mono text-indigo-900 bg-indigo-50/30 font-semibold">$${gasto2.toLocaleString('en-US',{minimumFractionDigits:2})}</td>
+                    <td class="py-3.5 px-4 text-right font-mono font-bold text-slate-900">$${totalGasto.toLocaleString('en-US',{minimumFractionDigits:2})}</td>
+                    <td class="py-3.5 px-4 text-right font-mono font-bold ${dispMonto < 0 ? 'text-red-600' : 'text-emerald-600'}">$${dispMonto.toLocaleString('en-US',{minimumFractionDigits:2})}</td>
+                    <td class="py-3.5 px-4 text-center">
+                        <span class="inline-block px-2.5 py-1 rounded-md text-[11px] font-mono font-bold border ${badgeColorDisp}">
+                            ${pctDisponible.toFixed(1)}%
+                        </span>
+                    </td>
                 </tr>`;
             });
+
+            const granDisponible = granPresupuesto - granGasto;
+            const granPctDisponible = granPresupuesto > 0 ? (granDisponible / granPresupuesto) * 100 : 0;
+
+            document.getElementById('consolidadoPresTotal').innerText = `$${granPresupuesto.toLocaleString('en-US',{minimumFractionDigits:2})}`;
+            document.getElementById('consolidadoGastoTotal').innerText = `$${granGasto.toLocaleString('en-US',{minimumFractionDigits:2})}`;
+            document.getElementById('consolidadoDispTotal').innerText = `$${granDisponible.toLocaleString('en-US',{minimumFractionDigits:2})} (${granPctDisponible.toFixed(1)}%)`;
+
+            const badgeSalud = document.getElementById('badgeEstadoSaludGlobal');
+            if(granPctDisponible >= 25) {
+                badgeSalud.innerHTML = "🟢 Saludable (" + granPctDisponible.toFixed(0) + "% Remanente)";
+                badgeSalud.className = "text-xs font-bold text-emerald-400";
+            } else if(granPctDisponible >= 10) {
+                badgeSalud.innerHTML = "🟡 Precaución (" + granPctDisponible.toFixed(0) + "% Remanente)";
+                badgeSalud.className = "text-xs font-bold text-amber-300";
+            } else {
+                badgeSalud.innerHTML = "🔴 Crítico (" + granPctDisponible.toFixed(0) + "% Remanente)";
+                badgeSalud.className = "text-xs font-bold text-red-400";
+            }
         }
 
         function renderizarTableroDireccion() {
@@ -1017,6 +1102,9 @@
             document.getElementById('kpiPartidaMayorMonto').innerText = `$${mayorGasto.toLocaleString('en-US',{minimumFractionDigits:2})}`;
             document.getElementById('kpiNumTransacciones').innerText = numTrans;
 
+            // Generar Sugerencias / Recomendaciones de la IA
+            generarRecomendacionesIA(pctAvance, totalPres, totalGast, partidaMayor);
+
             if(chartBarrasInst) chartBarrasInst.destroy();
             if(chartDonaInst) chartDonaInst.destroy();
 
@@ -1033,7 +1121,6 @@
                 options: { responsive: true, maintainAspectRatio: false }
             });
 
-            // Distribución dinámica por Forma de Pago
             const pagosMap = {};
             baseDatos.formasPago.forEach(fp => pagosMap[fp] = 0);
 
@@ -1061,8 +1148,55 @@
             });
         }
 
+        /* RECOMENDACIONES FINANCIERAS CONSULTADAS CON IA */
+        function generarRecomendacionesIA(pctAvance, totalPres, totalGast, partidaMayor) {
+            const container = document.getElementById('contenedorRecomendacionesIA');
+            let recs = [];
+
+            if(pctAvance > 85) {
+                recs.push({
+                    titulo: "⚠️ Control Urgente de Liquidez",
+                    desc: `Has consumido el **${pctAvance}%** de la partida presupuestal del mes. Se aconseja congelar gastos variables no indispensables.`
+                });
+            } else if(pctAvance >= 50) {
+                recs.push({
+                    titulo: "📊 Ritmo de Gastos Saludable",
+                    desc: `Con un avance del **${pctAvance}%**, el flujo operativo se mantiene moderado. Mantener monitoreo continuo semanal.`
+                });
+            } else {
+                recs.push({
+                    titulo: "💡 Holgura Presupuestal Optima",
+                    desc: `Apenas has ejercido el **${pctAvance}%**. Existe margen financiero positivo para proyectos estratégicos o reservas de contingencia.`
+                });
+            }
+
+            if(partidaMayor !== 'N/A') {
+                recs.push({
+                    titulo: "🎯 Partida de Alto Impacto",
+                    desc: `El rubro **${partidaMayor}** representa la mayor concentración de egresos. Evaluar renegociación de contratos con proveedores.`
+                });
+            } else {
+                recs.push({
+                    titulo: "🎯 Diversificación Egresos",
+                    desc: "No hay concentración crítica en una sola partida para este período."
+                });
+            }
+
+            recs.push({
+                titulo: "🛡️ Optimización Fiscal y Financiera",
+                desc: "Privilegiar compras con pago vía Transferencia Bancaria para asegurar deducibilidad inmediata y trazabilidad contable."
+            });
+
+            container.innerHTML = recs.map(r => `
+                <div class="bg-indigo-950/60 border border-indigo-700/50 p-3.5 rounded-lg">
+                    <h4 class="font-bold text-indigo-300 text-xs mb-1">${r.titulo}</h4>
+                    <p class="text-slate-300 leading-relaxed text-[11px]">${r.desc.replace(/\*\*(.*?)\*\*/g, '<strong class="text-white">$1</strong>')}</p>
+                </div>
+            `).join('');
+        }
+
         function exportarCSV() {
-            let csv = "PERIODO,CODIGO PADRE,DESCRIPCION,PRESUPUESTO SUMADO,GASTO CARRDUCI,GASTO CARRDUCI METAL,GASTO TOTAL,DISPONIBLE\n";
+            let csv = "PERIODO,CODIGO PADRE,DESCRIPCION,PRESUPUESTO SUMADO,GASTO CARRDUCI,GASTO CARRDUCI METAL,GASTO TOTAL,DISPONIBLE MONTO,DISPONIBLE PCT\n";
             let mapa = {};
 
             ['Carrduci', 'CarrduciMetal'].forEach(emp => {
@@ -1092,7 +1226,9 @@
                 const c = gC[m.cod] || 0;
                 const met = gM[m.cod] || 0;
                 const tot = c + met;
-                csv += `"${periodoActual}","${m.cod}","${m.desc}",${pres},${c},${met},${tot},${pres - tot}\n`;
+                const disp = pres - tot;
+                const pct = pres > 0 ? ((disp / pres) * 100).toFixed(2) : "0.00";
+                csv += `"${periodoActual}","${m.cod}","${m.desc}",${pres},${c},${met},${tot},${disp},"${pct}%"\n`;
             });
 
             const blob = new Blob([csv], { type: 'text/csv' });
