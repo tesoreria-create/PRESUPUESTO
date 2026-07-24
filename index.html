@@ -1,323 +1,447 @@
+HTML
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simulador Presupuestal y Control Diario</title>
-    <!-- Tailwind CSS para diseño -->
+    <title>Sistema de Control Presupuestal por Código</title>
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Chart.js para gráficos -->
+    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body class="bg-slate-100 font-sans text-slate-800 min-h-screen p-3 md:p-6">
 
-    <div class="max-w-5xl mx-auto bg-white rounded-xl shadow-lg overflow-hidden border border-slate-200">
+    <div class="max-w-6xl mx-auto bg-white rounded-xl shadow-lg overflow-hidden border border-slate-200">
         <!-- Encabezado -->
-        <header class="bg-indigo-600 text-white p-5 text-center flex flex-col md:flex-row justify-between items-center gap-2">
+        <header class="bg-indigo-700 text-white p-5 flex flex-col md:flex-row justify-between items-center gap-4">
             <div>
-                <h1 class="text-2xl font-bold">Control Presupuestal Diario</h1>
-                <p class="text-indigo-100 text-xs md:text-sm">Registra tus gastos del día a día y compara con tu presupuesto</p>
+                <h1 class="text-2xl font-bold">Control Presupuestal por Código de Partida</h1>
+                <p class="text-indigo-200 text-xs md:text-sm mt-0.5">Desglose detallado de presupuesto asignado vs. gasto real diario</p>
             </div>
-            <button onclick="exportarCSV()" class="bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-semibold py-2 px-4 rounded-lg shadow transition">
-                📥 Exportar a Excel
-            </button>
+            <div class="flex gap-2">
+                <button onclick="exportarCSV()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold py-2 px-3 rounded-lg shadow transition">
+                    📥 Exportar Excel
+                </button>
+            </div>
         </header>
 
-        <div class="p-4 md:p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- RESUMEN GENERAL -->
+        <div class="p-4 bg-slate-50 border-b border-slate-200 grid grid-cols-2 md:grid-cols-4 gap-3 text-center">
+            <div class="bg-white p-3 rounded-lg border border-slate-200 shadow-sm">
+                <span class="text-[11px] uppercase font-bold text-slate-500">Ingreso Total</span>
+                <p id="lblIngresoTotal" class="text-lg font-bold text-indigo-600">$0.00</p>
+            </div>
+            <div class="bg-white p-3 rounded-lg border border-slate-200 shadow-sm">
+                <span class="text-[11px] uppercase font-bold text-slate-500">Total Presupuestado</span>
+                <p id="lblTotalPresupuestado" class="text-lg font-bold text-slate-800">$0.00</p>
+            </div>
+            <div class="bg-white p-3 rounded-lg border border-slate-200 shadow-sm">
+                <span class="text-[11px] uppercase font-bold text-slate-500">Total Ejercido (Real)</span>
+                <p id="lblTotalEjercido" class="text-lg font-bold text-red-600">$0.00</p>
+            </div>
+            <div id="boxBalance" class="bg-emerald-50 p-3 rounded-lg border border-emerald-200 shadow-sm">
+                <span id="lblTituloBalance" class="text-[11px] uppercase font-bold text-emerald-800">Remanente Presupuestal</span>
+                <p id="lblBalance" class="text-lg font-bold text-emerald-700">$0.00</p>
+            </div>
+        </div>
+
+        <div class="p-4 md:p-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
             
-            <!-- COLUMNA IZQUIERDA: Presupuesto Base y Registro de Gastos -->
-            <div class="space-y-6">
+            <!-- COLUMNA IZQUIERDA: Formulario de Partidas e Ingreso -->
+            <div class="lg:col-span-1 space-y-5">
                 
-                <!-- Presupuesto / Ingreso Base -->
+                <!-- 1. Configurar Ingreso -->
                 <div class="bg-indigo-50 p-4 rounded-lg border border-indigo-100">
-                    <h2 class="text-md font-bold text-indigo-900 mb-2">1. Configurar Presupuesto Mensual</h2>
-                    <div class="grid grid-cols-2 gap-3">
-                        <div>
-                            <label class="block text-xs font-medium text-slate-700">Ingreso Mensual ($):</label>
-                            <input type="number" id="ingresos" value="25000" min="0" onchange="actualizarPresupuesto()" 
-                                class="w-full p-2 border border-indigo-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-medium text-slate-700">Límite Meta Gastos ($):</label>
-                            <input type="number" id="limiteGastos" value="18000" min="0" onchange="actualizarPresupuesto()" 
-                                class="w-full p-2 border border-indigo-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500">
-                        </div>
-                    </div>
+                    <h2 class="text-sm font-bold text-indigo-900 mb-2">1. Ingreso Base Global</h2>
+                    <label class="block text-xs font-medium text-slate-700 mb-1">Monto de Ingreso ($):</label>
+                    <input type="number" id="ingresoBase" value="25000" min="0" oninput="guardarIngreso()" 
+                        class="w-full p-2 border border-indigo-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500">
                 </div>
 
-                <!-- Formularios de Nuevo Gasto del Día -->
+                <!-- 2. Formulario para Agregar Partida Presupuestal por Código -->
                 <div class="bg-slate-50 p-4 rounded-lg border border-slate-200 space-y-3">
-                    <h2 class="text-md font-bold text-slate-900 mb-1">2. Registrar Gasto del Día</h2>
-                    
-                    <form id="formGasto" onsubmit="agregarGasto(event)" class="space-y-3">
+                    <h2 class="text-sm font-bold text-slate-900">2. + Registrar Código Presupuestal</h2>
+                    <form onsubmit="agregarPartida(event)" class="space-y-2.5">
+                        <div class="grid grid-cols-3 gap-2">
+                            <div>
+                                <label class="block text-[11px] font-medium text-slate-600">Código:</label>
+                                <input type="text" id="partidaCodigo" placeholder="Ej. 101" required class="w-full p-2 border border-slate-300 rounded-lg text-xs uppercase">
+                            </div>
+                            <div class="col-span-2">
+                                <label class="block text-[11px] font-medium text-slate-600">Monto Aprobado ($):</label>
+                                <input type="number" step="0.01" id="partidaMonto" placeholder="0.00" required class="w-full p-2 border border-slate-300 rounded-lg text-xs">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-medium text-slate-600">Descripción de la Partida:</label>
+                            <input type="text" id="partidaDescripcion" placeholder="Ej. Materiales de oficina, Renta, CFE..." required class="w-full p-2 border border-slate-300 rounded-lg text-xs">
+                        </div>
+                        <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 rounded-lg text-xs shadow transition">
+                            ➕ Guardar Código Presupuestal
+                        </button>
+                    </form>
+                </div>
+
+                <!-- 3. Formulario para Registrar Gasto Real Diario -->
+                <div class="bg-emerald-50 p-4 rounded-lg border border-emerald-200 space-y-3">
+                    <h2 class="text-sm font-bold text-emerald-900">3. + Registrar Gasto Diario</h2>
+                    <form onsubmit="agregarGastoDiario(event)" class="space-y-2.5">
                         <div class="grid grid-cols-2 gap-2">
                             <div>
-                                <label class="block text-xs font-medium text-slate-600">Fecha:</label>
-                                <input type="date" id="gastoFecha" required class="w-full p-2 border border-slate-300 rounded-lg text-sm">
+                                <label class="block text-[11px] font-medium text-slate-700">Fecha:</label>
+                                <input type="date" id="gastoFecha" required class="w-full p-2 border border-slate-300 rounded-lg text-xs">
                             </div>
                             <div>
-                                <label class="block text-xs font-medium text-slate-600">Categoría:</label>
-                                <select id="gastoCategoria" class="w-full p-2 border border-slate-300 rounded-lg text-sm">
-                                    <option value="Vivienda">Vivienda / Servicios</option>
-                                    <option value="Alimentacion">Alimentación / Súper</option>
-                                    <option value="Transporte">Transporte / Combustible</option>
-                                    <option value="Entretenimiento">Entretenimiento / Antojos</option>
-                                    <option value="Otros">Otros / Gastos Varios</option>
+                                <label class="block text-[11px] font-medium text-slate-700">Código Partida:</label>
+                                <select id="gastoSelectCodigo" required class="w-full p-2 border border-slate-300 rounded-lg text-xs bg-white">
+                                    <!-- Se llena con JS -->
                                 </select>
                             </div>
                         </div>
-
                         <div class="grid grid-cols-3 gap-2">
                             <div class="col-span-2">
-                                <label class="block text-xs font-medium text-slate-600">Concepto / Descripción:</label>
-                                <input type="text" id="gastoConcepto" placeholder="Ej. Tacos, Gasolina, CFE" required class="w-full p-2 border border-slate-300 rounded-lg text-sm">
+                                <label class="block text-[11px] font-medium text-slate-700">Concepto / Detalle:</label>
+                                <input type="text" id="gastoConcepto" placeholder="Ej. Compra de papelería" required class="w-full p-2 border border-slate-300 rounded-lg text-xs">
                             </div>
                             <div>
-                                <label class="block text-xs font-medium text-slate-600">Monto ($):</label>
-                                <input type="number" step="0.01" id="gastoMonto" placeholder="0.00" required class="w-full p-2 border border-slate-300 rounded-lg text-sm">
+                                <label class="block text-[11px] font-medium text-slate-700">Monto ($):</label>
+                                <input type="number" step="0.01" id="gastoMonto" placeholder="0.00" required class="w-full p-2 border border-slate-300 rounded-lg text-xs">
                             </div>
                         </div>
-
-                        <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 rounded-lg text-sm shadow transition">
-                            ➕ Registrar Gasto
+                        <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2 rounded-lg text-xs shadow transition">
+                            💵 Aplicar Gasto a Código
                         </button>
                     </form>
                 </div>
 
             </div>
 
-            <!-- COLUMNA DERECHA: Resumen y Gráficos -->
-            <div class="flex flex-col justify-between space-y-4">
+            <!-- COLUMNA DERECHA: Tablas y Comparativa -->
+            <div class="lg:col-span-2 space-y-6">
                 
-                <!-- Tarjetas de Métricas principales -->
-                <div class="grid grid-cols-3 gap-2 text-center">
-                    <div class="bg-slate-100 p-3 rounded-lg border border-slate-200">
-                        <span class="text-[10px] uppercase font-bold text-slate-500">Total Ingresos</span>
-                        <p id="lblIngresos" class="text-md font-bold text-slate-800">$0</p>
+                <!-- TABLA 1: Presupuesto por Código vs Ejercido -->
+                <div>
+                    <div class="flex justify-between items-center mb-2">
+                        <h2 class="text-sm font-bold text-slate-900">Desglose Presupuestal por Código</h2>
+                        <button onclick="borrarPartidas()" class="text-xs text-red-600 hover:underline">Reiniciar Códigos</button>
                     </div>
-                    <div class="bg-red-50 p-3 rounded-lg border border-red-200">
-                        <span class="text-[10px] uppercase font-bold text-red-700">Gastos Reales</span>
-                        <p id="lblTotalGastos" class="text-md font-bold text-red-700">$0</p>
-                    </div>
-                    <div id="boxBalance" class="bg-emerald-100 p-3 rounded-lg border border-emerald-200">
-                        <span id="lblTituloBalance" class="text-[10px] uppercase font-bold text-emerald-800">Disponible</span>
-                        <p id="lblBalance" class="text-md font-bold text-emerald-700">$0</p>
+                    <div class="overflow-x-auto max-h-60 bg-white rounded-lg border border-slate-200 shadow-sm">
+                        <table class="w-full text-left text-xs text-slate-600">
+                            <thead class="bg-slate-100 text-slate-700 font-semibold uppercase sticky top-0">
+                                <tr>
+                                    <th class="p-2.5">Código</th>
+                                    <th class="p-2.5">Descripción</th>
+                                    <th class="p-2.5 text-right">Presupuestado</th>
+                                    <th class="p-2.5 text-right">Gastado Real</th>
+                                    <th class="p-2.5 text-right">Disponible</th>
+                                    <th class="p-2.5 text-center">Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tablaPartidasBody" class="divide-y divide-slate-100">
+                                <!-- Se llena dinámicamente -->
+                            </tbody>
+                        </table>
                     </div>
                 </div>
 
-                <!-- Gráfico de Donas -->
-                <div class="relative h-48 flex items-center justify-center">
+                <!-- TABLA 2: Historial Diario de Gastos -->
+                <div>
+                    <div class="flex justify-between items-center mb-2">
+                        <h2 class="text-sm font-bold text-slate-900">Bitácora de Gastos Diarios Aplicados</h2>
+                        <button onclick="borrarGastos()" class="text-xs text-red-600 hover:underline">Limpiar Gastos</button>
+                    </div>
+                    <div class="overflow-x-auto max-h-52 bg-white rounded-lg border border-slate-200 shadow-sm">
+                        <table class="w-full text-left text-xs text-slate-600">
+                            <thead class="bg-slate-100 text-slate-700 font-semibold uppercase sticky top-0">
+                                <tr>
+                                    <th class="p-2.5">Fecha</th>
+                                    <th class="p-2.5">Código</th>
+                                    <th class="p-2.5">Concepto/Detalle</th>
+                                    <th class="p-2.5 text-right">Monto</th>
+                                    <th class="p-2.5 text-center">Borrar</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tablaGastosBody" class="divide-y divide-slate-100">
+                                <!-- Se llena dinámicamente -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Gráfico de Estado de Códigos -->
+                <div class="h-44 flex items-center justify-center pt-2">
                     <canvas id="graficoPresupuesto"></canvas>
                 </div>
 
-                <div id="mensajeAlerta" class="p-2.5 text-xs rounded-lg text-center font-medium bg-slate-100 text-slate-700">
-                    Cargando información...
-                </div>
-            </div>
-        </div>
-
-        <!-- TABLA DE HISTORIAL DE GASTOS DIARIOS -->
-        <div class="p-4 md:p-6 border-t border-slate-200 bg-slate-50">
-            <div class="flex justify-between items-center mb-3">
-                <h2 class="text-md font-bold text-slate-900">Historial de Gastos Registrados</h2>
-                <button onclick="borrarTodo()" class="text-xs text-red-600 hover:underline">Limpiar todo el historial</button>
-            </div>
-
-            <div class="overflow-x-auto max-h-60 bg-white rounded-lg border border-slate-200 shadow-sm">
-                <table class="w-full text-left text-xs text-slate-600">
-                    <thead class="bg-slate-100 text-slate-700 font-semibold uppercase sticky top-0">
-                        <tr>
-                            <th class="p-2.5">Fecha</th>
-                            <th class="p-2.5">Categoría</th>
-                            <th class="p-2.5">Concepto</th>
-                            <th class="p-2.5 text-right">Monto</th>
-                            <th class="p-2.5 text-center">Acción</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tablaGastosBody" class="divide-y divide-slate-100">
-                        <!-- Se llena dinámicamente -->
-                    </tbody>
-                </table>
             </div>
         </div>
     </div>
 
-    <!-- Lógica de Guardado en LocalStorage y Scripts -->
+    <!-- Lógica JavaScript -->
     <script>
-        let gastos = JSON.parse(localStorage.getItem('gastos_app')) || [];
+        let partidas = JSON.parse(localStorage.getItem('partidas_codigo')) || [
+            { codigo: '101', descripcion: 'Sueldos y Nomina', monto: 10000 },
+            { codigo: '201', descripcion: 'Servicios Básicos (Luz/Agua/Net)', monto: 3500 },
+            { codigo: '301', descripcion: 'Mantenimiento y Equipos', monto: 2500 }
+        ];
+
+        let gastos = JSON.parse(localStorage.getItem('gastos_codigo')) || [];
         let chartInstance = null;
 
-        // Establecer fecha de hoy por defecto en el formulario
-        document.getElementById('gastoFecha').valueToDate = new Date();
-        document.getElementById('gastoFecha').value = new Date().toISOString().split('T')[0];
+        window.onload = function() {
+            if(localStorage.getItem('ingreso_base')) {
+                document.getElementById('ingresoBase').value = localStorage.getItem('ingreso_base');
+            }
+            document.getElementById('gastoFecha').value = new Date().toISOString().split('T')[0];
+            actualizarTodo();
+        };
 
-        // Cargar presupuesto guardado
-        if(localStorage.getItem('ingresos_app')) {
-            document.getElementById('ingresos').value = localStorage.getItem('ingresos_app');
+        function guardarIngreso() {
+            localStorage.setItem('ingreso_base', document.getElementById('ingresoBase').value);
+            actualizarTodo();
         }
 
-        function agregarGasto(e) {
+        function agregarPartida(e) {
             e.preventDefault();
-            
+            const codigo = document.getElementById('partidaCodigo').value.trim().toUpperCase();
+            const descripcion = document.getElementById('partidaDescripcion').value.trim();
+            const monto = parseFloat(document.getElementById('partidaMonto').value) || 0;
+
+            const existe = partidas.find(p => p.codigo === codigo);
+            if(existe) {
+                alert(`El código ${codigo} ya existe. Usa otro código o elimínalo primero.`);
+                return;
+            }
+
+            partidas.push({ codigo, descripcion, monto });
+            localStorage.setItem('partidas_codigo', JSON.stringify(partidas));
+
+            document.getElementById('partidaCodigo').value = '';
+            document.getElementById('partidaDescripcion').value = '';
+            document.getElementById('partidaMonto').value = '';
+
+            actualizarTodo();
+        }
+
+        function eliminarPartida(codigo) {
+            if(confirm(`¿Deseas borrar la partida con código ${codigo}?`)) {
+                partidas = partidas.filter(p => p.codigo !== codigo);
+                localStorage.setItem('partidas_codigo', JSON.stringify(partidas));
+                actualizarTodo();
+            }
+        }
+
+        function agregarGastoDiario(e) {
+            e.preventDefault();
             const fecha = document.getElementById('gastoFecha').value;
-            const categoria = document.getElementById('gastoCategoria').value;
+            const codigo = document.getElementById('gastoSelectCodigo').value;
             const concepto = document.getElementById('gastoConcepto').value;
             const monto = parseFloat(document.getElementById('gastoMonto').value) || 0;
 
-            const nuevoGasto = { id: Date.now(), fecha, categoria, concepto, monto };
-            gastos.push(nuevoGasto);
+            if(!codigo) {
+                alert("Debes crear al menos un código presupuestal antes de registrar gastos.");
+                return;
+            }
 
-            guardarYActualizar();
+            gastos.unshift({ id: Date.now(), fecha, codigo, concepto, monto });
+            localStorage.setItem('gastos_codigo', JSON.stringify(gastos));
 
-            // Limpiar formulario excepto fecha
             document.getElementById('gastoConcepto').value = '';
             document.getElementById('gastoMonto').value = '';
+
+            actualizarTodo();
         }
 
         function eliminarGasto(id) {
             gastos = gastos.filter(g => g.id !== id);
-            guardarYActualizar();
+            localStorage.setItem('gastos_codigo', JSON.stringify(gastos));
+            actualizarTodo();
         }
 
-        function borrarTodo() {
-            if (confirm("¿Estás seguro de que deseas borrar todo el historial de gastos?")) {
-                gastos = [];
-                guardarYActualizar();
+        function borrarPartidas() {
+            if(confirm("¿Seguro que deseas borrar todas las partidas presupuestales?")) {
+                partidas = [];
+                localStorage.setItem('partidas_codigo', JSON.stringify(partidas));
+                actualizarTodo();
             }
         }
 
-        function guardarYActualizar() {
-            localStorage.setItem('gastos_app', JSON.stringify(gastos));
-            localStorage.setItem('ingresos_app', document.getElementById('ingresos').value);
-            actualizarInterfaz();
+        function borrarGastos() {
+            if(confirm("¿Seguro que deseas borrar todos los gastos registrados?")) {
+                gastos = [];
+                localStorage.setItem('gastos_codigo', JSON.stringify(gastos));
+                actualizarTodo();
+            }
         }
 
-        function actualizarPresupuesto() {
-            guardarYActualizar();
-        }
-
-        function actualizarInterfaz() {
-            const ingresos = parseFloat(document.getElementById('ingresos').value) || 0;
+        function actualizarTodo() {
+            const ingresoBase = parseFloat(document.getElementById('ingresoBase').value) || 0;
             
-            // Renderizar Tabla
-            const tbody = document.getElementById('tablaGastosBody');
-            tbody.innerHTML = '';
+            // 1. Calcular totales por código
+            let totalPresupuestado = 0;
+            let totalEjercido = 0;
 
-            let totalGastos = 0;
-            let desglose = { Vivienda: 0, Alimentacion: 0, Transporte: 0, Entretenimiento: 0, Otros: 0 };
+            // Mapeo de gastado por código
+            let gastadoPorCodigo = {};
+            gastos.forEach(g => {
+                totalEjercido += g.monto;
+                gastadoPorCodigo[g.codigo] = (gastadoPorCodigo[g.codigo] || 0) + g.monto;
+            });
 
-            // Ordenar de más reciente a más antiguo
-            const gastosOrdenados = [...gastos].sort((a,b) => new Date(b.fecha) - new Date(a.fecha));
+            // Render Tabla Partidas
+            const tbodyPartidas = document.getElementById('tablaPartidasBody');
+            tbodyPartidas.innerHTML = '';
 
-            gastosOrdenados.forEach(g => {
-                totalGastos += g.monto;
-                if(desglose[g.categoria] !== undefined) {
-                    desglose[g.categoria] += g.monto;
-                } else {
-                    desglose.Otros += g.monto;
-                }
+            const selectCodigo = document.getElementById('gastoSelectCodigo');
+            selectCodigo.innerHTML = '';
+
+            partidas.forEach(p => {
+                totalPresupuestado += p.monto;
+                const gastado = gastadoPorCodigo[p.codigo] || 0;
+                const disponible = p.monto - gastado;
+
+                // Opción para el selector de gastos
+                const option = document.createElement('option');
+                option.value = p.codigo;
+                option.innerText = `${p.codigo} - ${p.descripcion}`;
+                selectCodigo.appendChild(option);
 
                 const tr = document.createElement('tr');
                 tr.className = 'hover:bg-slate-50';
                 tr.innerHTML = `
+                    <td class="p-2.5 font-bold text-indigo-700">${p.codigo}</td>
+                    <td class="p-2.5 font-medium text-slate-800">${p.descripcion}</td>
+                    <td class="p-2.5 text-right text-slate-700 font-semibold">$${p.monto.toLocaleString('es-MX', {minimumFractionDigits: 2})}</td>
+                    <td class="p-2.5 text-right font-semibold text-red-600">$${gastado.toLocaleString('es-MX', {minimumFractionDigits: 2})}</td>
+                    <td class="p-2.5 text-right font-bold ${disponible >= 0 ? 'text-emerald-600' : 'text-red-700'}">$${disponible.toLocaleString('es-MX', {minimumFractionDigits: 2})}</td>
+                    <td class="p-2.5 text-center">
+                        <button onclick="eliminarPartida('${p.codigo}')" class="text-slate-400 hover:text-red-600 font-bold px-1">✕</button>
+                    </td>
+                `;
+                tbodyPartidas.appendChild(tr);
+            });
+
+            if(partidas.length === 0) {
+                tbodyPartidas.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-400">No hay códigos presupuestales registrados. Registra uno arriba.</td></tr>`;
+            }
+
+            // Render Tabla Gastos Diarios
+            const tbodyGastos = document.getElementById('tablaGastosBody');
+            tbodyGastos.innerHTML = '';
+
+            gastos.forEach(g => {
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-slate-50';
+                tr.innerHTML = `
                     <td class="p-2.5 whitespace-nowrap">${g.fecha}</td>
-                    <td class="p-2.5"><span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-slate-100">${g.categoria}</span></td>
+                    <td class="p-2.5"><span class="px-2 py-0.5 rounded text-[10px] font-bold bg-indigo-100 text-indigo-800">${g.codigo}</span></td>
                     <td class="p-2.5 font-medium text-slate-800">${g.concepto}</td>
                     <td class="p-2.5 text-right font-bold text-red-600">$${g.monto.toFixed(2)}</td>
                     <td class="p-2.5 text-center">
                         <button onclick="eliminarGasto(${g.id})" class="text-slate-400 hover:text-red-600 font-bold px-1">✕</button>
                     </td>
                 `;
-                tbody.appendChild(tr);
+                tbodyGastos.appendChild(tr);
             });
 
             if(gastos.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-400">No hay gastos registrados. ¡Agrega tu primer gasto arriba!</td></tr>`;
+                tbodyGastos.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-400">No hay gastos aplicados en la bitácora aún.</td></tr>`;
             }
 
-            // Calcular totales
-            const balance = ingresos - totalGastos;
-
-            document.getElementById('lblIngresos').innerText = '$' + ingresos.toLocaleString();
-            document.getElementById('lblTotalGastos').innerText = '$' + totalGastos.toLocaleString();
-            document.getElementById('lblBalance').innerText = '$' + Math.abs(balance).toLocaleString();
+            // Actualizar Resumen Superior
+            const remanente = totalPresupuestado - totalEjercido;
+            document.getElementById('lblIngresoTotal').innerText = '$' + ingresoBase.toLocaleString('es-MX', {minimumFractionDigits: 2});
+            document.getElementById('lblTotalPresupuestado').innerText = '$' + totalPresupuestado.toLocaleString('es-MX', {minimumFractionDigits: 2});
+            document.getElementById('lblTotalEjercido').innerText = '$' + totalEjercido.toLocaleString('es-MX', {minimumFractionDigits: 2});
+            document.getElementById('lblBalance').innerText = '$' + Math.abs(remanente).toLocaleString('es-MX', {minimumFractionDigits: 2});
 
             const boxBalance = document.getElementById('boxBalance');
             const lblTituloBalance = document.getElementById('lblTituloBalance');
             const lblBalance = document.getElementById('lblBalance');
-            const mensajeAlerta = document.getElementById('mensajeAlerta');
 
-            if (balance >= 0) {
-                lblTituloBalance.innerText = 'Disponible';
-                lblTituloBalance.className = 'text-[10px] uppercase font-bold text-emerald-800';
-                lblBalance.className = 'text-md font-bold text-emerald-700';
-                boxBalance.className = 'bg-emerald-100 p-3 rounded-lg border border-emerald-200';
-
-                const pct = ingresos > 0 ? ((balance / ingresos) * 100).toFixed(1) : 0;
-                mensajeAlerta.innerText = `Te queda disponible el ${pct}% de tu ingreso mensual.`;
-                mensajeAlerta.className = 'p-2.5 text-xs rounded-lg text-center font-medium bg-emerald-50 text-emerald-700 border border-emerald-200';
+            if(remanente >= 0) {
+                lblTituloBalance.innerText = 'Disponible de Presupuesto';
+                lblTituloBalance.className = 'text-[11px] uppercase font-bold text-emerald-800';
+                lblBalance.className = 'text-lg font-bold text-emerald-700';
+                boxBalance.className = 'bg-emerald-50 p-3 rounded-lg border border-emerald-200 shadow-sm';
             } else {
-                lblTituloBalance.innerText = 'Déficit';
-                lblTituloBalance.className = 'text-[10px] uppercase font-bold text-red-800';
-                lblBalance.className = 'text-md font-bold text-red-700';
-                boxBalance.className = 'bg-red-100 p-3 rounded-lg border border-red-200';
-
-                mensajeAlerta.innerText = '¡Atención! Has excedido tu presupuesto mensual.';
-                mensajeAlerta.className = 'p-2.5 text-xs rounded-lg text-center font-medium bg-red-50 text-red-700 border border-red-200';
+                lblTituloBalance.innerText = 'Sobrepresupuesto (Déficit)';
+                lblTituloBalance.className = 'text-[11px] uppercase font-bold text-red-800';
+                lblBalance.className = 'text-lg font-bold text-red-700';
+                boxBalance.className = 'bg-red-50 p-3 rounded-lg border border-red-200 shadow-sm';
             }
 
-            // Actualizar Gráfica
-            actualizarGrafico(desglose, balance > 0 ? balance : 0);
+            actualizarGrafico(partidas, gastadoPorCodigo);
         }
 
-        function actualizarGrafico(desglose, disponible) {
+        function actualizarGrafico(partidas, gastadoPorCodigo) {
             const ctx = document.getElementById('graficoPresupuesto').getContext('2d');
 
             if (chartInstance) {
                 chartInstance.destroy();
             }
 
+            const labels = partidas.map(p => `${p.codigo} - ${p.descripcion.substring(0, 12)}...`);
+            const dataPresupuesto = partidas.map(p => p.monto);
+            const dataGastado = partidas.map(p => gastadoPorCodigo[p.codigo] || 0);
+
             chartInstance = new Chart(ctx, {
-                type: 'doughnut',
+                type: 'bar',
                 data: {
-                    labels: ['Vivienda', 'Alimentación', 'Transporte', 'Entretenimiento', 'Otros', 'Disponible'],
-                    datasets: [{
-                        data: [desglose.Vivienda, desglose.Alimentacion, desglose.Transporte, desglose.Entretenimiento, desglose.Otros, disponible],
-                        backgroundColor: ['#f87171', '#fbbf24', '#60a5fa', '#c084fc', '#94a3b8', '#34d399'],
-                        borderWidth: 1
-                    }]
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Presupuestado ($)',
+                            data: dataPresupuesto,
+                            backgroundColor: '#6366f1'
+                        },
+                        {
+                            label: 'Gastado Real ($)',
+                            data: dataGastado,
+                            backgroundColor: '#f87171'
+                        }
+                    ]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: {
-                        legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 10 } } }
+                        legend: { position: 'top', labels: { font: { size: 10 } } }
+                    },
+                    scales: {
+                        x: { ticks: { font: { size: 9 } } },
+                        y: { ticks: { font: { size: 9 } } }
                     }
                 }
             });
         }
 
         function exportarCSV() {
-            if(gastos.length === 0) {
-                alert("No hay gastos registrados para exportar.");
+            if(partidas.length === 0) {
+                alert("No hay partidas presupuestales para exportar.");
                 return;
             }
-            let csvContent = "data:text/csv;charset=utf-8,Fecha,Categoria,Concepto,Monto\n";
-            gastos.forEach(g => {
-                csvContent += `${g.fecha},"${g.categoria}","${g.concepto}",${g.monto}\n`;
+
+            let csv = "DESGLOSE PRESUPUESTAL POR CODIGO\n";
+            csv += "Codigo,Descripcion,Monto Presupuestado\n";
+            partidas.forEach(p => {
+                csv += `"${p.codigo}","${p.descripcion}",${p.monto}\n`;
             });
 
-            const encodedUri = encodeURI(csvContent);
-            const link = document.createElement("a");
-            link.setAttribute("href", encodedUri);
-            link.setAttribute("download", "gastos_presupuesto.csv");
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        }
+            csv += "\nBITACORA DE GASTOS DIARIOS\n";
+            csv += "Fecha,Codigo,Concepto,Monto Gastado\n";
+            gastos.forEach(g => {
+                csv += `${g.fecha},"${g.codigo}","${g.concepto}",${g.monto}\n`;
+            });
 
-        // Inicializar al cargar
-        actualizarInterfaz();
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.setAttribute('href', url);
+            a.setAttribute('download', 'presupuesto_por_codigo.csv');
+            a.click();
+        }
     </script>
 </body>
 </html>
