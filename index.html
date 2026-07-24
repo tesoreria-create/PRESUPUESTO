@@ -28,7 +28,7 @@
 </head>
 <body class="antialiased text-slate-700 min-h-screen flex">
 
-    <!-- 1. SIDEBAR NAVEGACIÓN LATERAL (ESTILO DASHBOARD MODERN) -->
+    <!-- 1. SIDEBAR NAVEGACIÓN LATERAL -->
     <aside class="w-64 bg-[#001529] text-slate-300 flex flex-col shrink-0 min-h-screen shadow-xl z-20">
         <!-- Logo Header -->
         <div class="p-5 flex items-center space-x-3 border-b border-slate-800">
@@ -61,7 +61,6 @@
             </button>
         </nav>
 
-        <!-- Footer Sidebar -->
         <div class="p-4 border-t border-slate-800 text-[11px] text-slate-500 text-center">
             Módulo Dirección &copy; 2026
         </div>
@@ -99,7 +98,7 @@
         <!-- 3. ÁREA DE CONTENIDO -->
         <main class="p-8 space-y-6 flex-1">
 
-            <!-- KPIS SUPERIORES (ESTILO TARGETAS MINIMALISTAS) -->
+            <!-- KPIS SUPERIORES -->
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
                 <div class="bg-white p-5 rounded-xl border border-slate-200/80 shadow-sm relative">
                     <span class="text-xs font-medium text-slate-400">Ingreso Global Aprobado</span>
@@ -125,7 +124,7 @@
 
             <!-- PESTAÑA 1: CAPTURA Y BITÁCORA -->
             <div id="pestana1" class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                <!-- Formulario Sidebar -->
+                <!-- Formulario -->
                 <div class="lg:col-span-4 bg-white p-6 rounded-xl border border-slate-200/80 shadow-sm h-fit">
                     <div class="flex items-center space-x-2 pb-3 mb-4 border-b border-slate-100">
                         <i data-lucide="plus-circle" class="w-4 h-4 text-blue-600"></i>
@@ -162,7 +161,6 @@
 
                 <!-- Tablas Principales -->
                 <div class="lg:col-span-8 space-y-6">
-                    <!-- PRESUPUESTO INDIVIDUAL -->
                     <div class="bg-white p-6 rounded-xl border border-slate-200/80 shadow-sm">
                         <div class="flex justify-between items-center mb-4 pb-3 border-b border-slate-100">
                             <div>
@@ -190,7 +188,6 @@
                         </div>
                     </div>
 
-                    <!-- BITÁCORA DE GASTOS -->
                     <div class="bg-white p-6 rounded-xl border border-slate-200/80 shadow-sm">
                         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4 pb-3 border-b border-slate-100">
                             <h3 class="text-xs font-bold text-slate-700 uppercase">Bitácora General de Operaciones</h3>
@@ -289,8 +286,6 @@
 
             <!-- PESTAÑA 4: TABLERO DE DIRECCIÓN -->
             <div id="pestana4" class="space-y-6 hidden">
-                
-                <!-- FILTRO Y SELECCIÓN DE CÓDIGOS -->
                 <div class="bg-white p-6 rounded-xl border border-slate-200/80 shadow-sm space-y-4">
                     <div class="flex flex-col lg:flex-row justify-between lg:items-center gap-3 pb-3 border-b border-slate-100">
                         <div>
@@ -308,7 +303,6 @@
                     <div id="contenedorFiltroCodigos" class="flex flex-wrap gap-2 text-xs"></div>
                 </div>
 
-                <!-- KPIS ESPECÍFICOS DE TABLERO -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
                     <div class="bg-white p-5 rounded-xl border border-slate-200/80 shadow-sm">
                         <span class="text-xs font-medium text-slate-400">Ejecución del Presupuesto</span>
@@ -334,7 +328,6 @@
                     </div>
                 </div>
 
-                <!-- GRÁFICAS -->
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     <div class="bg-white p-6 rounded-xl border border-slate-200/80 shadow-sm">
                         <h3 class="text-xs font-bold text-slate-700 uppercase mb-4">Presupuesto vs Gasto Real</h3>
@@ -349,13 +342,42 @@
                         </div>
                     </div>
                 </div>
-
             </div>
 
         </main>
     </div>
 
-    <!-- JAVASCRIPT LÓGICO INTRACTO -->
+    <!-- MODAL DE EDICIÓN DE IMPORTE DE PARTIDA -->
+    <div id="modalEditarPartida" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center hidden">
+        <div class="bg-white rounded-xl shadow-xl border border-slate-200 p-6 w-full max-w-md space-y-4">
+            <div class="flex justify-between items-center pb-2 border-b border-slate-100">
+                <h3 class="text-xs font-bold text-slate-700 uppercase">Modificar Presupuesto Asignado</h3>
+                <button onclick="cerrarModalEditar()" class="text-slate-400 hover:text-slate-600 font-bold">✕</button>
+            </div>
+            
+            <form onsubmit="guardarEdicionPartida(event)" class="space-y-4 text-xs">
+                <input type="hidden" id="editCodigoOriginal">
+                <div>
+                    <label class="block font-medium text-slate-500 mb-1">Código Contable</label>
+                    <input type="text" id="editCodigo" disabled class="w-full border border-slate-200 rounded-lg p-2.5 bg-slate-100 font-mono text-slate-600 font-bold">
+                </div>
+                <div>
+                    <label class="block font-medium text-slate-500 mb-1">Descripción del Rubro</label>
+                    <input type="text" id="editDescripcion" required class="w-full border border-slate-200 rounded-lg p-2.5 bg-slate-50">
+                </div>
+                <div>
+                    <label class="block font-medium text-slate-500 mb-1">Nuevo Presupuesto Asignado ($)</label>
+                    <input type="number" step="0.01" id="editMonto" required class="w-full border border-slate-200 rounded-lg p-2.5 bg-slate-50 font-bold font-mono text-slate-800">
+                </div>
+                <div class="flex justify-end space-x-2 pt-2">
+                    <button type="button" onclick="cerrarModalEditar()" class="px-4 py-2 bg-slate-100 text-slate-600 rounded-lg font-semibold hover:bg-slate-200 transition">Cancelar</button>
+                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition shadow-sm">Guardar Cambios</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT -->
     <script>
         lucide.createIcons();
 
@@ -462,6 +484,39 @@
             renderizarTodo();
         }
 
+        /* FUNCIONALIDAD NUEVA DE EDICIÓN DE IMPORTE */
+        function abrirModalEditar(codigo) {
+            const partida = baseDatos[empresaActual].partidas.find(p => p.codigo === codigo);
+            if(!partida) return;
+
+            document.getElementById('editCodigoOriginal').value = partida.codigo;
+            document.getElementById('editCodigo').value = partida.codigo;
+            document.getElementById('editDescripcion').value = partida.descripcion;
+            document.getElementById('editMonto').value = partida.monto;
+
+            document.getElementById('modalEditarPartida').classList.remove('hidden');
+        }
+
+        function cerrarModalEditar() {
+            document.getElementById('modalEditarPartida').classList.add('hidden');
+        }
+
+        function guardarEdicionPartida(e) {
+            e.preventDefault();
+            const codigo = document.getElementById('editCodigoOriginal').value;
+            const nuevaDesc = document.getElementById('editDescripcion').value;
+            const nuevoMonto = parseFloat(document.getElementById('editMonto').value);
+
+            const partida = baseDatos[empresaActual].partidas.find(p => p.codigo === codigo);
+            if(partida) {
+                partida.descripcion = nuevaDesc;
+                partida.monto = nuevoMonto;
+            }
+
+            cerrarModalEditar();
+            renderizarTodo();
+        }
+
         function borrarGasto(id) {
             baseDatos[empresaActual].gastos = baseDatos[empresaActual].gastos.filter(g => g.id !== id);
             renderizarTodo();
@@ -553,6 +608,7 @@
             }
         }
 
+        /* CATÁLOGO RENDERIZADO CON BOTÓN DE EDICIÓN DE IMPORTE */
         function renderizarCatalogo() {
             const tCat = document.getElementById('tablaCatalogo');
             tCat.innerHTML = '';
@@ -562,7 +618,10 @@
                     <td class="py-3 px-2 font-bold text-slate-800 font-mono">${p.codigo}</td>
                     <td class="px-2 text-slate-600">${p.descripcion}</td>
                     <td class="px-2 text-right font-semibold text-slate-700 font-mono">$${p.monto.toLocaleString('en-US',{minimumFractionDigits:2})}</td>
-                    <td class="px-2 text-center"><button onclick="borrarPartida('${p.codigo}')" class="text-red-500 hover:bg-red-50 font-semibold px-2.5 py-1 rounded text-xs transition">Eliminar</button></td>
+                    <td class="px-2 text-center space-x-1">
+                        <button onclick="abrirModalEditar('${p.codigo}')" class="text-blue-600 hover:bg-blue-50 font-semibold px-2.5 py-1 rounded text-xs transition">Editar</button>
+                        <button onclick="borrarPartida('${p.codigo}')" class="text-red-500 hover:bg-red-50 font-semibold px-2.5 py-1 rounded text-xs transition">Eliminar</button>
+                    </td>
                 </tr>`;
             });
         }
