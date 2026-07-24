@@ -228,7 +228,7 @@
                     <div class="flex justify-between items-center mb-4 pb-3 border-b border-slate-100">
                         <div>
                             <h3 class="text-xs font-bold text-slate-700 uppercase">Catálogo de Subcuentas y Asignaciones</h3>
-                            <p class="text-[11px] text-slate-400">Edita los montos de cada subcuenta para el mes activo</p>
+                            <p class="text-[11px] text-slate-400">Administra las subcuentas y ajusta los montos para la entidad seleccionada</p>
                         </div>
                     </div>
                     <div class="overflow-x-auto">
@@ -296,7 +296,7 @@
         </div>
     </main>
 
-    <!-- LOGICA JAVASCRIPT CON PERSISTENCIA Y TABLA PLANA UNIFICADA -->
+    <!-- LOGICA JAVASCRIPT CORREGIDA CON PERSISTENCIA EN LOCALSTORAGE -->
     <script>
         const STORAGE_KEY = 'corpbudget_db_v2';
 
@@ -464,16 +464,12 @@
             const descripcion = document.getElementById('nuevaDescripcionPadre').value.trim();
 
             if (codigo && descripcion) {
-                const existe = baseDatos[empresaActual].codigosPadre.some(p => p.codigo === codigo);
-                if (!existe) {
-                    baseDatos[empresaActual].codigosPadre.push({ codigo, descripcion });
-                    document.getElementById('nuevoCodigoPadre').value = '';
-                    document.getElementById('nuevaDescripcionPadre').value = '';
-                    
-                    actualizarSelects();
-                    guardarState();
-                    renderizarTodo();
-                }
+                baseDatos[empresaActual].codigosPadre.push({ codigo, descripcion });
+                document.getElementById('nuevoCodigoPadre').value = '';
+                document.getElementById('nuevaDescripcionPadre').value = '';
+                actualizarSelects();
+                guardarState();
+                renderizarTodo();
             }
         }
 
@@ -485,18 +481,13 @@
             const monto = parseFloat(document.getElementById('nuevoMontoSub').value) || 0;
 
             if (codigoPadre && codigoSub) {
-                let sub = baseDatos[empresaActual].subcuentas.find(s => s.codigoSub === codigoSub);
-                if (!sub) {
-                    sub = { codigoSub, codigoPadre, descripcion, presupuestoPorPeriodo: {} };
-                    baseDatos[empresaActual].subcuentas.push(sub);
-                }
-                
-                sub.presupuestoPorPeriodo[periodoActual] = monto;
+                const subObj = { codigoSub, codigoPadre, descripcion, presupuestoPorPeriodo: {} };
+                subObj.presupuestoPorPeriodo[periodoActual] = monto;
+                baseDatos[empresaActual].subcuentas.push(subObj);
 
                 document.getElementById('nuevoCodigoSub').value = '';
                 document.getElementById('nuevaDescripcionSub').value = '';
                 document.getElementById('nuevoMontoSub').value = '';
-                
                 actualizarSelects();
                 guardarState();
                 renderizarTodo();
@@ -581,60 +572,24 @@
             });
         }
 
-        // MOSTRAR CUENTAS Y SUBCUENTAS CON LA ESTRUCTURA ORIGINAL PLANA
         function renderizarCatalogo() {
             const tbody = document.getElementById('tablaCatalogo');
-            if (!tbody) return;
-            
             tbody.innerHTML = '';
 
-            const codigosPadre = baseDatos[empresaActual].codigosPadre || [];
-            const subcuentas = baseDatos[empresaActual].subcuentas || [];
-
-            // 1. DIBUJAR CÓDIGOS PADRE
-            codigosPadre.forEach(p => {
-                tbody.innerHTML += `
-                    <tr class="hover:bg-slate-50 transition border-b border-slate-100 font-semibold text-slate-800">
-                        <td class="py-2.5 px-2 font-mono text-blue-600">${p.codigo}</td>
-                        <td class="py-2.5 px-2 font-mono text-slate-400">—</td>
-                        <td class="py-2.5 px-2">${p.descripcion} <span class="text-[10px] bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded font-normal ml-1">Cuenta Principal</span></td>
-                        <td class="py-2.5 px-2 text-right font-mono text-slate-400">—</td>
-                        <td class="py-2.5 px-2 text-center text-slate-400">Activo</td>
-                    </tr>
-                `;
-            });
-
-            // 2. DIBUJAR SUBCUENTAS
-            subcuentas.forEach(s => {
+            baseDatos[empresaActual].subcuentas.forEach(s => {
                 const montoActual = (s.presupuestoPorPeriodo && s.presupuestoPorPeriodo[periodoActual]) || 0;
                 tbody.innerHTML += `
-                    <tr class="hover:bg-slate-50 transition border-b border-slate-100">
+                    <tr>
                         <td class="py-2.5 px-2 font-mono font-bold">${s.codigoSub}</td>
                         <td class="py-2.5 px-2 font-mono">${s.codigoPadre}</td>
                         <td class="py-2.5 px-2">${s.descripcion}</td>
                         <td class="py-2.5 px-2 text-right">
-                            <input 
-                                type="number" 
-                                step="0.01" 
-                                value="${montoActual}" 
-                                onchange="guardarPresupuestoSubcuenta('${s.codigoSub}', this.value)" 
-                                class="w-24 text-right border border-slate-200 rounded px-1 py-0.5 font-mono text-xs focus:ring-1 focus:ring-blue-500 focus:outline-none"
-                            >
+                            <input type="number" step="0.01" value="${montoActual}" onchange="guardarPresupuestoSubcuenta('${s.codigoSub}', this.value)" class="w-24 text-right border rounded px-1 py-0.5 font-mono">
                         </td>
                         <td class="py-2.5 px-2 text-center text-slate-400">Activo</td>
                     </tr>
                 `;
             });
-
-            if (codigosPadre.length === 0 && subcuentas.length === 0) {
-                tbody.innerHTML = `
-                    <tr>
-                        <td colspan="5" class="py-6 text-center text-slate-400 italic">
-                            No hay registros. Da de alta un código o subcuenta en el panel izquierdo.
-                        </td>
-                    </tr>
-                `;
-            }
         }
 
         function renderizarConsolidado() {
@@ -651,18 +606,21 @@
                 const descM = baseDatos.CarrduciMetal.codigosPadre.find(p => p.codigo === cod)?.descripcion;
                 const desc = descC || descM || 'Rubro General';
 
+                // Presupuestos
                 let presTotal = 0;
                 ['Carrduci', 'CarrduciMetal'].forEach(emp => {
                     const subs = baseDatos[emp].subcuentas.filter(s => s.codigoPadre === cod);
                     subs.forEach(s => presTotal += (s.presupuestoPorPeriodo && s.presupuestoPorPeriodo[periodoActual]) || 0);
                 });
 
+                // Gastos Carrduci
                 let gastoC = 0;
                 const subsC = baseDatos.Carrduci.subcuentas.filter(s => s.codigoPadre === cod);
                 baseDatos.Carrduci.gastos.filter(g => g.fecha.startsWith(periodoActual)).forEach(g => {
                     if (subsC.some(s => s.codigoSub === g.codigoSub)) gastoC += g.monto;
                 });
 
+                // Gastos Carrduci Metal
                 let gastoM = 0;
                 const subsM = baseDatos.CarrduciMetal.subcuentas.filter(s => s.codigoPadre === cod);
                 baseDatos.CarrduciMetal.gastos.filter(g => g.fecha.startsWith(periodoActual)).forEach(g => {
