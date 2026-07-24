@@ -3,161 +3,177 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestión de Presupuesto</title>
+    <title>Presupuesto Tesorería</title>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { background-color: #f4f6f9; padding: 20px; color: #333; display: flex; justify-content: center; }
-        .container { max-width: 700px; width: 100%; background: #ffffff; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        h1 { text-align: center; margin-bottom: 20px; color: #1a252f; }
+        * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: #f4f6f8; margin: 0; padding: 20px; color: #333; }
+        .container { max-width: 800px; margin: 0 auto; background: white; padding: 25px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        h1 { text-align: center; color: #2c3e50; margin-bottom: 25px; }
         
-        .resumen { display: flex; gap: 15px; margin-bottom: 25px; }
-        .card { flex: 1; padding: 15px; border-radius: 8px; text-align: center; background: #eef2f5; }
-        .card h3 { font-size: 14px; color: #666; margin-bottom: 5px; }
-        .card p { font-size: 18px; font-weight: bold; }
-        .ingreso-val { color: #27ae60; }
-        .egreso-val { color: #e74c3c; }
-        .balance-val { color: #2980b9; }
+        .resumen-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 25px; }
+        .card { padding: 15px; border-radius: 8px; text-align: center; background: #fafafa; border: 1px solid #e2e8f0; }
+        .card h3 { font-size: 13px; text-transform: uppercase; color: #64748b; margin-top: 0; }
+        .card p { font-size: 22px; font-weight: bold; margin: 5px 0 0 0; }
+        .ingreso-num { color: #16a34a; }
+        .egreso-num { color: #dc2626; }
+        .balance-num { color: #2563eb; }
 
         form { display: grid; grid-template-columns: 2fr 1fr 1fr auto; gap: 10px; margin-bottom: 25px; }
-        input, select, button { padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px; outline: none; }
-        button { background-color: #27ae60; color: white; border: none; cursor: pointer; font-weight: bold; transition: 0.2s; }
-        button:hover { background-color: #219150; }
+        input, select, button { padding: 10px 12px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 14px; outline: none; }
+        button { background-color: #2563eb; color: white; border: none; font-weight: 600; cursor: pointer; transition: background 0.2s; }
+        button:hover { background-color: #1d4ed8; }
 
         table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
-        th { background-color: #f8f9fa; color: #555; }
-        .btn-eliminar { background-color: #e74c3c; color: white; padding: 5px 10px; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; }
-        .btn-eliminar:hover { background-color: #c0392b; }
+        th, td { text-align: left; padding: 12px; border-bottom: 1px solid #e2e8f0; }
+        th { background-color: #f8fafc; color: #475569; font-size: 14px; }
         
-        @media (max-width: 600px) {
+        .badge { padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; }
+        .badge-ingreso { background: #dcfce7; color: #15803d; }
+        .badge-egreso { background: #fee2e2; color: #b91c1c; }
+        
+        .btn-del { background: #ef4444; color: white; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; font-size: 12px; }
+        .btn-del:hover { background: #dc2626; }
+
+        @media (max-width: 640px) {
             form { grid-template-columns: 1fr; }
-            .resumen { flex-direction: column; }
         }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <h1>Control de Presupuesto</h1>
+        <h1>Presupuesto Tesorería</h1>
 
-        <!-- RESUMEN EN TIEMPO REAL -->
-        <div class="resumen">
+        <!-- RESUMEN DE TOTALES -->
+        <div class="resumen-cards">
             <div class="card">
-                <h3>INGRESOS</h3>
-                <p id="totalIngresos" class="ingreso-val">$0.00</p>
+                <h3>Total Ingresos</h3>
+                <p id="totalIngresos" class="ingreso-num">$0.00</p>
             </div>
             <div class="card">
-                <h3>EGRESOS</h3>
-                <p id="totalEgresos" class="egreso-val">$0.00</p>
+                <h3>Total Egresos</h3>
+                <p id="totalEgresos" class="egreso-num">$0.00</p>
             </div>
             <div class="card">
-                <h3>DISPONIBLE</h3>
-                <p id="totalBalance" class="balance-val">$0.00</p>
+                <h3>Balance Final</h3>
+                <p id="totalBalance" class="balance-num">$0.00</p>
             </div>
         </div>
 
-        <!-- FORMULARIO DE REGISTRO -->
-        <form id="formPresupuesto">
-            <input type="text" id="descripcion" placeholder="Descripción (ej. Renta, Sueldo)" required>
-            <input type="number" id="monto" step="0.01" placeholder="Monto" required>
+        <!-- FORMULARIO -->
+        <form id="presupuestoForm">
+            <input type="text" id="concepto" placeholder="Concepto (ej. Pago de servicio)" required>
+            <input type="number" id="monto" step="0.01" placeholder="Monto ($)" required>
             <select id="tipo">
                 <option value="ingreso">Ingreso (+)</option>
                 <option value="egreso">Egreso (-)</option>
             </select>
-            <button type="submit">Guardar</button>
+            <button type="submit">Agregar</button>
         </form>
 
-        <!-- TABLA DE MOVIMIENTOS -->
+        <!-- TABLA -->
         <table>
             <thead>
                 <tr>
-                    <th>Descripción</th>
+                    <th>Concepto</th>
                     <th>Tipo</th>
                     <th>Monto</th>
                     <th>Acción</th>
                 </tr>
             </thead>
             <tbody id="tablaCuerpo">
-                <!-- Se dibuja mediante JavaScript -->
+                <!-- Los registros guardados se dibujan aquí -->
             </tbody>
         </table>
     </div>
 
-    <!-- SCRIPT CON GUARDADO AUTOMÁTICO (LOCALSTORAGE) -->
     <script>
-        // 1. OBTENER REGISTROS DE LOCALSTORAGE O INICIAR VACÍO
-        let registros = JSON.parse(localStorage.getItem('tesoreria_presupuesto_datos')) || [];
+        // Key para guardar dentro del navegador
+        const STORAGE_KEY = 'tesoreria_presupuesto_datos_v1';
 
-        const form = document.getElementById('formPresupuesto');
-        const descInput = document.getElementById('descripcion');
+        // 1. OBTENER LOS DATOS SI EXISTEN, O INICIAR ARREGLO VACÍO
+        let registros = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+
+        const form = document.getElementById('presupuestoForm');
+        const conceptoInput = document.getElementById('concepto');
         const montoInput = document.getElementById('monto');
-        const tipoSelect = document.getElementById('tipo');
+        const tipoInput = document.getElementById('tipo');
         const tablaCuerpo = document.getElementById('tablaCuerpo');
 
-        // 2. FUNCIÓN PARA GUARDAR CAMBIOS PERMANENTEMENTE
-        function sincronizarStorage() {
-            localStorage.setItem('tesoreria_presupuesto_datos', JSON.stringify(registros));
+        // 2. FUNCIÓN PARA GUARDAR EN LOCALSTORAGE
+        function guardar() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(registros));
         }
 
-        // 3. RENDERIZAR INTERFAZ
-        function actualizarUI() {
+        // 3. FUNCIÓN PARA ACTUALIZAR LA PANTALLA Y CALCULAR TOTALES
+        function renderizar() {
             tablaCuerpo.innerHTML = '';
-            let ingresos = 0;
-            let egresos = 0;
+            let totalIngresos = 0;
+            let totalEgresos = 0;
 
             registros.forEach((item, index) => {
                 const monto = parseFloat(item.monto);
                 
                 if (item.tipo === 'ingreso') {
-                    ingresos += monto;
+                    totalIngresos += monto;
                 } else {
-                    egresos += monto;
+                    totalEgresos += monto;
                 }
 
                 const fila = document.createElement('tr');
                 fila.innerHTML = `
-                    <td>${item.descripcion}</td>
-                    <td style="color: ${item.tipo === 'ingreso' ? '#27ae60' : '#e74c3c'}">${item.tipo.toUpperCase()}</td>
+                    <td>${item.concepto}</td>
+                    <td>
+                        <span class="badge ${item.tipo === 'ingreso' ? 'badge-ingreso' : 'badge-egreso'}">
+                            ${item.tipo.toUpperCase()}
+                        </span>
+                    </td>
                     <td>$${monto.toFixed(2)}</td>
                     <td>
-                        <button class="btn-eliminar" onclick="eliminarFila(${index})">Eliminar</button>
+                        <button class="btn-del" onclick="eliminarRegistro(${index})">Eliminar</button>
                     </td>
                 `;
                 tablaCuerpo.appendChild(fila);
             });
 
-            // Actualizar tarjetas
-            document.getElementById('totalIngresos').textContent = `$${ingresos.toFixed(2)}`;
-            document.getElementById('totalEgresos').textContent = `$${egresos.toFixed(2)}`;
-            document.getElementById('totalBalance').textContent = `$${(ingresos - egresos).toFixed(2)}`;
+            // Actualizar Tarjetas
+            document.getElementById('totalIngresos').textContent = `$${totalIngresos.toFixed(2)}`;
+            document.getElementById('totalEgresos').textContent = `$${totalEgresos.toFixed(2)}`;
+            
+            const balance = totalIngresos - totalEgresos;
+            const balanceElem = document.getElementById('totalBalance');
+            balanceElem.textContent = `$${balance.toFixed(2)}`;
+            balanceElem.style.color = balance >= 0 ? '#2563eb' : '#dc2626';
         }
 
-        // 4. EVENTO AGREGAR REGISTRO
+        // 4. GUARDAR NUEVO REGISTRO
         form.addEventListener('submit', (e) => {
             e.preventDefault();
 
-            const nuevoItem = {
-                descripcion: descInput.value,
+            const nuevo = {
+                concepto: conceptoInput.value.trim(),
                 monto: parseFloat(montoInput.value),
-                tipo: tipoSelect.value
+                tipo: tipoInput.value
             };
 
-            registros.push(nuevoItem);
-            sincronizarStorage(); // <--- GUARDA AL AGREGAR
-            actualizarUI();
+            registros.push(nuevo);
+            guardar();     // <-- Guardar cambios en el navegador
+            renderizar();  // <-- Renderizar de nuevo
 
-            form.reset();
+            // Limpiar los inputs
+            conceptoInput.value = '';
+            montoInput.value = '';
         });
 
-        // 5. EVENTO ELIMINAR REGISTRO
-        window.eliminarFila = function(index) {
+        // 5. ELIMINAR REGISTRO
+        window.eliminarRegistro = function(index) {
             registros.splice(index, 1);
-            sincronizarStorage(); // <--- GUARDA AL ELIMINAR
-            actualizarUI();
+            guardar();     // <-- Guardar cambios al eliminar
+            renderizar();  // <-- Renderizar de nuevo
         };
 
-        // 6. CARGAR DATOS EN PANTALLA AL REFRESCAR LA PÁGINA (F5)
-        document.addEventListener('DOMContentLoaded', actualizarUI);
+        // 6. EJECUTAR AL CARGAR O REFRESCAR LA PÁGINA (F5)
+        document.addEventListener('DOMContentLoaded', renderizar);
     </script>
 </body>
 </html>
