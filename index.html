@@ -46,7 +46,7 @@
             </button>
             <button onclick="cambiarPestana(2)" id="tab2" class="sidebar-item w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800/60">
                 <i data-lucide="book-open" class="w-4 h-4"></i>
-                <span>Catálogo & Subcuentas</span>
+                <span>Catálogos & Configuración</span>
             </button>
             <button onclick="cambiarPestana(3)" id="tab3" class="sidebar-item w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800/60">
                 <i data-lucide="layers" class="w-4 h-4"></i>
@@ -71,7 +71,6 @@
             <div class="flex items-center space-x-4">
                 <i data-lucide="menu" class="w-5 h-5 text-slate-400 cursor-pointer"></i>
                 
-                <!-- Selector de Empresa -->
                 <div class="flex items-center space-x-2">
                     <span class="text-xs font-semibold text-slate-400">Entidad:</span>
                     <select id="empresaSelect" onchange="cambiarEmpresa()" class="bg-slate-50 border border-slate-300 text-slate-800 text-xs rounded-lg px-3 py-1.5 font-bold focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer">
@@ -80,7 +79,6 @@
                     </select>
                 </div>
 
-                <!-- SELECTOR DE MES Y AÑO -->
                 <div class="flex items-center space-x-2 bg-blue-50 border border-blue-200 px-3 py-1.5 rounded-lg">
                     <i data-lucide="calendar" class="w-4 h-4 text-blue-600"></i>
                     <span class="text-xs font-bold text-blue-900">Período:</span>
@@ -165,19 +163,11 @@
                             <div>
                                 <label class="block font-medium text-slate-500 mb-1">Clasificación</label>
                                 <select id="selectClasificacion" required class="w-full border border-slate-200 rounded-lg p-2 bg-slate-50 focus:bg-white focus:outline-none focus:ring-1 focus:ring-blue-500 text-slate-700">
-                                    <option value="Gasto Fijo">Gasto Fijo</option>
-                                    <option value="Gasto Variable">Gasto Variable</option>
-                                    <option value="Operativo">Operativo</option>
-                                    <option value="Extraordinario">Extraordinario</option>
-                                    <option value="Impuestos">Impuestos</option>
                                 </select>
                             </div>
                             <div>
                                 <label class="block font-medium text-slate-500 mb-1">Forma de Pago</label>
                                 <select id="selectFormaPago" required class="w-full border border-slate-200 rounded-lg p-2 bg-slate-50 focus:bg-white focus:outline-none focus:ring-1 focus:ring-blue-500 text-slate-700 font-semibold">
-                                    <option value="Transfer">Transfer</option>
-                                    <option value="Cheque">Cheque</option>
-                                    <option value="Reembolso">Reembolso</option>
                                 </select>
                             </div>
                         </div>
@@ -197,7 +187,6 @@
 
                 <!-- Tablas Principales -->
                 <div class="lg:col-span-8 space-y-6">
-                    <!-- Presupuesto por Código Acumulado -->
                     <div class="bg-white p-6 rounded-xl border border-slate-200/80 shadow-sm">
                         <div class="flex justify-between items-center mb-4 pb-3 border-b border-slate-100">
                             <div>
@@ -230,7 +219,6 @@
                         <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 mb-4 pb-3 border-b border-slate-100">
                             <h3 class="text-xs font-bold text-slate-700 uppercase">Bitácora de Gastos</h3>
                             
-                            <!-- Buscador e Insumos de Filtro -->
                             <div class="flex flex-wrap items-center gap-2 text-xs w-full md:w-auto">
                                 <div class="relative flex-1 md:w-56">
                                     <input type="text" id="inputBuscador" onkeyup="renderizarTablas()" placeholder="🔍 Buscar palabra, número, concepto..." class="w-full pl-8 pr-3 py-1 border border-slate-200 rounded-lg bg-slate-50 text-slate-700 focus:outline-none focus:ring-1 focus:ring-blue-500 text-xs">
@@ -259,80 +247,126 @@
                 </div>
             </div>
 
-            <!-- PESTAÑA 2: CATÁLOGO Y SUBCUENTAS -->
-            <div id="pestana2" class="grid grid-cols-1 lg:grid-cols-3 gap-6 hidden">
-                <div class="bg-white p-6 rounded-xl border border-slate-200/80 shadow-sm h-fit space-y-5">
-                    
-                    <!-- Formulario Alta Código Principal -->
-                    <div>
-                        <h3 class="text-xs font-bold text-slate-700 uppercase mb-3 pb-2 border-b border-slate-100">1. Alta de Código Principal</h3>
-                        <form onsubmit="agregarCodigoPrincipal(event)" class="space-y-3 text-xs">
-                            <div>
-                                <label class="block font-medium text-slate-500 mb-1">Código Contable Padre</label>
-                                <input type="text" id="nuevoCodigoPadre" required placeholder="Ej. 601-00" class="w-full border border-slate-200 rounded-lg p-2 bg-slate-50">
-                            </div>
-                            <div>
-                                <label class="block font-medium text-slate-500 mb-1">Descripción del Rubro</label>
-                                <input type="text" id="nuevaDescripcionPadre" required placeholder="Ej. Gastos Operativos" class="w-full border border-slate-200 rounded-lg p-2 bg-slate-50">
-                            </div>
-                            <button type="submit" class="w-full bg-slate-700 hover:bg-slate-800 text-white font-semibold py-2 rounded-lg text-xs transition">
-                                Guardar Código Principal
-                            </button>
-                        </form>
-                    </div>
-
-                    <!-- Formulario Alta Subcuenta -->
-                    <div class="pt-3 border-t border-slate-200">
-                        <h3 class="text-xs font-bold text-blue-600 uppercase mb-3 pb-2 border-b border-slate-100">2. Alta de Subcuenta con Monto</h3>
-                        <form onsubmit="agregarSubcuenta(event)" class="space-y-3 text-xs">
-                            <div>
-                                <label class="block font-medium text-slate-500 mb-1">Código Padre Periferico</label>
-                                <select id="selectCodigoPadreForm" required class="w-full border border-slate-200 rounded-lg p-2 bg-slate-50">
-                                    <option value="">Seleccionar Código Padre...</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block font-medium text-slate-500 mb-1">Código Subcuenta</label>
-                                <input type="text" id="nuevoCodigoSub" required placeholder="Ej. 601-00-01" class="w-full border border-slate-200 rounded-lg p-2 bg-slate-50">
-                            </div>
-                            <div>
-                                <label class="block font-medium text-slate-500 mb-1">Descripción Subcuenta</label>
-                                <input type="text" id="nuevaDescripcionSub" required placeholder="Ej. Servicio Energía Electrica CFE" class="w-full border border-slate-200 rounded-lg p-2 bg-slate-50">
-                            </div>
-                            <div>
-                                <label class="block font-medium text-slate-500 mb-1">Presupuesto Asignado Mes Activo ($)</label>
-                                <input type="number" step="0.01" id="nuevoMontoSub" required placeholder="0.00" class="w-full border border-slate-200 rounded-lg p-2 bg-slate-50">
-                            </div>
-                            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 rounded-lg text-xs transition shadow-sm">
-                                Guardar Subcuenta
-                            </button>
-                        </form>
-                    </div>
-
-                </div>
-
-                <div class="lg:col-span-2 bg-white p-6 rounded-xl border border-slate-200/80 shadow-sm">
-                    <div class="flex justify-between items-center mb-4 pb-3 border-b border-slate-100">
+            <!-- PESTAÑA 2: CATÁLOGOS Y CONFIGURACIÓN -->
+            <div id="pestana2" class="space-y-6 hidden">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div class="bg-white p-6 rounded-xl border border-slate-200/80 shadow-sm h-fit space-y-5">
+                        
+                        <!-- Formulario Alta Código Principal -->
                         <div>
-                            <h3 class="text-xs font-bold text-slate-700 uppercase">Catálogo de Subcuentas y Asignaciones</h3>
-                            <p class="text-[11px] text-slate-400">Edita los montos de cada subcuenta para el mes activo</p>
+                            <h3 class="text-xs font-bold text-slate-700 uppercase mb-3 pb-2 border-b border-slate-100">1. Alta de Código Principal</h3>
+                            <form onsubmit="agregarCodigoPrincipal(event)" class="space-y-3 text-xs">
+                                <div>
+                                    <label class="block font-medium text-slate-500 mb-1">Código Contable Padre</label>
+                                    <input type="text" id="nuevoCodigoPadre" required placeholder="Ej. 601-00" class="w-full border border-slate-200 rounded-lg p-2 bg-slate-50">
+                                </div>
+                                <div>
+                                    <label class="block font-medium text-slate-500 mb-1">Descripción del Rubro</label>
+                                    <input type="text" id="nuevaDescripcionPadre" required placeholder="Ej. Gastos Operativos" class="w-full border border-slate-200 rounded-lg p-2 bg-slate-50">
+                                </div>
+                                <button type="submit" class="w-full bg-slate-700 hover:bg-slate-800 text-white font-semibold py-2 rounded-lg text-xs transition">
+                                    Guardar Código Principal
+                                </button>
+                            </form>
+                        </div>
+
+                        <!-- Formulario Alta Subcuenta -->
+                        <div class="pt-3 border-t border-slate-200">
+                            <h3 class="text-xs font-bold text-blue-600 uppercase mb-3 pb-2 border-b border-slate-100">2. Alta de Subcuenta con Monto</h3>
+                            <form onsubmit="agregarSubcuenta(event)" class="space-y-3 text-xs">
+                                <div>
+                                    <label class="block font-medium text-slate-500 mb-1">Código Padre Pertenezco</label>
+                                    <select id="selectCodigoPadreForm" required class="w-full border border-slate-200 rounded-lg p-2 bg-slate-50">
+                                        <option value="">Seleccionar Código Padre...</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block font-medium text-slate-500 mb-1">Código Subcuenta</label>
+                                    <input type="text" id="nuevoCodigoSub" required placeholder="Ej. 601-00-01" class="w-full border border-slate-200 rounded-lg p-2 bg-slate-50">
+                                </div>
+                                <div>
+                                    <label class="block font-medium text-slate-500 mb-1">Descripción Subcuenta</label>
+                                    <input type="text" id="nuevaDescripcionSub" required placeholder="Ej. Servicio Energía Electrica CFE" class="w-full border border-slate-200 rounded-lg p-2 bg-slate-50">
+                                </div>
+                                <div>
+                                    <label class="block font-medium text-slate-500 mb-1">Presupuesto Asignado Mes Activo ($)</label>
+                                    <input type="number" step="0.01" id="nuevoMontoSub" required placeholder="0.00" class="w-full border border-slate-200 rounded-lg p-2 bg-slate-50">
+                                </div>
+                                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 rounded-lg text-xs transition shadow-sm">
+                                    Guardar Subcuenta
+                                </button>
+                            </form>
+                        </div>
+
+                    </div>
+
+                    <div class="lg:col-span-2 bg-white p-6 rounded-xl border border-slate-200/80 shadow-sm">
+                        <div class="flex justify-between items-center mb-4 pb-3 border-b border-slate-100">
+                            <div>
+                                <h3 class="text-xs font-bold text-slate-700 uppercase">Catálogo de Subcuentas y Asignaciones</h3>
+                                <p class="text-[11px] text-slate-400">Edita los montos de cada subcuenta para el mes activo</p>
+                            </div>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs">
+                                <thead>
+                                    <tr class="border-b border-slate-200 text-slate-400 font-semibold uppercase text-[10px]">
+                                        <th class="py-2.5 px-2">Subcuenta</th>
+                                        <th class="py-2.5 px-2">Código Padre</th>
+                                        <th class="py-2.5 px-2">Descripción</th>
+                                        <th class="py-2.5 px-2 text-right">Presupuesto Mes ($)</th>
+                                        <th class="py-2.5 px-2 text-center">Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tablaCatalogo" class="divide-y divide-slate-100 text-slate-700"></tbody>
+                            </table>
                         </div>
                     </div>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left text-xs">
-                            <thead>
-                                <tr class="border-b border-slate-200 text-slate-400 font-semibold uppercase text-[10px]">
-                                    <th class="py-2.5 px-2">Subcuenta</th>
-                                    <th class="py-2.5 px-2">Código Padre</th>
-                                    <th class="py-2.5 px-2">Descripción</th>
-                                    <th class="py-2.5 px-2 text-right">Presupuesto Mes ($)</th>
-                                    <th class="py-2.5 px-2 text-center">Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tablaCatalogo" class="divide-y divide-slate-100 text-slate-700"></tbody>
-                        </table>
+                </div>
+
+                <!-- SECCIÓN ADMINISTRADOR DE CLASIFICACIONES Y FORMAS DE PAGO -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-slate-200">
+                    <!-- Administrar Clasificaciones -->
+                    <div class="bg-white p-6 rounded-xl border border-slate-200/80 shadow-sm">
+                        <h3 class="text-xs font-bold text-slate-700 uppercase mb-3 pb-2 border-b border-slate-100">Administrar Clasificaciones de Gasto</h3>
+                        <form onsubmit="agregarClasificacion(event)" class="flex gap-2 mb-4">
+                            <input type="text" id="nuevaClasificacionInput" required placeholder="Nueva Clasificación (ej. Mantenimiento)" class="flex-1 border border-slate-200 rounded-lg p-2 text-xs bg-slate-50 focus:bg-white focus:outline-none">
+                            <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded-lg text-xs transition">Agregar</button>
+                        </form>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs">
+                                <thead>
+                                    <tr class="border-b border-slate-200 text-slate-400 font-semibold uppercase text-[10px]">
+                                        <th class="py-2 px-2">Nombre Clasificación</th>
+                                        <th class="py-2 px-2 text-center">Acción</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tablaClasificaciones" class="divide-y divide-slate-100 text-slate-700"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Administrar Formas de Pago -->
+                    <div class="bg-white p-6 rounded-xl border border-slate-200/80 shadow-sm">
+                        <h3 class="text-xs font-bold text-slate-700 uppercase mb-3 pb-2 border-b border-slate-100">Administrar Formas de Pago</h3>
+                        <form onsubmit="agregarFormaPago(event)" class="flex gap-2 mb-4">
+                            <input type="text" id="nuevaFormaPagoInput" required placeholder="Nueva Forma de Pago (ej. Tarjeta de Crédito)" class="flex-1 border border-slate-200 rounded-lg p-2 text-xs bg-slate-50 focus:bg-white focus:outline-none">
+                            <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded-lg text-xs transition">Agregar</button>
+                        </form>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs">
+                                <thead>
+                                    <tr class="border-b border-slate-200 text-slate-400 font-semibold uppercase text-[10px]">
+                                        <th class="py-2 px-2">Nombre Forma Pago</th>
+                                        <th class="py-2 px-2 text-center">Acción</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tablaFormasPago" class="divide-y divide-slate-100 text-slate-700"></tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
+
             </div>
 
             <!-- PESTAÑA 3: COMPARATIVO CONSOLIDADO -->
@@ -429,6 +463,8 @@
 
         let baseDatos = {
             ingresoGlobal: 250000.00,
+            clasificaciones: ['Gasto Fijo', 'Gasto Variable', 'Operativo', 'Extraordinario', 'Impuestos'],
+            formasPago: ['Transfer', 'Cheque', 'Reembolso'],
             Carrduci: {
                 codigosPadre: [
                     { codigo: '601-00', descripcion: 'Servicios Públicos y Generales' },
@@ -519,9 +555,13 @@
         function actualizarSelects() {
             const selectSubcuenta = document.getElementById('selectSubcuenta');
             const selectCodigoPadreForm = document.getElementById('selectCodigoPadreForm');
+            const selectClasificacion = document.getElementById('selectClasificacion');
+            const selectFormaPago = document.getElementById('selectFormaPago');
 
             selectSubcuenta.innerHTML = '<option value="">Seleccionar subcuenta...</option>';
             selectCodigoPadreForm.innerHTML = '<option value="">Seleccionar Código Padre...</option>';
+            selectClasificacion.innerHTML = '';
+            selectFormaPago.innerHTML = '';
 
             baseDatos[empresaActual].subcuentas.forEach(s => {
                 selectSubcuenta.innerHTML += `<option value="${s.codigoSub}">${s.codigoSub} - ${s.descripcion}</option>`;
@@ -529,6 +569,14 @@
 
             baseDatos[empresaActual].codigosPadre.forEach(p => {
                 selectCodigoPadreForm.innerHTML += `<option value="${p.codigo}">${p.codigo} - ${p.descripcion}</option>`;
+            });
+
+            baseDatos.clasificaciones.forEach(c => {
+                selectClasificacion.innerHTML += `<option value="${c}">${c}</option>`;
+            });
+
+            baseDatos.formasPago.forEach(fp => {
+                selectFormaPago.innerHTML += `<option value="${fp}">${fp}</option>`;
             });
         }
 
@@ -609,10 +657,109 @@
             renderizarTodo();
         }
 
+        /* FUNCIONES DE EDICIÓN Y ALTA DE CLASIFICACIONES Y FORMAS DE PAGO */
+        function agregarClasificacion(e) {
+            e.preventDefault();
+            const val = document.getElementById('nuevaClasificacionInput').value.trim();
+            if(val && !baseDatos.clasificaciones.includes(val)) {
+                baseDatos.clasificaciones.push(val);
+                document.getElementById('nuevaClasificacionInput').value = '';
+                actualizarSelects();
+                renderizarClasificacionesYPagos();
+            }
+        }
+
+        function editarClasificacion(index, nuevoNombre) {
+            const val = nuevoNombre.trim();
+            if(val) {
+                const viejo = baseDatos.clasificaciones[index];
+                baseDatos.clasificaciones[index] = val;
+                // Actualizar referencias en los gastos guardados
+                ['Carrduci', 'CarrduciMetal'].forEach(emp => {
+                    baseDatos[emp].gastos.forEach(g => {
+                        if(g.clasificacion === viejo) g.clasificacion = val;
+                    });
+                });
+                actualizarSelects();
+                renderizarTodo();
+            }
+        }
+
+        function borrarClasificacion(index) {
+            baseDatos.clasificaciones.splice(index, 1);
+            actualizarSelects();
+            renderizarClasificacionesYPagos();
+        }
+
+        function agregarFormaPago(e) {
+            e.preventDefault();
+            const val = document.getElementById('nuevaFormaPagoInput').value.trim();
+            if(val && !baseDatos.formasPago.includes(val)) {
+                baseDatos.formasPago.push(val);
+                document.getElementById('nuevaFormaPagoInput').value = '';
+                actualizarSelects();
+                renderizarClasificacionesYPagos();
+            }
+        }
+
+        function editarFormaPago(index, nuevoNombre) {
+            const val = nuevoNombre.trim();
+            if(val) {
+                const viejo = baseDatos.formasPago[index];
+                baseDatos.formasPago[index] = val;
+                // Actualizar referencias en los gastos guardados
+                ['Carrduci', 'CarrduciMetal'].forEach(emp => {
+                    baseDatos[emp].gastos.forEach(g => {
+                        if(g.formaPago === viejo) g.formaPago = val;
+                    });
+                });
+                actualizarSelects();
+                renderizarTodo();
+            }
+        }
+
+        function borrarFormaPago(index) {
+            baseDatos.formasPago.splice(index, 1);
+            actualizarSelects();
+            renderizarClasificacionesYPagos();
+        }
+
+        function renderizarClasificacionesYPagos() {
+            const tClas = document.getElementById('tablaClasificaciones');
+            const tPagos = document.getElementById('tablaFormasPago');
+
+            tClas.innerHTML = '';
+            baseDatos.clasificaciones.forEach((c, idx) => {
+                tClas.innerHTML += `
+                <tr class="hover:bg-slate-50 transition">
+                    <td class="py-2 px-2">
+                        <input type="text" value="${c}" onchange="editarClasificacion(${idx}, this.value)" class="w-full bg-transparent border-b border-transparent focus:border-blue-500 focus:outline-none font-semibold text-slate-700">
+                    </td>
+                    <td class="py-2 px-2 text-center">
+                        <button onclick="borrarClasificacion(${idx})" class="text-red-500 hover:bg-red-50 px-2 py-0.5 rounded font-semibold text-[11px]">Eliminar</button>
+                    </td>
+                </tr>`;
+            });
+
+            tPagos.innerHTML = '';
+            baseDatos.formasPago.forEach((fp, idx) => {
+                tPagos.innerHTML += `
+                <tr class="hover:bg-slate-50 transition">
+                    <td class="py-2 px-2">
+                        <input type="text" value="${fp}" onchange="editarFormaPago(${idx}, this.value)" class="w-full bg-transparent border-b border-transparent focus:border-blue-500 focus:outline-none font-semibold text-slate-700">
+                    </td>
+                    <td class="py-2 px-2 text-center">
+                        <button onclick="borrarFormaPago(${idx})" class="text-red-500 hover:bg-red-50 px-2 py-0.5 rounded font-semibold text-[11px]">Eliminar</button>
+                    </td>
+                </tr>`;
+            });
+        }
+
         function renderizarTodo() {
             renderizarMetricas();
             renderizarTablas();
             renderizarCatalogo();
+            renderizarClasificacionesYPagos();
             renderizarConsolidado();
             if(pestanaActiva === 4) renderizarTableroDireccion();
         }
@@ -641,16 +788,13 @@
             const textoBuscador = document.getElementById('inputBuscador').value.toLowerCase().trim();
             const filtroFechaDia = document.getElementById('filtroFechaDia').value;
 
-            // Renderizar presupuesto sumado por Código Padre
             tPres.innerHTML = '';
             baseDatos[empresaActual].codigosPadre.forEach(p => {
                 const subcuentasRel = baseDatos[empresaActual].subcuentas.filter(s => s.codigoPadre === p.codigo);
                 const codigosSubRel = subcuentasRel.map(s => s.codigoSub);
 
-                // Sumar presupuestos de subcuentas del mes
                 const presSumado = subcuentasRel.reduce((acc, s) => acc + obtenerPresupuestoSubcuenta(empresaActual, s.codigoSub, periodoActual), 0);
                 
-                // Sumar gastos de subcuentas del mes
                 const gastoSumado = baseDatos[empresaActual].gastos
                     .filter(x => codigosSubRel.includes(x.codigoSub) && x.fecha.startsWith(periodoActual))
                     .reduce((acc, b) => acc + b.monto, 0);
@@ -680,7 +824,6 @@
                 </tr>`;
             });
 
-            // Renderizar Bitácora con Buscador Universal
             tBit.innerHTML = '';
             let lista = baseDatos[empresaActual].gastos.filter(g => g.fecha.startsWith(periodoActual));
             
@@ -703,17 +846,13 @@
                 tBit.innerHTML = `<tr><td colspan="7" class="py-6 text-center text-slate-400 italic">No hay registros que coincidan con la búsqueda o filtro</td></tr>`;
             } else {
                 lista.forEach(g => {
-                    let badgePago = 'bg-blue-50 text-blue-700 border-blue-200';
-                    if(g.formaPago === 'Cheque') badgePago = 'bg-purple-50 text-purple-700 border-purple-200';
-                    if(g.formaPago === 'Reembolso') badgePago = 'bg-amber-50 text-amber-700 border-amber-200';
-
                     tBit.innerHTML += `
                     <tr class="hover:bg-slate-50 transition">
                         <td class="py-2.5 px-2 font-mono text-slate-500 font-semibold">${g.fecha}</td>
                         <td class="px-2 font-bold text-slate-800 font-mono">${g.codigoSub}</td>
                         <td class="px-2 text-slate-600">${g.concepto}</td>
                         <td class="px-2 text-slate-500"><span class="bg-slate-100 text-slate-600 px-2 py-0.5 rounded text-[10px] font-semibold">${g.clasificacion}</span></td>
-                        <td class="px-2"><span class="${badgePago} border px-2 py-0.5 rounded text-[10px] font-bold">${g.formaPago}</span></td>
+                        <td class="px-2"><span class="bg-blue-50 text-blue-700 border border-blue-200 px-2 py-0.5 rounded text-[10px] font-bold">${g.formaPago}</span></td>
                         <td class="px-2 text-right font-semibold text-amber-600 font-mono">$${g.monto.toLocaleString('en-US',{minimumFractionDigits:2})}</td>
                         <td class="px-2 text-center"><button onclick="borrarGasto(${g.id})" class="text-slate-400 hover:text-red-500 font-bold px-2 py-1 transition">✕</button></td>
                     </tr>`;
@@ -894,22 +1033,28 @@
                 options: { responsive: true, maintainAspectRatio: false }
             });
 
-            // Distribución por Forma de Pago
-            const pagosMap = { Transfer: 0, Cheque: 0, Reembolso: 0 };
+            // Distribución dinámica por Forma de Pago
+            const pagosMap = {};
+            baseDatos.formasPago.forEach(fp => pagosMap[fp] = 0);
+
             baseDatos[empresaActual].gastos
                 .filter(g => g.fecha.startsWith(periodoActual))
                 .forEach(g => {
-                    if(pagosMap[g.formaPago] !== undefined) pagosMap[g.formaPago] += g.monto;
+                    if(pagosMap[g.formaPago] !== undefined) {
+                        pagosMap[g.formaPago] += g.monto;
+                    } else {
+                        pagosMap[g.formaPago] = g.monto;
+                    }
                 });
 
             const ctx2 = document.getElementById('chartDona').getContext('2d');
             chartDonaInst = new Chart(ctx2, {
                 type: 'doughnut',
                 data: {
-                    labels: ['Transfer', 'Cheque', 'Reembolso'],
+                    labels: Object.keys(pagosMap),
                     datasets: [{
-                        data: [pagosMap.Transfer, pagosMap.Cheque, pagosMap.Reembolso],
-                        backgroundColor: ['#1890ff', '#722ed1', '#faad14']
+                        data: Object.values(pagosMap),
+                        backgroundColor: ['#1890ff', '#722ed1', '#faad14', '#13c2c2', '#eb2f96', '#52c41a']
                     }]
                 },
                 options: { responsive: true, maintainAspectRatio: false }
