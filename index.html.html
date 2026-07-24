@@ -1,0 +1,1194 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Control Presupuestal y Tablero Ejecutivo - Carrduci & Carrduci Metal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Chart.js CDN for Executive Charts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; }
+        .tab-active { border-bottom: 3px solid #2563eb; color: #1e40af; font-weight: 700; }
+        @media print {
+            .no-print { display: none !important; }
+            body { background: white !important; }
+            .print-full-width { width: 100% !important; max-width: none !important; }
+        }
+    </style>
+</head>
+<body class="text-slate-800 min-h-screen flex flex-col">
+
+    <!-- Header -->
+    <header class="bg-gradient-to-r from-slate-900 via-indigo-950 to-blue-900 text-white shadow-xl sticky top-0 z-50 no-print">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex flex-wrap justify-between items-center gap-4">
+            <div class="flex items-center gap-3">
+                <div class="p-2.5 bg-blue-500/20 rounded-xl border border-blue-400/30">
+                    <i class="fa-solid fa-chart-line text-2xl text-blue-400"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-lg md:text-xl tracking-tight">Control Presupuestal & Tablero Ejecutivo</h1>
+                    <p class="text-xs text-blue-200">Carrduci Metal & Carrduci • Proyecciones, Gráficas y Consolidado General</p>
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-2">
+                <button onclick="window.print()" class="px-3.5 py-1.5 bg-indigo-600/80 hover:bg-indigo-600 text-white border border-indigo-400/30 rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-sm">
+                    <i class="fa-solid fa-print"></i> Imprimir / PDF
+                </button>
+                <span class="px-3 py-1 bg-amber-500/20 border border-amber-400/30 text-amber-300 rounded-lg text-xs font-semibold flex items-center gap-1.5">
+                    <i class="fa-solid fa-building-user"></i> Vista Dirección General
+                </span>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 py-8 flex-1 w-full space-y-8 print-full-width">
+
+        <!-- Navigation Tabs -->
+        <div class="bg-white rounded-2xl p-2 border border-slate-200 shadow-sm flex flex-wrap gap-2 no-print">
+            <button onclick="switchTab('ejecutivo')" id="tab-btn-ejecutivo" class="tab-active px-5 py-3 rounded-xl text-sm transition flex items-center gap-2">
+                <i class="fa-solid fa-chart-pie text-blue-600"></i>
+                🏛️ Informe Dirección General
+            </button>
+            <button onclick="switchTab('simulador')" id="tab-btn-simulador" class="px-5 py-3 rounded-xl text-sm font-semibold text-slate-600 hover:text-slate-900 transition flex items-center gap-2">
+                <i class="fa-solid fa-sliders text-indigo-600"></i>
+                Simulador & Captura
+            </button>
+            <button onclick="switchTab('catalogo-mod')" id="tab-btn-catalogo-mod" class="px-5 py-3 rounded-xl text-sm font-semibold text-slate-600 hover:text-slate-900 transition flex items-center gap-2">
+                <i class="fa-solid fa-book-bookmark text-amber-600"></i>
+                Catálogo Contable
+            </button>
+            <button onclick="switchTab('estructura')" id="tab-btn-estructura" class="px-5 py-3 rounded-xl text-sm font-semibold text-slate-600 hover:text-slate-900 transition flex items-center gap-2">
+                <i class="fa-solid fa-table-cells text-slate-500"></i>
+                Estructura Multi-Empresa
+            </button>
+            <button onclick="switchTab('instrucciones')" id="tab-btn-instrucciones" class="px-5 py-3 rounded-xl text-sm font-semibold text-slate-600 hover:text-slate-900 transition flex items-center gap-2">
+                <i class="fa-solid fa-wand-magic-sparkles text-emerald-500"></i>
+                Instalar en Google Sheets
+            </button>
+        </div>
+
+        <!-- Global Filter Control Bar -->
+        <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-wrap items-center justify-between gap-4 no-print">
+            <div class="flex items-center gap-3">
+                <i class="fa-solid fa-filter text-indigo-600 text-base"></i>
+                <span class="text-xs font-bold text-slate-700 uppercase tracking-wider">Filtro Razón Social:</span>
+                <div class="flex flex-wrap gap-1.5">
+                    <button onclick="filtrarRazonSocial('TODOS')" id="btn-filter-TODOS" class="px-3.5 py-1.5 rounded-lg text-xs font-bold bg-slate-900 text-white shadow-sm transition">
+                        🏢 Vista Consolidada
+                    </button>
+                    <button onclick="filtrarRazonSocial('Carrduci Metal')" id="btn-filter-Carrduci Metal" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 transition">
+                        ⚙️ Carrduci Metal
+                    </button>
+                    <button onclick="filtrarRazonSocial('Carrduci')" id="btn-filter-Carrduci" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 transition">
+                        🏢 Carrduci
+                    </button>
+                    <button onclick="filtrarRazonSocial('Compartido')" id="btn-filter-Compartido" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 transition">
+                        🔄 Compartidos
+                    </button>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-2">
+                <span class="text-xs font-bold text-slate-600 uppercase">Mes:</span>
+                <select id="select-mes-filtro" onchange="renderTodo()" class="p-2 border border-slate-300 rounded-xl text-xs font-bold text-slate-800 bg-slate-50 focus:ring-2 focus:ring-blue-500">
+                    <option value="Enero" selected>Enero 2026</option>
+                    <option value="Febrero">Febrero 2026</option>
+                    <option value="Marzo">Marzo 2026</option>
+                    <option value="Acumulado">Acumulado Anual</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- SECTION: INFORME PARA DIRECCIÓN GENERAL -->
+        <div id="section-ejecutivo" class="space-y-6">
+
+            <!-- Executive Banner -->
+            <div class="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white p-6 rounded-2xl shadow-md flex flex-wrap justify-between items-center gap-4">
+                <div>
+                    <span class="text-xs uppercase tracking-widest text-indigo-300 font-bold">Resumen de Desempeño Financiero</span>
+                    <h2 class="text-2xl font-extrabold mt-1" id="lbl-titulo-ejecutivo">Informe Consolidado de Gastos - Enero 2026</h2>
+                    <p class="text-xs text-slate-300 mt-1">Sintesis mensual de ejecución presupuestal, proyección de cierre y conciliación bancaria.</p>
+                </div>
+                <div class="flex items-center gap-3">
+                    <button onclick="exportarCSVMovimientos()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold transition flex items-center gap-2 shadow-md">
+                        <i class="fa-solid fa-file-csv"></i> Exportar a Excel / CSV
+                    </button>
+                </div>
+            </div>
+
+            <!-- Executive KPIs Grid (5 KPIs) -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+                    <div class="flex justify-between items-start">
+                        <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Presupuesto Mes</span>
+                        <i class="fa-solid fa-wallet text-indigo-500 text-sm"></i>
+                    </div>
+                    <div class="text-2xl font-extrabold text-slate-900 mt-2" id="kpi-exec-pto">$130,000.00</div>
+                    <p class="text-[11px] text-slate-500 mt-1" id="kpi-exec-pto-sub">Límite Autorizado</p>
+                </div>
+
+                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+                    <div class="flex justify-between items-start">
+                        <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Gasto Real Acum.</span>
+                        <i class="fa-solid fa-receipt text-amber-500 text-sm"></i>
+                    </div>
+                    <div class="text-2xl font-extrabold text-amber-600 mt-2" id="kpi-exec-gasto">$38,850.00</div>
+                    <p class="text-[11px] text-slate-500 mt-1" id="kpi-exec-pct">29.9% ejercido</p>
+                </div>
+
+                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+                    <div class="flex justify-between items-start">
+                        <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Disponible Restante</span>
+                        <i class="fa-solid fa-piggy-bank text-emerald-500 text-sm"></i>
+                    </div>
+                    <div class="text-2xl font-extrabold text-emerald-600 mt-2" id="kpi-exec-disp">$91,150.00</div>
+                    <p class="text-[11px] text-slate-500 mt-1">Margen sin comprometer</p>
+                </div>
+
+                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+                    <div class="flex justify-between items-start">
+                        <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Proyección a Cierre</span>
+                        <i class="fa-solid fa-chart-line text-blue-500 text-sm"></i>
+                    </div>
+                    <div class="text-2xl font-extrabold text-blue-900 mt-2" id="kpi-exec-proyeccion">$112,000.00</div>
+                    <p class="text-[11px] text-emerald-600 font-bold mt-1" id="kpi-exec-desvio">🟢 Dentro de Presupuesto (-13.8%)</p>
+                </div>
+
+                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+                    <div class="flex justify-between items-start">
+                        <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Cuentas con Movimiento</span>
+                        <i class="fa-solid fa-list-check text-indigo-600 text-sm"></i>
+                    </div>
+                    <div class="text-2xl font-extrabold text-indigo-700 mt-2" id="kpi-exec-cuentas-activas">3 / 6</div>
+                    <p class="text-[11px] text-slate-500 mt-1">Rubros operados este mes</p>
+                </div>
+            </div>
+
+            <!-- Executive Charts Row -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- Chart 1: Presupuesto vs Real vs Proyectado -->
+                <div class="lg:col-span-7 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-3">
+                    <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+                        <div>
+                            <h3 class="font-bold text-slate-900 text-sm flex items-center gap-2">
+                                <i class="fa-solid fa-chart-bar text-indigo-600"></i>
+                                Comparativo: Presupuesto vs Real vs Proyección
+                            </h3>
+                            <p class="text-[11px] text-slate-500">Monto en pesos por rubro contable ($ MXN)</p>
+                        </div>
+                        <span class="text-[10px] bg-slate-100 font-mono px-2 py-1 rounded text-slate-600">Chart.js Engine</span>
+                    </div>
+                    <div class="h-64 relative">
+                        <canvas id="chartPresupuestoVsReal"></canvas>
+                    </div>
+                </div>
+
+                <!-- Chart 2: Distribución por Razón Social & Proyección de Cierre -->
+                <div class="lg:col-span-5 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-3">
+                    <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+                        <div>
+                            <h3 class="font-bold text-slate-900 text-sm flex items-center gap-2">
+                                <i class="fa-solid fa-chart-pie text-emerald-600"></i>
+                                Distribución de Gastos por Entidad
+                            </h3>
+                            <p class="text-[11px] text-slate-500">Participación % del gasto acumulado</p>
+                        </div>
+                    </div>
+                    <div class="h-64 relative flex items-center justify-center">
+                        <canvas id="chartDistribucionEmpresa"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cuentas con Movimiento en el Mes -->
+            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                <div class="flex flex-wrap justify-between items-center border-b border-slate-100 pb-3 gap-2">
+                    <div>
+                        <h3 class="font-bold text-slate-900 text-base flex items-center gap-2">
+                            <i class="fa-solid fa-arrow-trend-up text-blue-600"></i>
+                            Cuentas Contables con Movimiento en el Mes
+                        </h3>
+                        <p class="text-xs text-slate-500">Filtro exclusivo de cuentas operadas con sus montos reales, variaciones y estado presupuestal.</p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-xs bg-slate-100 font-bold text-slate-700 px-3 py-1 rounded-lg" id="lbl-cuentas-activas-badge">
+                            3 rubros activos
+                        </span>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs">
+                        <thead class="bg-slate-50 text-slate-600 font-bold uppercase tracking-wider border-b border-slate-200">
+                            <tr>
+                                <th class="p-3">Código</th>
+                                <th class="p-3">Rubro Contable</th>
+                                <th class="p-3">Entidad Asignada</th>
+                                <th class="p-3 text-right">Presupuesto</th>
+                                <th class="p-3 text-right">Gasto Real</th>
+                                <th class="p-3 text-right">Proyección Cierre</th>
+                                <th class="p-3 text-right">Disponible</th>
+                                <th class="p-3 text-center">% Ejercido</th>
+                                <th class="p-3 text-center">Estatus</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbl-cuentas-movimientos-body" class="divide-y divide-slate-100">
+                            <!-- Populated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Vista Unificada de Todos los Gastos / Bitácora General para Dirección -->
+            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                <div class="flex flex-wrap justify-between items-center border-b border-slate-100 pb-3 gap-3">
+                    <div>
+                        <h3 class="font-bold text-slate-900 text-base flex items-center gap-2">
+                            <i class="fa-solid fa-folder-open text-amber-600"></i>
+                            Bitácora Consolidada General de Gastos (Vista Dirección General)
+                        </h3>
+                        <p class="text-xs text-slate-500">Registro detallado de todos los comprobantes, folios, bancas pagadoras y razones sociales.</p>
+                    </div>
+
+                    <div class="flex flex-wrap items-center gap-2 no-print">
+                        <input type="text" id="input-search-bitacora" oninput="renderBitacoraEjecutiva()" placeholder="Buscar concepto, folio..." class="p-2 border border-slate-300 rounded-xl text-xs bg-slate-50 focus:ring-2 focus:ring-blue-500 w-48">
+                        <select id="select-banca-filtro" onchange="renderBitacoraEjecutiva()" class="p-2 border border-slate-300 rounded-xl text-xs bg-slate-50 focus:ring-2 focus:ring-blue-500">
+                            <option value="TODAS">Todas las Bancas</option>
+                            <option value="Banca Carrduci Metal">Banca Carrduci Metal</option>
+                            <option value="Banca Carrduci">Banca Carrduci</option>
+                            <option value="Caja Chica / Efectivo">Caja Chica / Efectivo</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs">
+                        <thead class="bg-slate-900 text-white font-bold uppercase tracking-wider">
+                            <tr>
+                                <th class="p-3">Fecha</th>
+                                <th class="p-3">Razón Social</th>
+                                <th class="p-3">Banca Origen</th>
+                                <th class="p-3">Código / Rubro</th>
+                                <th class="p-3">Concepto Detallado</th>
+                                <th class="p-3">Proveedor / Folio</th>
+                                <th class="p-3 text-right">Monto ($ MXN)</th>
+                                <th class="p-3 text-center no-print">Comprobante</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbl-bitacora-ejecutiva-body" class="divide-y divide-slate-100 font-mono">
+                            <!-- Populated dynamically -->
+                        </tbody>
+                        <tfoot class="bg-slate-100 font-bold border-t-2 border-slate-300 text-xs">
+                            <tr>
+                                <td colspan="6" class="p-3 text-right font-sans uppercase">Total Gasto Real Consolidado:</td>
+                                <td class="p-3 text-right text-amber-700 text-sm" id="lbl-foot-total-gasto">$0.00</td>
+                                <td class="no-print"></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- SECTION: SIMULADOR INTERACTIVO Y CAPTURA -->
+        <div id="section-simulador" class="hidden space-y-6">
+            
+            <!-- KPIs Header -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+                    <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Presupuesto Asignado</span>
+                    <div class="text-2xl font-extrabold text-blue-900 mt-1" id="kpi-pto">$130,000.00</div>
+                    <div class="text-xs text-slate-500 mt-1" id="kpi-sub-pto">Global Consolidado</div>
+                </div>
+
+                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+                    <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Gasto Real Acumulado</span>
+                    <div class="text-2xl font-extrabold text-amber-600 mt-1" id="kpi-gasto">$38,850.00</div>
+                    <div class="text-xs text-slate-500 mt-1">Egresos registrados en bitácora</div>
+                </div>
+
+                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+                    <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Disponible Restante</span>
+                    <div class="text-2xl font-extrabold text-emerald-600 mt-1" id="kpi-disponible">$91,150.00</div>
+                    <div class="text-xs text-slate-500 mt-1">Margen libre actual</div>
+                </div>
+
+                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+                    <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">% Ejercido Total</span>
+                    <div class="text-2xl font-extrabold text-indigo-600 mt-1" id="kpi-porcentaje">29.9%</div>
+                    <div class="text-xs text-slate-500 mt-1">Consumo global del presupuesto</div>
+                </div>
+            </div>
+
+            <!-- Main Layout: Bitácora + Resumen -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                
+                <!-- Left: Control Mensual Table -->
+                <div class="lg:col-span-7 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                    <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+                        <h2 class="font-bold text-slate-900 text-base flex items-center gap-2">
+                            <i class="fa-solid fa-list-check text-blue-600"></i>
+                            Pestaña 04: Control Mensual por Cuenta
+                        </h2>
+                        <span class="text-xs bg-indigo-50 text-indigo-700 font-bold px-2.5 py-1 rounded-lg" id="lbl-filtro-activo">
+                            Mostrando: Todas las Razones Sociales
+                        </span>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs">
+                            <thead class="bg-slate-50 text-slate-600 font-bold uppercase tracking-wider border-b border-slate-200">
+                                <tr>
+                                    <th class="p-2.5">Código / Rubro</th>
+                                    <th class="p-2.5 text-right">Presupuesto</th>
+                                    <th class="p-2.5 text-right">Gasto Real</th>
+                                    <th class="p-2.5 text-right">Disponible</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbl-resumen-body" class="divide-y divide-slate-100">
+                                <!-- Dynamic JS Population -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Right: Interactive Bitácora de Gastos -->
+                <div class="lg:col-span-5 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                    <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+                        <h2 class="font-bold text-slate-900 text-base flex items-center gap-2">
+                            <i class="fa-solid fa-cart-shopping text-emerald-600"></i>
+                            Pestaña 03: Registrar Nueva Compra / Egreso
+                        </h2>
+                    </div>
+
+                    <form id="form-nuevo-gasto" onsubmit="agregarGasto(event)" class="space-y-3 text-xs">
+                        
+                        <!-- Razón Social y Banca -->
+                        <div class="grid grid-cols-2 gap-3 p-3 bg-slate-50 border border-slate-200 rounded-xl">
+                            <div>
+                                <label class="font-bold text-slate-700 block mb-1">
+                                    <i class="fa-solid fa-building text-slate-500 mr-1"></i> Razón Social:
+                                </label>
+                                <select id="input-razon" class="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white font-semibold">
+                                    <option value="Carrduci Metal">⚙️ Carrduci Metal</option>
+                                    <option value="Carrduci">🏢 Carrduci</option>
+                                    <option value="Compartido">🔄 Compartido / Por Dividir</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="font-bold text-slate-700 block mb-1">
+                                    <i class="fa-solid fa-credit-card text-slate-500 mr-1"></i> Banca Orig. / Pago:
+                                </label>
+                                <select id="input-banca" class="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white font-semibold">
+                                    <option value="Banca Carrduci Metal">🏦 Banca Carrduci Metal</option>
+                                    <option value="Banca Carrduci">🏦 Banca Carrduci</option>
+                                    <option value="Caja Chica / Efectivo">💵 Caja Chica / Efectivo</option>
+                                    <option value="Tarjeta Corporativa">💳 Tarjeta Corporativa</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="font-semibold text-slate-700">Clasificación Contable:</label>
+                            <select id="input-codigo" class="w-full mt-1 p-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 bg-white font-medium">
+                                <!-- Dynamic options loaded from catalog -->
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="font-semibold text-slate-700">Concepto Detallado (¿Qué se compró?):</label>
+                            <input type="text" id="input-concepto" placeholder="Ej. Compra de perfiles de acero o flete" required class="w-full mt-1 p-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500">
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="font-semibold text-slate-700">Monto Gastado ($):</label>
+                                <input type="number" step="0.01" id="input-monto" placeholder="15000.00" required class="w-full mt-1 p-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            <div>
+                                <label class="font-semibold text-slate-700">Proveedor / Folio Factura:</label>
+                                <input type="text" id="input-folio" placeholder="Factura A-884" class="w-full mt-1 p-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500">
+                            </div>
+                        </div>
+
+                        <!-- Adjuntar Comprobante -->
+                        <div>
+                            <label class="font-semibold text-slate-700 flex items-center justify-between">
+                                <span><i class="fa-solid fa-file-invoice text-indigo-600 mr-1"></i> Comprobante / Factura (Opcional):</span>
+                                <span id="lbl-img-status" class="text-[10px] text-slate-400 font-normal">Sin archivo</span>
+                            </label>
+                            <div class="mt-1 flex items-center gap-2">
+                                <label class="flex-1 border border-dashed border-slate-300 hover:border-indigo-500 rounded-xl p-2.5 bg-slate-50 hover:bg-indigo-50/40 transition cursor-pointer flex items-center justify-center gap-2 text-slate-600 hover:text-indigo-600 text-xs font-semibold">
+                                    <i class="fa-solid fa-paperclip text-sm"></i>
+                                    <span id="btn-text-img">Cargar foto de factura / ticket</span>
+                                    <input type="file" id="input-imagen" accept="image/*" class="hidden" onchange="previewImagenSeleccionada(event)">
+                                </label>
+                                <button type="button" id="btn-quitar-img" onclick="quitarImagenPrevia()" class="hidden px-3 py-2.5 bg-red-100 hover:bg-red-200 text-red-600 rounded-xl text-xs font-semibold transition" title="Quitar imagen">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                            </div>
+                            <div id="preview-img-container" class="hidden mt-2 relative rounded-xl overflow-hidden border border-slate-200 max-h-28 bg-slate-900/5 flex items-center justify-center p-1">
+                                <img id="img-preview-thumb" src="" alt="Vista previa" class="max-h-24 object-contain rounded-lg">
+                            </div>
+                        </div>
+
+                        <button type="submit" class="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-sm transition flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-plus"></i> Registrar en Bitácora y Actualizar
+                        </button>
+                    </form>
+
+                    <!-- Bitácora visible de compras registradas -->
+                    <div class="pt-4 border-t border-slate-100 space-y-2">
+                        <div class="flex justify-between items-center">
+                            <h3 class="font-bold text-slate-800 text-xs uppercase tracking-wider">Bitácora Reciente (<span id="lbl-filtro-gastos-name font-bold">Todos</span>)</h3>
+                            <span class="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded" id="lbl-total-gastos-count">0 compras</span>
+                        </div>
+                        <div class="max-h-52 overflow-y-auto space-y-1.5" id="lista-gastos-bitacora">
+                            <!-- Contenido dinámico mediante JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section: Cargar Catálogo Contable Oficial -->
+        <div id="section-catalogo-mod" class="hidden space-y-6">
+            <div class="bg-white p-6 md:p-8 rounded-2xl border border-slate-200 shadow-sm space-y-6">
+                <div class="flex flex-wrap items-center justify-between gap-4 border-b border-slate-100 pb-4">
+                    <div>
+                        <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+                            <i class="fa-solid fa-file-import text-indigo-600"></i>
+                            Importación del Catálogo Contable Unificado
+                        </h2>
+                        <p class="text-xs text-slate-500 mt-1">Pega el listado de tus cuentas contables. Podrás asignar cada cuenta o gasto a Carrduci Metal, Carrduci o mantenerlo como compartido.</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                    <div class="lg:col-span-6 space-y-4">
+                        <label class="block text-xs font-bold text-slate-700 uppercase">
+                            Pegar Cuentas (Formato: Código | Nombre del Rubro | Presupuesto Mensual):
+                        </label>
+                        <textarea id="txt-catalogo-import" rows="8" class="w-full p-3 font-mono text-xs border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 bg-slate-50" placeholder="601-01 | Sueldos y Salarios Operativos | 65000&#10;601-02 | Arrendamiento Local Naves | 25000&#10;601-03 | Servicios de Internet y Banca | 5500&#10;602-01 | Papelería y Consumibles | 4000&#10;603-01 | Mantenimiento de Maquinaria / Equipos | 18000"></textarea>
+
+                        <div class="flex flex-wrap gap-2">
+                            <button onclick="procesarCargaCatalogo()" class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-xs shadow-sm transition flex items-center gap-2">
+                                <i class="fa-solid fa-check-double"></i> Cargar Catálogo Unificado
+                            </button>
+                            <button onclick="cargarEjemploSAT()" class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl text-xs transition">
+                                Cargar Ejemplo Carrduci / Metal
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="lg:col-span-6 bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3">
+                        <div class="flex justify-between items-center border-b border-slate-200 pb-2">
+                            <span class="text-xs font-bold text-slate-700 uppercase">Cuentas Activas (<span id="count-cuentas">0</span>)</span>
+                            <span class="text-[10px] text-emerald-600 font-bold bg-emerald-100 px-2 py-0.5 rounded">Sincronizado</span>
+                        </div>
+                        <div class="max-h-60 overflow-y-auto space-y-1.5 text-xs font-mono" id="preview-catalogo-list">
+                            <!-- Populated dynamically -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section: Estructura Multi-Empresa -->
+        <div id="section-estructura" class="hidden space-y-6">
+            <div class="bg-white p-6 md:p-8 rounded-2xl border border-slate-200 shadow-sm space-y-6">
+                <h2 class="text-xl font-bold text-slate-900 border-b border-slate-100 pb-3">Estructura Recomendada para Separar Carrduci & Carrduci Metal</h2>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="p-4 border border-slate-200 rounded-xl bg-slate-50 space-y-2">
+                        <div class="font-bold text-blue-900 text-sm">01_Catálogo</div>
+                        <p class="text-xs text-slate-600">Columnas: <code class="font-bold text-slate-800">Codigo_Clasificacion | Nombre_Rubro | Razon_Social_Predeterminada</code></p>
+                        <p class="text-xs text-slate-500">Mantiene las cuentas estándar compartidas o asignadas a cada entidad.</p>
+                    </div>
+
+                    <div class="p-4 border border-slate-200 rounded-xl bg-slate-50 space-y-2">
+                        <div class="font-bold text-blue-900 text-sm">02_Presupuesto</div>
+                        <p class="text-xs text-slate-600">Columnas: <code class="font-bold text-slate-800">Codigo | Nombre | Razon_Social | Enero ... | Diciembre</code></p>
+                        <p class="text-xs text-slate-500">Permite metas independientes para Carrduci Metal y Carrduci.</p>
+                    </div>
+
+                    <div class="p-4 border border-slate-200 rounded-xl bg-slate-50 space-y-2">
+                        <div class="font-bold text-blue-900 text-sm">03_Gastos_Detalle (Bitácora)</div>
+                        <p class="text-xs text-slate-600">Columnas: <code class="font-bold text-slate-800">Fecha | Razon_Social | Banca_Origen | Codigo | Rubro | Concepto | Monto</code></p>
+                        <p class="text-xs text-slate-500">Aquí se especifica qué bancas pagaron el gasto y a qué razón social corresponde fiscal u operativamente.</p>
+                    </div>
+
+                    <div class="p-4 border border-slate-200 rounded-xl bg-slate-50 space-y-2">
+                        <div class="font-bold text-blue-900 text-sm">04_Control_Mensual</div>
+                        <p class="text-xs text-slate-600">Fórmula de Gasto Real: <code class="font-bold text-emerald-700">=SUMAR.SI.CONJUNTO('03_Gastos_Detalle'!H:H, '03_Gastos_Detalle'!B:B, "Carrduci Metal", ...)</code></p>
+                        <p class="text-xs text-slate-500">Calcula automáticamente el total individual o consolidado.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section: Instrucciones -->
+        <div id="section-instrucciones" class="hidden space-y-6">
+            <div class="bg-white p-6 md:p-8 rounded-2xl border border-slate-200 shadow-sm space-y-6">
+                <h2 class="text-xl font-bold text-slate-900 border-b border-slate-100 pb-3">Instalación en Google Sheets con Multi-Empresa</h2>
+
+                <ol class="space-y-4 text-sm text-slate-700">
+                    <li class="flex items-start gap-3">
+                        <span class="w-7 h-7 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold text-xs flex-shrink-0">1</span>
+                        <div>
+                            <p class="font-bold text-slate-900">Abre tu Google Sheets y abre el Editor de Código:</p>
+                            <p class="text-xs text-slate-600">Ve al menú superior: **Extensiones > Apps Script**.</p>
+                        </div>
+                    </li>
+
+                    <li class="flex items-start gap-3">
+                        <span class="w-7 h-7 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold text-xs flex-shrink-0">2</span>
+                        <div>
+                            <p class="font-bold text-slate-900">Pega el nuevo script v4.1:</p>
+                            <p class="text-xs text-slate-600">Reemplaza el código anterior con el script de `codigo_google_apps_script.js` que incluye soporte para Carrduci Metal y Carrduci.</p>
+                        </div>
+                    </li>
+
+                    <li class="flex items-start gap-3">
+                        <span class="w-7 h-7 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold text-xs flex-shrink-0">3</span>
+                        <div>
+                            <p class="font-bold text-slate-900">Ejecuta la inicialización:</p>
+                            <p class="text-xs text-slate-600">En el menú de tu Google Sheets: **`⚙️ Control Presupuestal` > `1. Inicializar Plantilla Completa Multi-Empresa`**.</p>
+                        </div>
+                    </li>
+                </ol>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Modal Visor de Facturas -->
+    <div id="modal-factura" class="hidden fixed inset-0 z-50 bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-2xl w-full p-6 shadow-2xl border border-slate-200 space-y-4 max-h-[90vh] flex flex-col">
+            <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-file-invoice text-indigo-600 text-lg"></i>
+                    <h3 id="modal-factura-titulo" class="font-bold text-slate-900 text-base">Comprobante de Pago</h3>
+                </div>
+                <button onclick="cerrarModalFactura()" class="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+            <div class="flex-1 overflow-auto flex items-center justify-center bg-slate-900/5 rounded-xl p-3 min-h-[250px]">
+                <img id="modal-factura-img" src="" alt="Factura" class="max-h-[60vh] object-contain rounded-lg shadow-md">
+            </div>
+            <div class="flex justify-between items-center pt-2 text-xs">
+                <span id="modal-factura-info" class="text-slate-500 font-medium"></span>
+                <button onclick="cerrarModalFactura()" class="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white font-semibold rounded-xl transition">
+                    Cerrar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let filtroEmpresaActual = "TODOS";
+        let mesFiltroActual = "Enero";
+
+        let catalogo = [
+            { codigo: "601-01", rubro: "Sueldos y Salarios Operativos", pto: 65000 },
+            { codigo: "601-02", rubro: "Arrendamiento de Naves / Locales", pto: 25000 },
+            { codigo: "601-03", rubro: "Servicios Públicos (Luz CFE, Agua)", pto: 18000 },
+            { codigo: "602-01", rubro: "Papelería y Consumibles de Oficina", pto: 4000 },
+            { codigo: "603-01", rubro: "Mantenimiento de Maquinaria y Perfiles", pto: 18000 },
+            { codigo: "604-01", rubro: "Licencias de Software, ERP y Banca", pto: 12000 }
+        ];
+
+        let gastos = [
+            { fecha: "2026-01-05", mes: "Enero", codigo: "601-03", concepto: "Pago Luz CFE Planta Metal", monto: 18450, folio: "CFE-98123", razon: "Carrduci Metal", banca: "Banca Carrduci Metal", imagen: "https://placehold.co/600x800/1e293b/ffffff?text=Factura+CFE+Carrduci+Metal" },
+            { fecha: "2026-01-12", mes: "Enero", codigo: "602-01", concepto: "Papelería corporativa compartida", monto: 2400, folio: "Office-4412", razon: "Compartido", banca: "Banca Carrduci", imagen: null },
+            { fecha: "2026-01-18", mes: "Enero", codigo: "603-01", concepto: "Refacciones y mantenimiento cortadora", monto: 18000, folio: "ServiMetal", razon: "Carrduci Metal", banca: "Banca Carrduci Metal", imagen: "https://placehold.co/600x800/334155/ffffff?text=Comprobante+Mantenimiento+Metal" },
+            { fecha: "2026-01-22", mes: "Enero", codigo: "604-01", concepto: "Renovación Licencia ERP Contable", monto: 6500, folio: "SOFT-8821", razon: "Carrduci", banca: "Banca Carrduci", imagen: null }
+        ];
+
+        let imagenTemporalBase64 = null;
+        let chartVsRealInstance = null;
+        let chartDistribucionInstance = null;
+
+        function previewImagenSeleccionada(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                imagenTemporalBase64 = evt.target.result;
+                document.getElementById('img-preview-thumb').src = imagenTemporalBase64;
+                document.getElementById('preview-img-container').classList.remove('hidden');
+                document.getElementById('btn-quitar-img').classList.remove('hidden');
+                document.getElementById('btn-text-img').innerText = file.name;
+                document.getElementById('lbl-img-status').innerText = 'Imagen lista';
+                document.getElementById('lbl-img-status').className = 'text-[10px] text-emerald-600 font-bold';
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function quitarImagenPrevia() {
+            imagenTemporalBase64 = null;
+            document.getElementById('input-imagen').value = '';
+            document.getElementById('preview-img-container').classList.add('hidden');
+            document.getElementById('btn-quitar-img').classList.add('hidden');
+            document.getElementById('btn-text-img').innerText = 'Cargar foto de factura / ticket';
+            document.getElementById('lbl-img-status').innerText = 'Sin archivo';
+            document.getElementById('lbl-img-status').className = 'text-[10px] text-slate-400 font-normal';
+        }
+
+        function verFactura(index) {
+            const g = gastos[index];
+            if (!g || !g.imagen) return;
+
+            document.getElementById('modal-factura-titulo').innerText = `Factura / Comprobante - ${g.folio}`;
+            document.getElementById('modal-factura-info').innerText = `${g.razon} | ${g.banca} | ${g.concepto} ($${g.monto.toLocaleString('es-MX', {minimumFractionDigits: 2})})`;
+            document.getElementById('modal-factura-img').src = g.imagen;
+            document.getElementById('modal-factura').classList.remove('hidden');
+        }
+
+        function cerrarModalFactura() {
+            document.getElementById('modal-factura').classList.add('hidden');
+        }
+
+        function switchTab(tabName) {
+            ['ejecutivo', 'simulador', 'catalogo-mod', 'estructura', 'instrucciones'].forEach(t => {
+                const sec = document.getElementById(`section-${t}`);
+                const btn = document.getElementById(`tab-btn-${t}`);
+                if (sec) sec.classList.add('hidden');
+                if (btn) btn.className = "px-5 py-3 rounded-xl text-sm font-semibold text-slate-600 hover:text-slate-900 transition flex items-center gap-2";
+            });
+
+            const activeSec = document.getElementById(`section-${tabName}`);
+            const activeBtn = document.getElementById(`tab-btn-${tabName}`);
+            if (activeSec) activeSec.classList.remove('hidden');
+            if (activeBtn) activeBtn.className = "tab-active px-5 py-3 rounded-xl text-sm transition flex items-center gap-2";
+
+            renderTodo();
+        }
+
+        function filtrarRazonSocial(empresa) {
+            filtroEmpresaActual = empresa;
+
+            ['TODOS', 'Carrduci Metal', 'Carrduci', 'Compartido'].forEach(opt => {
+                const btn = document.getElementById(`btn-filter-${opt}`);
+                if (btn) {
+                    btn.className = opt === empresa 
+                        ? "px-3.5 py-1.5 rounded-lg text-xs font-bold bg-slate-900 text-white shadow-sm transition"
+                        : "px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 transition";
+                }
+            });
+
+            const lblActive = document.getElementById('lbl-filtro-activo');
+            const lblGastosName = document.getElementById('lbl-filtro-gastos-name');
+            if (lblActive) lblActive.innerText = empresa === 'TODOS' ? 'Mostrando: Ambas Empresas (Consolidado)' : `Mostrando: ${empresa}`;
+            if (lblGastosName) lblGastosName.innerText = empresa === 'TODOS' ? 'Todas las empresas' : empresa;
+
+            renderTodo();
+        }
+
+        function renderTodo() {
+            mesFiltroActual = document.getElementById('select-mes-filtro')?.value || "Enero";
+            
+            actualizarDropdownCatalogo();
+            renderSimulador();
+            renderBitacoraGastos();
+            renderInformeEjecutivo();
+            renderBitacoraEjecutiva();
+        }
+
+        function actualizarDropdownCatalogo() {
+            const select = document.getElementById('input-codigo');
+            if (!select) return;
+            select.innerHTML = '';
+            
+            catalogo.forEach(item => {
+                const opt = document.createElement('option');
+                opt.value = item.codigo;
+                opt.textContent = `${item.codigo} - ${item.rubro}`;
+                select.appendChild(opt);
+            });
+
+            const previewContainer = document.getElementById('preview-catalogo-list');
+            const countSpan = document.getElementById('count-cuentas');
+            if (previewContainer) {
+                previewContainer.innerHTML = '';
+                catalogo.forEach(item => {
+                    const row = document.createElement('div');
+                    row.className = "p-2 bg-white rounded border border-slate-200 flex justify-between items-center text-xs";
+                    row.innerHTML = `<span class="font-bold text-indigo-900">${item.codigo}</span> <span class="text-slate-600 font-sans text-[11px] truncate mx-2 flex-1">${item.rubro}</span> <span class="font-bold text-slate-800">$${item.pto.toLocaleString('es-MX')}</span>`;
+                    previewContainer.appendChild(row);
+                });
+            }
+            if (countSpan) countSpan.innerText = catalogo.length;
+        }
+
+        function procesarCargaCatalogo() {
+            const rawText = document.getElementById('txt-catalogo-import').value.trim();
+            if (!rawText) return;
+
+            const lines = rawText.split('\n');
+            const nuevoCatalogo = [];
+
+            lines.forEach(line => {
+                const parts = line.split('|').map(p => p.trim());
+                if (parts.length >= 2) {
+                    const cod = parts[0];
+                    const rubro = parts[1];
+                    const pto = parts[2] ? parseFloat(parts[2].replace(/[^0-9.-]/g, '')) || 0 : 15000;
+                    nuevoCatalogo.push({ codigo: cod, rubro: rubro, pto: pto });
+                }
+            });
+
+            if (nuevoCatalogo.length > 0) {
+                catalogo = nuevoCatalogo;
+                renderTodo();
+                alert(`¡Se han cargado ${nuevoCatalogo.length} cuentas al catálogo unificado!`);
+            }
+        }
+
+        function cargarEjemploSAT() {
+            const ej = "601-01 | Sueldos y Salarios Operativos | 65000\n601-02 | Arrendamiento de Naves Industrial | 25000\n601-03 | Servicios Públicos (Luz CFE, Agua) | 18000\n602-01 | Papelería y Consumibles | 4000\n603-01 | Mantenimiento de Maquinaria y Equipos | 18000\n604-01 | Licencias de Software y Banca Electrónica | 12000";
+            document.getElementById('txt-catalogo-import').value = ej;
+            procesarCargaCatalogo();
+        }
+
+        function renderSimulador() {
+            const tbody = document.getElementById('tbl-resumen-body');
+            if (!tbody) return;
+            tbody.innerHTML = '';
+
+            let totalPto = 0;
+            let totalGasto = 0;
+
+            catalogo.forEach(item => {
+                const gastosFiltrados = gastos.filter(g => {
+                    const matchCodigo = g.codigo === item.codigo;
+                    const matchMes = mesFiltroActual === 'Acumulado' || g.mes === mesFiltroActual;
+                    if (filtroEmpresaActual === 'TODOS') return matchCodigo && matchMes;
+                    return matchCodigo && matchMes && g.razon === filtroEmpresaActual;
+                });
+
+                const gastoAcum = gastosFiltrados.reduce((acc, g) => acc + g.monto, 0);
+
+                let ptoAjustado = item.pto;
+                if (filtroEmpresaActual === 'Carrduci Metal') ptoAjustado = item.pto * 0.60;
+                else if (filtroEmpresaActual === 'Carrduci') ptoAjustado = item.pto * 0.40;
+
+                const disponible = ptoAjustado - gastoAcum;
+                totalPto += ptoAjustado;
+                totalGasto += gastoAcum;
+
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50 transition";
+                tr.innerHTML = `
+                    <td class="p-2.5 font-bold text-slate-800">${item.codigo} <br><span class="font-normal text-slate-500">${item.rubro}</span></td>
+                    <td class="p-2.5 text-right font-medium text-slate-700">$${ptoAjustado.toLocaleString('es-MX', {minimumFractionDigits: 2})}</td>
+                    <td class="p-2.5 text-right font-bold text-amber-600">$${gastoAcum.toLocaleString('es-MX', {minimumFractionDigits: 2})}</td>
+                    <td class="p-2.5 text-right font-bold ${disponible >= 0 ? 'text-emerald-600' : 'text-red-600'}">$${disponible.toLocaleString('es-MX', {minimumFractionDigits: 2})}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            const totalDisp = totalPto - totalGasto;
+            const pctEjercido = totalPto > 0 ? (totalGasto / totalPto) * 100 : 0;
+
+            document.getElementById('kpi-pto').innerText = `$${totalPto.toLocaleString('es-MX', {minimumFractionDigits: 2})}`;
+            document.getElementById('kpi-gasto').innerText = `$${totalGasto.toLocaleString('es-MX', {minimumFractionDigits: 2})}`;
+            document.getElementById('kpi-disponible').innerText = `$${totalDisp.toLocaleString('es-MX', {minimumFractionDigits: 2})}`;
+            document.getElementById('kpi-porcentaje').innerText = `${pctEjercido.toFixed(1)}%`;
+            document.getElementById('kpi-sub-pto').innerText = filtroEmpresaActual === 'TODOS' ? 'Global Consolidado' : `Presupuesto ${filtroEmpresaActual}`;
+        }
+
+        function agregarGasto(event) {
+            event.preventDefault();
+            const razon = document.getElementById('input-razon').value;
+            const banca = document.getElementById('input-banca').value;
+            const codigo = document.getElementById('input-codigo').value;
+            const concepto = document.getElementById('input-concepto').value.trim();
+            const monto = parseFloat(document.getElementById('input-monto').value);
+            const folio = document.getElementById('input-folio').value.trim() || 'S/F';
+
+            if (!codigo || !concepto || isNaN(monto) || monto <= 0) return;
+
+            gastos.push({ 
+                fecha: new Date().toISOString().split('T')[0],
+                mes: mesFiltroActual === 'Acumulado' ? 'Enero' : mesFiltroActual,
+                codigo, 
+                concepto, 
+                monto, 
+                folio,
+                razon,
+                banca,
+                imagen: imagenTemporalBase64 
+            });
+
+            document.getElementById('input-concepto').value = '';
+            document.getElementById('input-monto').value = '';
+            document.getElementById('input-folio').value = '';
+            quitarImagenPrevia();
+
+            renderTodo();
+        }
+
+        function eliminarGasto(index) {
+            gastos.splice(index, 1);
+            renderTodo();
+        }
+
+        function renderBitacoraGastos() {
+            const container = document.getElementById('lista-gastos-bitacora');
+            const countLbl = document.getElementById('lbl-total-gastos-count');
+            if (!container) return;
+
+            const gastosVisibles = gastos.filter(g => {
+                const matchMes = mesFiltroActual === 'Acumulado' || g.mes === mesFiltroActual;
+                if (filtroEmpresaActual === 'TODOS') return matchMes;
+                return matchMes && g.razon === filtroEmpresaActual;
+            });
+
+            container.innerHTML = '';
+            if (countLbl) countLbl.innerText = `${gastosVisibles.length} registro(s)`;
+
+            gastosVisibles.forEach((g, idx) => {
+                const div = document.createElement('div');
+                div.className = "p-2.5 bg-slate-50 border border-slate-200 rounded-xl flex justify-between items-center text-xs hover:bg-slate-100 transition";
+                
+                const btnFactura = g.imagen ? `
+                    <button type="button" onclick="verFactura(${idx})" class="px-2 py-0.5 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 text-indigo-700 rounded text-[10px] font-bold transition flex items-center gap-1">
+                        <i class="fa-solid fa-paperclip"></i> Ver
+                    </button>
+                ` : '';
+
+                const badgeRazon = g.razon === 'Carrduci Metal' 
+                    ? '<span class="text-[9px] bg-slate-800 text-slate-100 font-bold px-1.5 py-0.5 rounded">Metal</span>'
+                    : g.razon === 'Carrduci' 
+                    ? '<span class="text-[9px] bg-blue-100 text-blue-800 font-bold px-1.5 py-0.5 rounded">Carrduci</span>'
+                    : '<span class="text-[9px] bg-amber-100 text-amber-800 font-bold px-1.5 py-0.5 rounded">Compartido</span>';
+
+                div.innerHTML = `
+                    <div class="space-y-1 overflow-hidden pr-2 flex-1">
+                        <div class="flex items-center gap-1.5 flex-wrap">
+                            <span class="font-bold text-indigo-700 font-mono text-[11px]">${g.codigo}</span>
+                            ${badgeRazon}
+                            <span class="text-[9px] bg-slate-200 text-slate-700 px-1.5 py-0.2 rounded font-mono">${g.banca}</span>
+                            ${btnFactura}
+                        </div>
+                        <p class="font-semibold text-slate-800 truncate text-[11px]">${g.concepto} <span class="text-slate-400 font-normal">(${g.folio})</span></p>
+                    </div>
+                    <div class="flex items-center gap-2 flex-shrink-0">
+                        <span class="font-extrabold text-amber-600 font-mono text-xs">$${g.monto.toLocaleString('es-MX', {minimumFractionDigits: 2})}</span>
+                        <button type="button" onclick="eliminarGasto(${idx})" class="text-slate-400 hover:text-red-600 transition p-1" title="Eliminar gasto">
+                            <i class="fa-solid fa-trash-can"></i>
+                        </button>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function renderInformeEjecutivo() {
+            const tituloHeader = document.getElementById('lbl-titulo-ejecutivo');
+            if (tituloHeader) {
+                tituloHeader.innerText = `Informe Consolidado de Gastos - ${mesFiltroActual} (${filtroEmpresaActual})`;
+            }
+
+            let totalPto = 0;
+            let totalGastoReal = 0;
+            let cuentasActivas = 0;
+
+            const arrayLabels = [];
+            const arrayPto = [];
+            const arrayReal = [];
+            const arrayProyeccion = [];
+
+            const tbodyMov = document.getElementById('tbl-cuentas-movimientos-body');
+            if (tbodyMov) tbodyMov.innerHTML = '';
+
+            catalogo.forEach(item => {
+                const gastosCuenta = gastos.filter(g => {
+                    const matchCodigo = g.codigo === item.codigo;
+                    const matchMes = mesFiltroActual === 'Acumulado' || g.mes === mesFiltroActual;
+                    if (filtroEmpresaActual === 'TODOS') return matchCodigo && matchMes;
+                    return matchCodigo && matchMes && g.razon === filtroEmpresaActual;
+                });
+
+                const gastoRealCuenta = gastosCuenta.reduce((sum, g) => sum + g.monto, 0);
+
+                let ptoCuenta = item.pto;
+                if (filtroEmpresaActual === 'Carrduci Metal') ptoCuenta = item.pto * 0.60;
+                else if (filtroEmpresaActual === 'Carrduci') ptoCuenta = item.pto * 0.40;
+
+                totalPto += ptoCuenta;
+                totalGastoReal += gastoRealCuenta;
+
+                // Factor de Proyección simple: Si lleva movimiento, se estima corrida proyectada al 110% del gasto actual o límite pto si no sobrepasa
+                const proyeccionCuenta = gastoRealCuenta > 0 ? Math.min(ptoCuenta, gastoRealCuenta * 1.12) : 0;
+
+                if (gastoRealCuenta > 0) {
+                    cuentasActivas++;
+
+                    arrayLabels.push(item.codigo);
+                    arrayPto.push(ptoCuenta);
+                    arrayReal.push(gastoRealCuenta);
+                    arrayProyeccion.push(proyeccionCuenta);
+
+                    if (tbodyMov) {
+                        const pct = ptoCuenta > 0 ? (gastoRealCuenta / ptoCuenta) * 100 : 0;
+                        const disp = ptoCuenta - gastoRealCuenta;
+                        const statusBadge = pct > 90 
+                            ? '<span class="px-2 py-0.5 bg-red-100 text-red-700 font-bold rounded text-[10px]">Alerta Crítica</span>'
+                            : pct > 60 
+                            ? '<span class="px-2 py-0.5 bg-amber-100 text-amber-800 font-bold rounded text-[10px]">Moderado</span>'
+                            : '<span class="px-2 py-0.5 bg-emerald-100 text-emerald-800 font-bold rounded text-[10px]">Optimo</span>';
+
+                        const tr = document.createElement('tr');
+                        tr.className = "hover:bg-slate-50 transition border-b border-slate-100 font-mono";
+                        tr.innerHTML = `
+                            <td class="p-3 font-bold text-indigo-900">${item.codigo}</td>
+                            <td class="p-3 font-sans font-semibold text-slate-800">${item.rubro}</td>
+                            <td class="p-3 font-sans"><span class="px-2 py-0.5 bg-slate-100 text-slate-700 font-bold rounded text-[10px]">${filtroEmpresaActual}</span></td>
+                            <td class="p-3 text-right font-medium text-slate-700">$${ptoCuenta.toLocaleString('es-MX', {minimumFractionDigits:2})}</td>
+                            <td class="p-3 text-right font-extrabold text-amber-600">$${gastoRealCuenta.toLocaleString('es-MX', {minimumFractionDigits:2})}</td>
+                            <td class="p-3 text-right text-blue-900 font-semibold">$${proyeccionCuenta.toLocaleString('es-MX', {minimumFractionDigits:2})}</td>
+                            <td class="p-3 text-right font-bold ${disp >= 0 ? 'text-emerald-600' : 'text-red-600'}">$${disp.toLocaleString('es-MX', {minimumFractionDigits:2})}</td>
+                            <td class="p-3 text-center font-bold text-slate-700">${pct.toFixed(1)}%</td>
+                            <td class="p-3 text-center font-sans">${statusBadge}</td>
+                        `;
+                        tbodyMov.appendChild(tr);
+                    }
+                }
+            });
+
+            // Proyección global a cierre de mes/periodo
+            const proyeccionTotal = totalGastoReal > 0 ? totalGastoReal * 1.15 : 0;
+            const disponibleTotal = totalPto - totalGastoReal;
+            const pctGlobal = totalPto > 0 ? (totalGastoReal / totalPto) * 100 : 0;
+
+            document.getElementById('kpi-exec-pto').innerText = `$${totalPto.toLocaleString('es-MX', {minimumFractionDigits:2})}`;
+            document.getElementById('kpi-exec-gasto').innerText = `$${totalGastoReal.toLocaleString('es-MX', {minimumFractionDigits:2})}`;
+            document.getElementById('kpi-exec-pct').innerText = `${pctGlobal.toFixed(1)}% ejercido este mes`;
+            document.getElementById('kpi-exec-disp').innerText = `$${disponibleTotal.toLocaleString('es-MX', {minimumFractionDigits:2})}`;
+            document.getElementById('kpi-exec-proyeccion').innerText = `$${proyeccionTotal.toLocaleString('es-MX', {minimumFractionDigits:2})}`;
+            document.getElementById('kpi-exec-cuentas-activas').innerText = `${cuentasActivas} / ${catalogo.length}`;
+            
+            const badgeCuentas = document.getElementById('lbl-cuentas-activas-badge');
+            if (badgeCuentas) badgeCuentas.innerText = `${cuentasActivas} de ${catalogo.length} rubros con egresos`;
+
+            const desvioElem = document.getElementById('kpi-exec-desvio');
+            if (desvioElem) {
+                if (proyeccionTotal <= totalPto) {
+                    const diffPct = totalPto > 0 ? ((totalPto - proyeccionTotal) / totalPto) * 100 : 0;
+                    desvioElem.innerText = `🟢 Bajo Presupuesto (-${diffPct.toFixed(1)}%)`;
+                    desvioElem.className = "text-[11px] text-emerald-600 font-bold mt-1";
+                } else {
+                    const diffPct = totalPto > 0 ? ((proyeccionTotal - totalPto) / totalPto) * 100 : 0;
+                    desvioElem.innerText = `🔴 Riesgo Sobregasto (+${diffPct.toFixed(1)}%)`;
+                    desvioElem.className = "text-[11px] text-red-600 font-bold mt-1";
+                }
+            }
+
+            renderChartVsReal(arrayLabels, arrayPto, arrayReal, arrayProyeccion);
+            renderChartDistribucion();
+        }
+
+        function renderBitacoraEjecutiva() {
+            const tbody = document.getElementById('tbl-bitacora-ejecutiva-body');
+            const searchVal = document.getElementById('input-search-bitacora')?.value.toLowerCase() || '';
+            const bancaVal = document.getElementById('select-banca-filtro')?.value || 'TODAS';
+            const footTotal = document.getElementById('lbl-foot-total-gasto');
+
+            if (!tbody) return;
+            tbody.innerHTML = '';
+
+            let totalAcum = 0;
+
+            const gastosFiltrados = gastos.filter(g => {
+                const matchEmpresa = filtroEmpresaActual === 'TODOS' || g.razon === filtroEmpresaActual;
+                const matchMes = mesFiltroActual === 'Acumulado' || g.mes === mesFiltroActual;
+                const matchBanca = bancaVal === 'TODAS' || g.banca === bancaVal;
+                const matchSearch = g.concepto.toLowerCase().includes(searchVal) || g.folio.toLowerCase().includes(searchVal) || g.codigo.toLowerCase().includes(searchVal);
+                return matchEmpresa && matchMes && matchBanca && matchSearch;
+            });
+
+            gastosFiltrados.forEach((g, idx) => {
+                totalAcum += g.monto;
+
+                const rubroObj = catalogo.find(c => c.codigo === g.codigo);
+                const nombreRubro = rubroObj ? rubroObj.rubro : 'Gasto General';
+
+                const btnComprobante = g.imagen ? `
+                    <button onclick="verFactura(${idx})" class="px-2 py-1 bg-indigo-50 border border-indigo-200 text-indigo-700 rounded text-[10px] font-bold hover:bg-indigo-100 transition">
+                        <i class="fa-solid fa-eye mr-1"></i> Ver Adjunto
+                    </button>
+                ` : '<span class="text-slate-400 text-[10px] font-sans">Sin archivo</span>';
+
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50 transition border-b border-slate-100";
+                tr.innerHTML = `
+                    <td class="p-3 text-slate-700">${g.fecha}</td>
+                    <td class="p-3 font-sans font-bold text-slate-800">${g.razon}</td>
+                    <td class="p-3 text-slate-600">${g.banca}</td>
+                    <td class="p-3 font-bold text-indigo-900">${g.codigo} - <span class="font-normal font-sans text-slate-600">${nombreRubro}</span></td>
+                    <td class="p-3 font-sans text-slate-800 font-semibold">${g.concepto}</td>
+                    <td class="p-3 text-slate-600">${g.folio}</td>
+                    <td class="p-3 text-right font-bold text-amber-700">$${g.monto.toLocaleString('es-MX', {minimumFractionDigits: 2})}</td>
+                    <td class="p-3 text-center no-print font-sans">${btnComprobante}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            if (footTotal) footTotal.innerText = `$${totalAcum.toLocaleString('es-MX', {minimumFractionDigits: 2})}`;
+        }
+
+        function renderChartVsReal(labels, pto, real, proy) {
+            const ctx = document.getElementById('chartPresupuestoVsReal')?.getContext('2d');
+            if (!ctx) return;
+
+            if (chartVsRealInstance) chartVsRealInstance.destroy();
+
+            chartVsRealInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels.length ? labels : ['Sin datos'],
+                    datasets: [
+                        {
+                            label: 'Presupuesto Mes ($)',
+                            data: pto.length ? pto : [0],
+                            backgroundColor: 'rgba(99, 102, 241, 0.7)',
+                            borderColor: 'rgb(99, 102, 241)',
+                            borderWidth: 1,
+                            borderRadius: 6
+                        },
+                        {
+                            label: 'Gasto Real Acumulado ($)',
+                            data: real.length ? real : [0],
+                            backgroundColor: 'rgba(245, 158, 11, 0.85)',
+                            borderColor: 'rgb(245, 158, 11)',
+                            borderWidth: 1,
+                            borderRadius: 6
+                        },
+                        {
+                            label: 'Proyección Cierre ($)',
+                            data: proy.length ? proy : [0],
+                            backgroundColor: 'rgba(59, 130, 246, 0.35)',
+                            borderColor: 'rgb(59, 130, 246)',
+                            borderWidth: 1,
+                            borderDash: [4, 4],
+                            borderRadius: 6
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'top', labels: { font: { family: 'Plus Jakarta Sans', size: 11 } } },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `${context.dataset.label}: $${context.parsed.y.toLocaleString('es-MX')}`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            ticks: {
+                                callback: function(value) { return '$' + value.toLocaleString('es-MX'); }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function renderChartDistribucion() {
+            const ctx = document.getElementById('chartDistribucionEmpresa')?.getContext('2d');
+            if (!ctx) return;
+
+            if (chartDistribucionInstance) chartDistribucionInstance.destroy();
+
+            let gastoMetal = 0;
+            let gastoCarrduci = 0;
+            let gastoCompartido = 0;
+
+            gastos.forEach(g => {
+                if (mesFiltroActual === 'Acumulado' || g.mes === mesFiltroActual) {
+                    if (g.razon === 'Carrduci Metal') gastoMetal += g.monto;
+                    else if (g.razon === 'Carrduci') gastoCarrduci += g.monto;
+                    else gastoCompartido += g.monto;
+                }
+            });
+
+            chartDistribucionInstance = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['⚙️ Carrduci Metal', '🏢 Carrduci', '🔄 Compartido'],
+                    datasets: [{
+                        data: [gastoMetal, gastoCarrduci, gastoCompartido],
+                        backgroundColor: [
+                            '#1e293b',
+                            '#2563eb',
+                            '#f59e0b'
+                        ],
+                        hoverOffset: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom', labels: { font: { family: 'Plus Jakarta Sans', size: 11 } } },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `${context.label}: $${context.parsed.toLocaleString('es-MX')}`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function exportarCSVMovimientos() {
+            let csvContent = "data:text/csv;charset=utf-8,";
+            csvContent += "Fecha,Mes,Razon_Social,Banca_Origen,Codigo_Rubro,Concepto_Detallado,Proveedor_Folio,Monto_Gastado\n";
+
+            gastos.forEach(g => {
+                const row = [
+                    `"${g.fecha}"`,
+                    `"${g.mes}"`,
+                    `"${g.razon}"`,
+                    `"${g.banca}"`,
+                    `"${g.codigo}"`,
+                    `"${g.concepto.replace(/"/g, '""')}"`,
+                    `"${g.folio}"`,
+                    g.monto
+                ].join(",");
+                csvContent += row + "\n";
+            });
+
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `Reporte_Ejecutivo_Gastos_${mesFiltroActual}_${filtroEmpresaActual}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // Initial launch on DOM Load
+        window.onload = function() {
+            renderTodo();
+        };
+    </script>
+</body>
+</html>
