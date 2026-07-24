@@ -240,14 +240,19 @@
                 </div>
 
                 <div class="lg:col-span-2 bg-white p-6 rounded-xl border border-slate-200/80 shadow-sm">
-                    <h3 class="text-xs font-bold text-slate-700 uppercase mb-4 pb-3 border-b border-slate-100">Catálogo de Partidas Asignadas</h3>
+                    <div class="flex justify-between items-center mb-4 pb-3 border-b border-slate-100">
+                        <h3 class="text-xs font-bold text-slate-700 uppercase">Catálogo de Partidas Asignadas</h3>
+                        <span class="text-[11px] text-blue-600 bg-blue-50 px-2.5 py-1 rounded font-semibold border border-blue-100">
+                            ✏️ Haz clic en cualquier importe para editarlo directamente
+                        </span>
+                    </div>
                     <div class="overflow-x-auto">
                         <table class="w-full text-left text-xs">
                             <thead>
                                 <tr class="border-b border-slate-200 text-slate-400 font-semibold uppercase text-[10px]">
                                     <th class="py-2.5 px-2">Código</th>
                                     <th class="py-2.5 px-2">Descripción</th>
-                                    <th class="py-2.5 px-2 text-right">Presupuesto Asignado</th>
+                                    <th class="py-2.5 px-2 text-right">Presupuesto Asignado ($)</th>
                                     <th class="py-2.5 px-2 text-center">Acciones</th>
                                 </tr>
                             </thead>
@@ -345,36 +350,6 @@
             </div>
 
         </main>
-    </div>
-
-    <!-- MODAL DE EDICIÓN DE IMPORTE DE PARTIDA -->
-    <div id="modalEditarPartida" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center hidden">
-        <div class="bg-white rounded-xl shadow-xl border border-slate-200 p-6 w-full max-w-md space-y-4">
-            <div class="flex justify-between items-center pb-2 border-b border-slate-100">
-                <h3 class="text-xs font-bold text-slate-700 uppercase">Modificar Presupuesto Asignado</h3>
-                <button onclick="cerrarModalEditar()" class="text-slate-400 hover:text-slate-600 font-bold">✕</button>
-            </div>
-            
-            <form onsubmit="guardarEdicionPartida(event)" class="space-y-4 text-xs">
-                <input type="hidden" id="editCodigoOriginal">
-                <div>
-                    <label class="block font-medium text-slate-500 mb-1">Código Contable</label>
-                    <input type="text" id="editCodigo" disabled class="w-full border border-slate-200 rounded-lg p-2.5 bg-slate-100 font-mono text-slate-600 font-bold">
-                </div>
-                <div>
-                    <label class="block font-medium text-slate-500 mb-1">Descripción del Rubro</label>
-                    <input type="text" id="editDescripcion" required class="w-full border border-slate-200 rounded-lg p-2.5 bg-slate-50">
-                </div>
-                <div>
-                    <label class="block font-medium text-slate-500 mb-1">Nuevo Presupuesto Asignado ($)</label>
-                    <input type="number" step="0.01" id="editMonto" required class="w-full border border-slate-200 rounded-lg p-2.5 bg-slate-50 font-bold font-mono text-slate-800">
-                </div>
-                <div class="flex justify-end space-x-2 pt-2">
-                    <button type="button" onclick="cerrarModalEditar()" class="px-4 py-2 bg-slate-100 text-slate-600 rounded-lg font-semibold hover:bg-slate-200 transition">Cancelar</button>
-                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition shadow-sm">Guardar Cambios</button>
-                </div>
-            </form>
-        </div>
     </div>
 
     <!-- JAVASCRIPT -->
@@ -484,37 +459,16 @@
             renderizarTodo();
         }
 
-        /* FUNCIONALIDAD NUEVA DE EDICIÓN DE IMPORTE */
-        function abrirModalEditar(codigo) {
-            const partida = baseDatos[empresaActual].partidas.find(p => p.codigo === codigo);
-            if(!partida) return;
-
-            document.getElementById('editCodigoOriginal').value = partida.codigo;
-            document.getElementById('editCodigo').value = partida.codigo;
-            document.getElementById('editDescripcion').value = partida.descripcion;
-            document.getElementById('editMonto').value = partida.monto;
-
-            document.getElementById('modalEditarPartida').classList.remove('hidden');
-        }
-
-        function cerrarModalEditar() {
-            document.getElementById('modalEditarPartida').classList.add('hidden');
-        }
-
-        function guardarEdicionPartida(e) {
-            e.preventDefault();
-            const codigo = document.getElementById('editCodigoOriginal').value;
-            const nuevaDesc = document.getElementById('editDescripcion').value;
-            const nuevoMonto = parseFloat(document.getElementById('editMonto').value);
+        /* FUNCIÓN DE EDICIÓN DIRECTA EN LA CELDA */
+        function actualizarMontoPartidaDirecto(codigo, nuevoValor) {
+            const valorNumerico = parseFloat(nuevoValor);
+            if(isNaN(valorNumerico) || valorNumerico < 0) return;
 
             const partida = baseDatos[empresaActual].partidas.find(p => p.codigo === codigo);
             if(partida) {
-                partida.descripcion = nuevaDesc;
-                partida.monto = nuevoMonto;
+                partida.monto = valorNumerico;
+                renderizarTodo();
             }
-
-            cerrarModalEditar();
-            renderizarTodo();
         }
 
         function borrarGasto(id) {
@@ -608,7 +562,7 @@
             }
         }
 
-        /* CATÁLOGO RENDERIZADO CON BOTÓN DE EDICIÓN DE IMPORTE */
+        /* CATÁLOGO CON EDICIÓN DIRECTA EN LA CELDA (INPUT INLINE) */
         function renderizarCatalogo() {
             const tCat = document.getElementById('tablaCatalogo');
             tCat.innerHTML = '';
@@ -617,9 +571,17 @@
                 <tr class="hover:bg-slate-50 transition">
                     <td class="py-3 px-2 font-bold text-slate-800 font-mono">${p.codigo}</td>
                     <td class="px-2 text-slate-600">${p.descripcion}</td>
-                    <td class="px-2 text-right font-semibold text-slate-700 font-mono">$${p.monto.toLocaleString('en-US',{minimumFractionDigits:2})}</td>
-                    <td class="px-2 text-center space-x-1">
-                        <button onclick="abrirModalEditar('${p.codigo}')" class="text-blue-600 hover:bg-blue-50 font-semibold px-2.5 py-1 rounded text-xs transition">Editar</button>
+                    <td class="px-2 text-right">
+                        <div class="inline-flex items-center space-x-1 border border-slate-200 rounded-lg bg-slate-50 hover:bg-white focus-within:bg-white focus-within:ring-1 focus-within:ring-blue-500 px-2 py-1 transition">
+                            <span class="text-slate-400 font-mono font-bold">$</span>
+                            <input type="number" 
+                                   step="0.01" 
+                                   value="${p.monto}" 
+                                   onchange="actualizarMontoPartidaDirecto('${p.codigo}', this.value)"
+                                   class="w-28 text-right font-bold text-slate-800 font-mono bg-transparent focus:outline-none">
+                        </div>
+                    </td>
+                    <td class="px-2 text-center">
                         <button onclick="borrarPartida('${p.codigo}')" class="text-red-500 hover:bg-red-50 font-semibold px-2.5 py-1 rounded text-xs transition">Eliminar</button>
                     </td>
                 </tr>`;
