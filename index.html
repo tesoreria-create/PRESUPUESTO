@@ -1,55 +1,708 @@
-function renderizarCatalogo() {
-    const tbody = document.getElementById('tablaCatalogo');
-    if (!tbody) return;
-    
-    tbody.innerHTML = '';
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CorpBudget - Sistema de Presupuesto Corporativo</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="bg-slate-100 text-slate-800 font-sans antialiased min-h-screen flex">
 
-    const codigosPadre = baseDatos[empresaActual].codigosPadre || [];
-    const subcuentas = baseDatos[empresaActual].subcuentas || [];
+    <!-- SIDEBAR -->
+    <aside class="w-64 bg-slate-900 text-slate-300 flex flex-col justify-between p-4 min-h-screen">
+        <div class="space-y-6">
+            <div class="flex items-center space-x-3 px-2">
+                <div class="p-2 bg-blue-600 rounded-lg text-white">
+                    <i data-lucide="wallet" class="w-6 h-6"></i>
+                </div>
+                <h1 class="text-white font-bold text-base tracking-wide leading-tight">CorpBudget</h1>
+            </div>
 
-    // 1. PRIMERO MOSTRAMOS LOS CÓDIGOS PADRE DADOS DE ALTA
-    codigosPadre.forEach(p => {
-        tbody.innerHTML += `
-            <tr class="hover:bg-slate-50 transition border-b border-slate-100 font-semibold text-slate-800">
-                <td class="py-2.5 px-2 font-mono text-blue-600">${p.codigo}</td>
-                <td class="py-2.5 px-2 font-mono text-slate-400">—</td>
-                <td class="py-2.5 px-2">${p.descripcion} <span class="text-[10px] bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded font-normal ml-1">Cuenta Principal</span></td>
-                <td class="py-2.5 px-2 text-right font-mono text-slate-400">—</td>
-                <td class="py-2.5 px-2 text-center text-slate-400">Activo</td>
-            </tr>
-        `;
-    });
+            <nav class="space-y-1">
+                <button onclick="cambiarPestana(1)" id="tab1" class="sidebar-item w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-white bg-blue-600 font-medium">
+                    <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
+                    <span>Presupuesto y Bitácora</span>
+                </button>
+                <button onclick="cambiarPestana(2)" id="tab2" class="sidebar-item w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800/60 transition">
+                    <i data-lucide="book-open" class="w-4 h-4"></i>
+                    <span>Catálogo & Subcuentas</span>
+                </button>
+                <button onclick="cambiarPestana(3)" id="tab3" class="sidebar-item w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800/60 transition">
+                    <i data-lucide="layers" class="w-4 h-4"></i>
+                    <span>Consolidado Multiempresa</span>
+                </button>
+                <button onclick="cambiarPestana(4)" id="tab4" class="sidebar-item w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800/60 transition">
+                    <i data-lucide="sparkles" class="w-4 h-4 text-amber-400"></i>
+                    <span>Tablero IA Advisor</span>
+                </button>
+            </nav>
+        </div>
 
-    // 2. LUEGO MOSTRAMOS LAS SUBCUENTAS DADAS DE ALTA
-    subcuentas.forEach(s => {
-        const montoActual = (s.presupuestoPorPeriodo && s.presupuestoPorPeriodo[periodoActual]) || 0;
-        tbody.innerHTML += `
-            <tr class="hover:bg-slate-50 transition border-b border-slate-100">
-                <td class="py-2.5 px-2 font-mono font-bold">${s.codigoSub}</td>
-                <td class="py-2.5 px-2 font-mono">${s.codigoPadre}</td>
-                <td class="py-2.5 px-2">${s.descripcion}</td>
-                <td class="py-2.5 px-2 text-right">
-                    <input 
-                        type="number" 
-                        step="0.01" 
-                        value="${montoActual}" 
-                        onchange="guardarPresupuestoSubcuenta('${s.codigoSub}', this.value)" 
-                        class="w-24 text-right border border-slate-200 rounded px-1 py-0.5 font-mono text-xs focus:ring-1 focus:ring-blue-500 focus:outline-none"
-                    >
-                </td>
-                <td class="py-2.5 px-2 text-center text-slate-400">Activo</td>
-            </tr>
-        `;
-    });
+        <div class="p-3 bg-slate-800/60 rounded-lg text-xs text-slate-400">
+            <span class="block font-semibold text-slate-200">Entidad Activa</span>
+            <span id="labelEmpresaSidebar" class="text-blue-400 font-bold">Carrduci</span>
+        </div>
+    </aside>
 
-    // Si la tabla está totalmente vacía
-    if (codigosPadre.length === 0 && subcuentas.length === 0) {
-        tbody.innerHTML = `
-            <tr>
-                <td colspan="5" class="py-6 text-center text-slate-400 italic">
-                    No hay registros. Da de alta un código o subcuenta en el panel izquierdo.
-                </td>
-            </tr>
-        `;
-    }
-}
+    <!-- MAIN CONTENT -->
+    <main class="flex-1 flex flex-col min-h-screen overflow-y-auto">
+        <!-- TOPBAR HEADER -->
+        <header class="bg-white border-b border-slate-200 px-8 py-4 flex justify-between items-center sticky top-0 z-10 shadow-sm">
+            <div class="flex items-center space-x-6">
+                <div class="flex items-center space-x-2">
+                    <span class="text-xs font-semibold text-slate-400">Entidad:</span>
+                    <select id="empresaSelect" onchange="cambiarEmpresa()" class="bg-slate-50 border border-slate-300 text-slate-800 text-xs rounded-lg px-3 py-1.5 font-bold focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer">
+                        <option value="Carrduci">Carrduci S.A. de C.V.</option>
+                        <option value="CarrduciMetal">Carrduci Metal</option>
+                    </select>
+                </div>
+                <div class="flex items-center space-x-2 bg-blue-50 border border-blue-200 px-3 py-1.5 rounded-lg">
+                    <i data-lucide="calendar" class="w-4 h-4 text-blue-600"></i>
+                    <span class="text-xs font-bold text-blue-900">Período:</span>
+                    <input type="month" id="inputPeriodo" onchange="cambiarPeriodo()" class="bg-transparent text-xs font-bold text-blue-900 focus:outline-none cursor-pointer">
+                </div>
+            </div>
+            <div class="text-xs font-semibold text-slate-500" id="badgeMesActual">
+                Período Carga
+            </div>
+        </header>
+
+        <!-- CONTAINER BODY -->
+        <div class="p-8 space-y-6 flex-1">
+            
+            <!-- PESTAÑA 1: PRESUPUESTO Y BITÁCORA -->
+            <div id="pestana1" class="space-y-6">
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                    
+                    <!-- FORMULARIO REGISTRO GASTO -->
+                    <div class="lg:col-span-4 bg-white p-6 rounded-xl border border-slate-200/80 shadow-sm space-y-4">
+                        <h3 class="text-xs font-bold text-slate-700 uppercase pb-2 border-b border-slate-100" id="formTitulo">Registrar Nuevo Gasto</h3>
+                        <form onsubmit="guardarGasto(event)" class="space-y-3 text-xs">
+                            <input type="hidden" id="gastoIndexEdit">
+                            <div>
+                                <label class="block font-medium text-slate-500 mb-1">Fecha</label>
+                                <input type="date" id="inputFecha" required class="w-full border border-slate-200 rounded-lg p-2 bg-slate-50 focus:bg-white focus:outline-none focus:ring-1 focus:ring-blue-500 text-slate-700">
+                            </div>
+                            <div>
+                                <label class="block font-medium text-slate-500 mb-1">Subcuenta / Partida</label>
+                                <select id="selectSubcuenta" required class="w-full border border-slate-200 rounded-lg p-2 bg-slate-50 focus:bg-white focus:outline-none focus:ring-1 focus:ring-blue-500 text-slate-700">
+                                    <!-- Dinámico -->
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block font-medium text-slate-500 mb-1">Concepto / Descripción</label>
+                                <input type="text" id="inputConcepto" required placeholder="Ej. Pago de factura CFE" class="w-full border border-slate-200 rounded-lg p-2 bg-slate-50 focus:bg-white focus:outline-none focus:ring-1 focus:ring-blue-500 text-slate-700">
+                            </div>
+                            <div>
+                                <label class="block font-medium text-slate-500 mb-1">Monto ($)</label>
+                                <input type="number" step="0.01" id="inputMonto" required placeholder="0.00" class="w-full border border-slate-200 rounded-lg p-2 bg-slate-50 focus:bg-white focus:outline-none focus:ring-1 focus:ring-blue-500 text-slate-700 font-mono font-semibold">
+                            </div>
+                            <div class="grid grid-cols-2 gap-2">
+                                <div>
+                                    <label class="block font-medium text-slate-500 mb-1">Clasificación</label>
+                                    <select id="selectClasificacion" required class="w-full border border-slate-200 rounded-lg p-2 bg-slate-50 focus:bg-white focus:outline-none focus:ring-1 focus:ring-blue-500 text-slate-700">
+                                        <!-- Dinámico -->
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block font-medium text-slate-500 mb-1">Forma de Pago</label>
+                                    <select id="selectFormaPago" required class="w-full border border-slate-200 rounded-lg p-2 bg-slate-50 focus:bg-white focus:outline-none focus:ring-1 focus:ring-blue-500 text-slate-700 font-semibold">
+                                        <!-- Dinámico -->
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="pt-2 flex gap-2">
+                                <button type="submit" id="btnSubmitGasto" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 rounded-lg text-xs transition shadow-sm">
+                                    Guardar Gasto
+                                </button>
+                                <button type="button" id="btnCancelarEdit" onclick="cancelarEdicionGasto()" class="hidden bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold px-3 py-2.5 rounded-lg text-xs transition">
+                                    Cancelar
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- TABLAS PRINCIPALES -->
+                    <div class="lg:col-span-8 space-y-6">
+                        <!-- Presupuesto por Código Acumulado -->
+                        <div class="bg-white p-6 rounded-xl border border-slate-200/80 shadow-sm">
+                            <h3 class="text-xs font-bold text-slate-700 uppercase mb-4 pb-2 border-b border-slate-100" id="presupuestoTitulo">Ejecución Presupuestal por Rubro</h3>
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left text-xs">
+                                    <thead>
+                                        <tr class="border-b border-slate-200 text-slate-400 font-semibold uppercase text-[10px]">
+                                            <th class="pb-3">Código</th>
+                                            <th class="pb-3">Rubro</th>
+                                            <th class="pb-3 text-right">Presupuesto ($)</th>
+                                            <th class="pb-3 text-right">Ejecutado ($)</th>
+                                            <th class="pb-3 text-right">Disponible ($)</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tablaPresupuestoResumen" class="divide-y divide-slate-100 text-slate-700 font-medium"></tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Bitácora de Gastos con Buscador -->
+                        <div class="bg-white p-6 rounded-xl border border-slate-200/80 shadow-sm">
+                            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 mb-4 pb-3 border-b border-slate-100">
+                                <h3 class="text-xs font-bold text-slate-700 uppercase">Bitácora de Gastos</h3>
+                                <div class="flex flex-wrap items-center gap-2 text-xs w-full md:w-auto">
+                                    <div class="relative flex-1 md:w-56">
+                                        <input type="text" id="inputBuscador" onkeyup="renderizarTablas()" placeholder="🔍 Buscar concepto..." class="w-full pl-3 pr-3 py-1 border border-slate-200 rounded-lg bg-slate-50 text-slate-700 focus:outline-none focus:ring-1 focus:ring-blue-500 text-xs">
+                                    </div>
+                                    <input type="date" id="filtroFechaDia" onchange="renderizarTablas()" class="border border-slate-200 rounded-lg px-2 py-1 bg-slate-50 text-slate-700 focus:outline-none" title="Filtrar por día exacto">
+                                </div>
+                            </div>
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left text-xs">
+                                    <thead>
+                                        <tr class="border-b border-slate-200 text-slate-400 font-semibold uppercase text-[10px]">
+                                            <th class="pb-3">Fecha</th>
+                                            <th class="pb-3">Concepto</th>
+                                            <th class="pb-3">Subcuenta</th>
+                                            <th class="pb-3 text-right">Monto</th>
+                                            <th class="pb-3 text-center">Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tablaBitacoraGastos" class="divide-y divide-slate-100 text-slate-700"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PESTAÑA 2: CATÁLOGO Y SUBCUENTAS -->
+            <div id="pestana2" class="grid grid-cols-1 lg:grid-cols-3 gap-6 hidden">
+                <div class="bg-white p-6 rounded-xl border border-slate-200/80 shadow-sm h-fit space-y-5">
+                    <div>
+                        <h3 class="text-xs font-bold text-slate-700 uppercase mb-3 pb-2 border-b border-slate-100">1. Alta de Código Principal</h3>
+                        <form onsubmit="agregarCodigoPrincipal(event)" class="space-y-3 text-xs">
+                            <div>
+                                <label class="block font-medium text-slate-500 mb-1">Código Contable Padre</label>
+                                <input type="text" id="nuevoCodigoPadre" required placeholder="Ej. 601-00" class="w-full border border-slate-200 rounded-lg p-2 bg-slate-50">
+                            </div>
+                            <div>
+                                <label class="block font-medium text-slate-500 mb-1">Descripción del Rubro</label>
+                                <input type="text" id="nuevaDescripcionPadre" required placeholder="Ej. Gastos Operativos" class="w-full border border-slate-200 rounded-lg p-2 bg-slate-50">
+                            </div>
+                            <button type="submit" class="w-full bg-slate-700 hover:bg-slate-800 text-white font-semibold py-2 rounded-lg text-xs transition">
+                                Guardar Código Principal
+                            </button>
+                        </form>
+                    </div>
+
+                    <div class="pt-3 border-t border-slate-200">
+                        <h3 class="text-xs font-bold text-blue-600 uppercase mb-3 pb-2 border-b border-slate-100">2. Alta de Subcuenta con Monto</h3>
+                        <form onsubmit="agregarSubcuenta(event)" class="space-y-3 text-xs">
+                            <div>
+                                <label class="block font-medium text-slate-500 mb-1">Código Padre</label>
+                                <select id="selectCodigoPadreForm" required class="w-full border border-slate-200 rounded-lg p-2 bg-slate-50">
+                                    <!-- Dinámico -->
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block font-medium text-slate-500 mb-1">Código Subcuenta</label>
+                                <input type="text" id="nuevoCodigoSub" required placeholder="Ej. 601-00-01" class="w-full border border-slate-200 rounded-lg p-2 bg-slate-50">
+                            </div>
+                            <div>
+                                <label class="block font-medium text-slate-500 mb-1">Descripción Subcuenta</label>
+                                <input type="text" id="nuevaDescripcionSub" required placeholder="Ej. Servicio Energía Electrica" class="w-full border border-slate-200 rounded-lg p-2 bg-slate-50">
+                            </div>
+                            <div>
+                                <label class="block font-medium text-slate-500 mb-1">Presupuesto Mes Activo ($)</label>
+                                <input type="number" step="0.01" id="nuevoMontoSub" required placeholder="0.00" class="w-full border border-slate-200 rounded-lg p-2 bg-slate-50">
+                            </div>
+                            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 rounded-lg text-xs transition shadow-sm">
+                                Guardar Subcuenta
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="lg:col-span-2 bg-white p-6 rounded-xl border border-slate-200/80 shadow-sm">
+                    <div class="flex justify-between items-center mb-4 pb-3 border-b border-slate-100">
+                        <div>
+                            <h3 class="text-xs font-bold text-slate-700 uppercase">Catálogo de Subcuentas y Asignaciones</h3>
+                            <p class="text-[11px] text-slate-400">Edita los montos de cada subcuenta para el mes activo</p>
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs">
+                            <thead>
+                                <tr class="border-b border-slate-200 text-slate-400 font-semibold uppercase text-[10px]">
+                                    <th class="py-2.5 px-2">Subcuenta</th>
+                                    <th class="py-2.5 px-2">Código Padre</th>
+                                    <th class="py-2.5 px-2">Descripción</th>
+                                    <th class="py-2.5 px-2 text-right">Presupuesto Mes ($)</th>
+                                    <th class="py-2.5 px-2 text-center">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tablaCatalogo" class="divide-y divide-slate-100 text-slate-700"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PESTAÑA 3: COMPARATIVO CONSOLIDADO MULTIEMPRESA -->
+            <div id="pestana3" class="bg-white p-6 rounded-xl border border-slate-200/80 shadow-sm hidden space-y-4">
+                <div class="mb-4 pb-3 border-b border-slate-100 flex justify-between items-center">
+                    <div>
+                        <h3 class="text-xs font-bold text-slate-700 uppercase">Consolidado Multiempresa</h3>
+                        <p class="text-[11px] text-slate-400">Comparativa Global del Mes: Carrduci S.A. vs Carrduci Metal</p>
+                    </div>
+                    <span class="bg-blue-50 text-blue-600 text-[11px] font-semibold px-2.5 py-1 rounded border border-blue-100">Visión Corporativa</span>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs">
+                        <thead>
+                            <tr class="bg-slate-100 text-slate-600 uppercase text-[10px] font-bold">
+                                <th class="py-3 px-4 rounded-l">Código Padre</th>
+                                <th class="py-3 px-4">Concepto Rubro</th>
+                                <th class="py-3 px-4 text-right">Presupuesto Mes Total</th>
+                                <th class="py-3 px-4 text-right text-blue-700">Gasto Carrduci</th>
+                                <th class="py-3 px-4 text-right text-indigo-700">Gasto Carrduci Metal</th>
+                                <th class="py-3 px-4 text-right">Gasto Acumulado</th>
+                                <th class="py-3 px-4 text-right rounded-r">Disponible Global</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tablaConsolidado" class="divide-y divide-slate-100 text-slate-700"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- PESTAÑA 4: TABLERO DE DIRECCIÓN E IA -->
+            <div id="pestana4" class="space-y-6 hidden">
+                <div class="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white rounded-xl p-6 shadow-md border border-indigo-800">
+                    <div class="flex items-center space-x-3 mb-4 pb-3 border-b border-indigo-700/60">
+                        <div class="p-2 bg-indigo-500/20 rounded-lg text-indigo-300 border border-indigo-400/30">
+                            <i data-lucide="sparkles" class="w-5 h-5 text-indigo-300"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-sm font-bold uppercase tracking-wide text-indigo-200">Recomendaciones Inteligentes Financieras (IA Consultada)</h3>
+                            <p class="text-[11px] text-slate-300">Análisis diagnóstico para optimizar la salud financiera del grupo</p>
+                        </div>
+                    </div>
+                    <div id="contenedorRecomendacionesIA" class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+                        <!-- Se llena dinámicamente -->
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- LOGICA JAVASCRIPT CON PERSISTENCIA Y TABLA PLANA UNIFICADA -->
+    <script>
+        const STORAGE_KEY = 'corpbudget_db_v2';
+
+        // BASE DE DATOS INICIAL
+        const baseDatosDefault = {
+            empresaActiva: 'Carrduci',
+            periodoActual: new Date().toISOString().slice(0, 7),
+            clasificaciones: ['Gasto Fijo', 'Gasto Variable', 'Operativo', 'Extraordinario', 'Impuestos'],
+            formasPago: ['Transfer', 'Cheque', 'Reembolso'],
+            Carrduci: {
+                codigosPadre: [
+                    { codigo: '601-00', descripcion: 'Servicios Públicos y Generales' },
+                    { codigo: '602-00', descripcion: 'Mantenimiento y Equipamiento' }
+                ],
+                subcuentas: [
+                    { codigoSub: '601-00-01', codigoPadre: '601-00', descripcion: 'Servicio CFE', presupuestoPorPeriodo: {} },
+                    { codigoSub: '602-00-01', codigoPadre: '602-00', descripcion: 'Mantenimiento Vehicular', presupuestoPorPeriodo: {} }
+                ],
+                gastos: []
+            },
+            CarrduciMetal: {
+                codigosPadre: [
+                    { codigo: '601-00', descripcion: 'Servicios Públicos y Generales' }
+                ],
+                subcuentas: [
+                    { codigoSub: '601-00-01', codigoPadre: '601-00', descripcion: 'Energía Industrial CFE', presupuestoPorPeriodo: {} }
+                ],
+                gastos: []
+            }
+        };
+
+        // CARGA DESDE LOCALSTORAGE O DEFAULT
+        let baseDatos = JSON.parse(localStorage.getItem(STORAGE_KEY)) || baseDatosDefault;
+
+        let empresaActual = baseDatos.empresaActiva || 'Carrduci';
+        let periodoActual = baseDatos.periodoActual || new Date().toISOString().slice(0, 7);
+
+        function guardarState() {
+            baseDatos.empresaActiva = empresaActual;
+            baseDatos.periodoActual = periodoActual;
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(baseDatos));
+        }
+
+        // INICIALIZACIÓN
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('inputPeriodo').value = periodoActual;
+            document.getElementById('empresaSelect').value = empresaActual;
+            actualizarNombresEmpresaUI();
+            actualizarSelects();
+            renderizarTodo();
+            lucide.createIcons();
+        });
+
+        function cambiarPestana(num) {
+            [1, 2, 3, 4].forEach(i => {
+                const el = document.getElementById(`pestana${i}`);
+                const tab = document.getElementById(`tab${i}`);
+                if (el) el.classList.add('hidden');
+                if (tab) {
+                    tab.classList.remove('bg-blue-600', 'text-white');
+                    tab.classList.add('text-slate-300');
+                }
+            });
+            const actualEl = document.getElementById(`pestana${num}`);
+            const actualTab = document.getElementById(`tab${num}`);
+            if (actualEl) actualEl.classList.remove('hidden');
+            if (actualTab) {
+                actualTab.classList.add('bg-blue-600', 'text-white');
+                actualTab.classList.remove('text-slate-300');
+            }
+        }
+
+        function cambiarEmpresa() {
+            empresaActual = document.getElementById('empresaSelect').value;
+            actualizarNombresEmpresaUI();
+            actualizarSelects();
+            renderizarTodo();
+            guardarState();
+        }
+
+        function cambiarPeriodo() {
+            periodoActual = document.getElementById('inputPeriodo').value;
+            renderizarTodo();
+            guardarState();
+        }
+
+        function actualizarNombresEmpresaUI() {
+            document.getElementById('labelEmpresaSidebar').innerText = empresaActual === 'Carrduci' ? 'Carrduci S.A.' : 'Carrduci Metal';
+            document.getElementById('badgeMesActual').innerText = `Período Activo: ${periodoActual}`;
+        }
+
+        function actualizarSelects() {
+            const selectSubcuenta = document.getElementById('selectSubcuenta');
+            const selectCodigoPadreForm = document.getElementById('selectCodigoPadreForm');
+            const selectClasificacion = document.getElementById('selectClasificacion');
+            const selectFormaPago = document.getElementById('selectFormaPago');
+
+            selectSubcuenta.innerHTML = '<option value="">Seleccionar subcuenta...</option>';
+            selectCodigoPadreForm.innerHTML = '<option value="">Seleccionar Código Padre...</option>';
+            selectClasificacion.innerHTML = '';
+            selectFormaPago.innerHTML = '';
+
+            baseDatos[empresaActual].subcuentas.forEach(s => {
+                selectSubcuenta.innerHTML += `<option value="${s.codigoSub}">${s.codigoSub} - ${s.descripcion}</option>`;
+            });
+
+            baseDatos[empresaActual].codigosPadre.forEach(p => {
+                selectCodigoPadreForm.innerHTML += `<option value="${p.codigo}">${p.codigo} - ${p.descripcion}</option>`;
+            });
+
+            baseDatos.clasificaciones.forEach(c => {
+                selectClasificacion.innerHTML += `<option value="${c}">${c}</option>`;
+            });
+
+            baseDatos.formasPago.forEach(fp => {
+                selectFormaPago.innerHTML += `<option value="${fp}">${fp}</option>`;
+            });
+        }
+
+        // GUARDAR O EDITAR GASTO
+        function guardarGasto(e) {
+            e.preventDefault();
+            const indexEdit = document.getElementById('gastoIndexEdit').value;
+            const gastoObj = {
+                fecha: document.getElementById('inputFecha').value,
+                codigoSub: document.getElementById('selectSubcuenta').value,
+                concepto: document.getElementById('inputConcepto').value.trim(),
+                monto: parseFloat(document.getElementById('inputMonto').value),
+                clasificacion: document.getElementById('selectClasificacion').value,
+                formaPago: document.getElementById('selectFormaPago').value
+            };
+
+            if (indexEdit !== '') {
+                baseDatos[empresaActual].gastos[indexEdit] = gastoObj;
+            } else {
+                baseDatos[empresaActual].gastos.push(gastoObj);
+            }
+
+            cancelarEdicionGasto();
+            guardarState();
+            renderizarTodo();
+        }
+
+        function cancelarEdicionGasto() {
+            document.getElementById('gastoIndexEdit').value = '';
+            document.getElementById('inputFecha').value = '';
+            document.getElementById('selectSubcuenta').value = '';
+            document.getElementById('inputConcepto').value = '';
+            document.getElementById('inputMonto').value = '';
+            document.getElementById('formTitulo').innerText = 'Registrar Nuevo Gasto';
+            document.getElementById('btnSubmitGasto').innerText = 'Guardar Gasto';
+            document.getElementById('btnCancelarEdit').classList.add('hidden');
+        }
+
+        function eliminarGasto(index) {
+            baseDatos[empresaActual].gastos.splice(index, 1);
+            guardarState();
+            renderizarTodo();
+        }
+
+        // AGREGAR CÓDIGO PADRE Y SUBCUENTAS
+        function agregarCodigoPrincipal(e) {
+            e.preventDefault();
+            const codigo = document.getElementById('nuevoCodigoPadre').value.trim();
+            const descripcion = document.getElementById('nuevaDescripcionPadre').value.trim();
+
+            if (codigo && descripcion) {
+                const existe = baseDatos[empresaActual].codigosPadre.some(p => p.codigo === codigo);
+                if (!existe) {
+                    baseDatos[empresaActual].codigosPadre.push({ codigo, descripcion });
+                    document.getElementById('nuevoCodigoPadre').value = '';
+                    document.getElementById('nuevaDescripcionPadre').value = '';
+                    
+                    actualizarSelects();
+                    guardarState();
+                    renderizarTodo();
+                }
+            }
+        }
+
+        function agregarSubcuenta(e) {
+            e.preventDefault();
+            const codigoPadre = document.getElementById('selectCodigoPadreForm').value;
+            const codigoSub = document.getElementById('nuevoCodigoSub').value.trim();
+            const descripcion = document.getElementById('nuevaDescripcionSub').value.trim();
+            const monto = parseFloat(document.getElementById('nuevoMontoSub').value) || 0;
+
+            if (codigoPadre && codigoSub) {
+                let sub = baseDatos[empresaActual].subcuentas.find(s => s.codigoSub === codigoSub);
+                if (!sub) {
+                    sub = { codigoSub, codigoPadre, descripcion, presupuestoPorPeriodo: {} };
+                    baseDatos[empresaActual].subcuentas.push(sub);
+                }
+                
+                sub.presupuestoPorPeriodo[periodoActual] = monto;
+
+                document.getElementById('nuevoCodigoSub').value = '';
+                document.getElementById('nuevaDescripcionSub').value = '';
+                document.getElementById('nuevoMontoSub').value = '';
+                
+                actualizarSelects();
+                guardarState();
+                renderizarTodo();
+            }
+        }
+
+        function guardarPresupuestoSubcuenta(codigoSub, monto) {
+            const sub = baseDatos[empresaActual].subcuentas.find(s => s.codigoSub === codigoSub);
+            if (sub) {
+                if (!sub.presupuestoPorPeriodo) sub.presupuestoPorPeriodo = {};
+                sub.presupuestoPorPeriodo[periodoActual] = parseFloat(monto) || 0;
+                guardarState();
+                renderizarTodo();
+            }
+        }
+
+        // RENDERIZADOS
+        function renderizarTodo() {
+            renderizarTablas();
+            renderizarCatalogo();
+            renderizarConsolidado();
+            renderizarIA();
+        }
+
+        function renderizarTablas() {
+            // Bitácora
+            const tbodyBitacora = document.getElementById('tablaBitacoraGastos');
+            tbodyBitacora.innerHTML = '';
+            const buscador = document.getElementById('inputBuscador').value.toLowerCase();
+            const filtroDia = document.getElementById('filtroFechaDia').value;
+
+            const gastosEmpresa = baseDatos[empresaActual].gastos.filter(g => {
+                const coincideMes = g.fecha.startsWith(periodoActual);
+                const coincideTexto = g.concepto.toLowerCase().includes(buscador) || g.codigoSub.toLowerCase().includes(buscador);
+                const coincideDia = filtroDia ? g.fecha === filtroDia : true;
+                return coincideMes && coincideTexto && coincideDia;
+            });
+
+            gastosEmpresa.forEach((g, idx) => {
+                tbodyBitacora.innerHTML += `
+                    <tr class="hover:bg-slate-50 transition">
+                        <td class="py-2.5 font-mono">${g.fecha}</td>
+                        <td class="py-2.5 font-medium">${g.concepto}</td>
+                        <td class="py-2.5"><span class="bg-slate-100 px-2 py-0.5 rounded text-[10px] font-mono">${g.codigoSub}</span></td>
+                        <td class="py-2.5 text-right font-mono font-semibold">$${g.monto.toFixed(2)}</td>
+                        <td class="py-2.5 text-center">
+                            <button onclick="eliminarGasto(${idx})" class="text-red-500 hover:text-red-700 font-bold px-1">✕</button>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            // Resumen por Código Padre
+            const tbodyResumen = document.getElementById('tablaPresupuestoResumen');
+            tbodyResumen.innerHTML = '';
+
+            baseDatos[empresaActual].codigosPadre.forEach(p => {
+                const subs = baseDatos[empresaActual].subcuentas.filter(s => s.codigoPadre === p.codigo);
+                let presTotal = 0;
+                subs.forEach(s => {
+                    presTotal += (s.presupuestoPorPeriodo && s.presupuestoPorPeriodo[periodoActual]) || 0;
+                });
+
+                let ejecutadoTotal = 0;
+                baseDatos[empresaActual].gastos.forEach(g => {
+                    if (g.fecha.startsWith(periodoActual)) {
+                        const subAsoc = subs.find(s => s.codigoSub === g.codigoSub);
+                        if (subAsoc) ejecutadoTotal += g.monto;
+                    }
+                });
+
+                const disp = presTotal - ejecutadoTotal;
+                tbodyResumen.innerHTML += `
+                    <tr>
+                        <td class="py-2 font-mono font-bold">${p.codigo}</td>
+                        <td class="py-2">${p.descripcion}</td>
+                        <td class="py-2 text-right font-mono">$${presTotal.toFixed(2)}</td>
+                        <td class="py-2 text-right font-mono text-amber-600">$${ejecutadoTotal.toFixed(2)}</td>
+                        <td class="py-2 text-right font-mono font-bold ${disp >= 0 ? 'text-emerald-600' : 'text-red-600'}">$${disp.toFixed(2)}</td>
+                    </tr>
+                `;
+            });
+        }
+
+        // MOSTRAR CUENTAS Y SUBCUENTAS CON LA ESTRUCTURA ORIGINAL PLANA
+        function renderizarCatalogo() {
+            const tbody = document.getElementById('tablaCatalogo');
+            if (!tbody) return;
+            
+            tbody.innerHTML = '';
+
+            const codigosPadre = baseDatos[empresaActual].codigosPadre || [];
+            const subcuentas = baseDatos[empresaActual].subcuentas || [];
+
+            // 1. DIBUJAR CÓDIGOS PADRE
+            codigosPadre.forEach(p => {
+                tbody.innerHTML += `
+                    <tr class="hover:bg-slate-50 transition border-b border-slate-100 font-semibold text-slate-800">
+                        <td class="py-2.5 px-2 font-mono text-blue-600">${p.codigo}</td>
+                        <td class="py-2.5 px-2 font-mono text-slate-400">—</td>
+                        <td class="py-2.5 px-2">${p.descripcion} <span class="text-[10px] bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded font-normal ml-1">Cuenta Principal</span></td>
+                        <td class="py-2.5 px-2 text-right font-mono text-slate-400">—</td>
+                        <td class="py-2.5 px-2 text-center text-slate-400">Activo</td>
+                    </tr>
+                `;
+            });
+
+            // 2. DIBUJAR SUBCUENTAS
+            subcuentas.forEach(s => {
+                const montoActual = (s.presupuestoPorPeriodo && s.presupuestoPorPeriodo[periodoActual]) || 0;
+                tbody.innerHTML += `
+                    <tr class="hover:bg-slate-50 transition border-b border-slate-100">
+                        <td class="py-2.5 px-2 font-mono font-bold">${s.codigoSub}</td>
+                        <td class="py-2.5 px-2 font-mono">${s.codigoPadre}</td>
+                        <td class="py-2.5 px-2">${s.descripcion}</td>
+                        <td class="py-2.5 px-2 text-right">
+                            <input 
+                                type="number" 
+                                step="0.01" 
+                                value="${montoActual}" 
+                                onchange="guardarPresupuestoSubcuenta('${s.codigoSub}', this.value)" 
+                                class="w-24 text-right border border-slate-200 rounded px-1 py-0.5 font-mono text-xs focus:ring-1 focus:ring-blue-500 focus:outline-none"
+                            >
+                        </td>
+                        <td class="py-2.5 px-2 text-center text-slate-400">Activo</td>
+                    </tr>
+                `;
+            });
+
+            if (codigosPadre.length === 0 && subcuentas.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="5" class="py-6 text-center text-slate-400 italic">
+                            No hay registros. Da de alta un código o subcuenta en el panel izquierdo.
+                        </td>
+                    </tr>
+                `;
+            }
+        }
+
+        function renderizarConsolidado() {
+            const tbody = document.getElementById('tablaConsolidado');
+            tbody.innerHTML = '';
+
+            const todosPadres = [...new Set([
+                ...baseDatos.Carrduci.codigosPadre.map(p => p.codigo),
+                ...baseDatos.CarrduciMetal.codigosPadre.map(p => p.codigo)
+            ])];
+
+            todosPadres.forEach(cod => {
+                const descC = baseDatos.Carrduci.codigosPadre.find(p => p.codigo === cod)?.descripcion;
+                const descM = baseDatos.CarrduciMetal.codigosPadre.find(p => p.codigo === cod)?.descripcion;
+                const desc = descC || descM || 'Rubro General';
+
+                let presTotal = 0;
+                ['Carrduci', 'CarrduciMetal'].forEach(emp => {
+                    const subs = baseDatos[emp].subcuentas.filter(s => s.codigoPadre === cod);
+                    subs.forEach(s => presTotal += (s.presupuestoPorPeriodo && s.presupuestoPorPeriodo[periodoActual]) || 0);
+                });
+
+                let gastoC = 0;
+                const subsC = baseDatos.Carrduci.subcuentas.filter(s => s.codigoPadre === cod);
+                baseDatos.Carrduci.gastos.filter(g => g.fecha.startsWith(periodoActual)).forEach(g => {
+                    if (subsC.some(s => s.codigoSub === g.codigoSub)) gastoC += g.monto;
+                });
+
+                let gastoM = 0;
+                const subsM = baseDatos.CarrduciMetal.subcuentas.filter(s => s.codigoPadre === cod);
+                baseDatos.CarrduciMetal.gastos.filter(g => g.fecha.startsWith(periodoActual)).forEach(g => {
+                    if (subsM.some(s => s.codigoSub === g.codigoSub)) gastoM += g.monto;
+                });
+
+                const acumulado = gastoC + gastoM;
+                const disp = presTotal - acumulado;
+
+                tbody.innerHTML += `
+                    <tr>
+                        <td class="py-3 px-4 font-mono font-bold">${cod}</td>
+                        <td class="py-3 px-4 font-medium">${desc}</td>
+                        <td class="py-3 px-4 text-right font-mono">$${presTotal.toFixed(2)}</td>
+                        <td class="py-3 px-4 text-right font-mono text-blue-600">$${gastoC.toFixed(2)}</td>
+                        <td class="py-3 px-4 text-right font-mono text-indigo-600">$${gastoM.toFixed(2)}</td>
+                        <td class="py-3 px-4 text-right font-mono text-amber-600">$${acumulado.toFixed(2)}</td>
+                        <td class="py-3 px-4 text-right font-mono font-bold ${disp >= 0 ? 'text-emerald-600' : 'text-red-600'}">$${disp.toFixed(2)}</td>
+                    </tr>
+                `;
+            });
+        }
+
+        function renderizarIA() {
+            const container = document.getElementById('contenedorRecomendacionesIA');
+            container.innerHTML = `
+                <div class="bg-white/10 backdrop-blur-md p-3 rounded-lg border border-white/10">
+                    <span class="font-bold text-amber-300 block mb-1">⚡ Alerta de Desvío</span>
+                    <p class="text-slate-300">Monitorea los rubros con balance negativo al cierre de período para evitar sobrecostos.</p>
+                </div>
+                <div class="bg-white/10 backdrop-blur-md p-3 rounded-lg border border-white/10">
+                    <span class="font-bold text-emerald-300 block mb-1">📈 Balance Global</span>
+                    <p class="text-slate-300">Se recomienda mantener un margen de contingencia presupuestal del 5% entre entidades.</p>
+                </div>
+                <div class="bg-white/10 backdrop-blur-md p-3 rounded-lg border border-white/10">
+                    <span class="font-bold text-blue-300 block mb-1">💡 Optimización</span>
+                    <p class="text-slate-300">Asigna presupuestos por subcuenta desde la pestaña Catálogo antes de registrar los movimientos diarios.</p>
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>
